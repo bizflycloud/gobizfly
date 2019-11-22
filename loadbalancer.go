@@ -6,6 +6,8 @@ package gobizfly
 
 import (
 	"context"
+	"encoding/json"
+	"net/http"
 )
 
 const (
@@ -70,7 +72,25 @@ type loadbalancer struct {
 }
 
 func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error) {
-	panic("implement me")
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerPath, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		LoadBalancers []*LoadBalancer `json:"loadbalancers"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return data.LoadBalancers, nil
 }
 
 func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateRequest) (*LoadBalancer, error) {
@@ -78,7 +98,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
-	return nil, nil
+	panic("implement me")
 }
 
 func (l *loadbalancer) Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
