@@ -63,6 +63,7 @@ func WithHTTPClient(client *http.Client) Option {
 func WithTenantName(tenant string) Option {
 	return func(c *Client) error {
 		c.tenantName = tenant
+		return nil
 	}
 }
 
