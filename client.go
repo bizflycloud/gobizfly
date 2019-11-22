@@ -1,0 +1,117 @@
+package gobizfly
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"errors"
+	"net/http"
+	"net/url"
+)
+
+const (
+	version       = "0.0.1"
+	ua            = "bizfly-client-go/" + version
+	defaultAPIURL = "https://manage.bizflycloud.vn"
+	mediaType     = "application/json"
+)
+
+// Client represents BizFly API client.
+type Client struct {
+	Token TokenService
+
+	httpClient *http.Client
+	apiURL     *url.URL
+	userAgent  string
+	// TODO: this will be removed in near future
+	tenantName string
+}
+
+// Option set Client specific attributes
+type Option func(c *Client) error
+
+// WithAPIUrl sets the API url option for BizFly client.
+func WithAPIUrl(u string) Option {
+	return func(c *Client) error {
+		var err error
+		c.apiURL, err = url.Parse(u)
+		return err
+	}
+}
+
+// WithHTTPClient sets the client option for BizFly client.
+func WithHTTPClient(client *http.Client) Option {
+	return func(c *Client) error {
+		if client == nil {
+			return errors.New("client is nil")
+		}
+
+		c.httpClient = client
+
+		return nil
+	}
+}
+
+// WithTenantName sets the tenant name option for BizFly client.
+//
+// Deprecated: X-Tenant-Name header required will be removed in API server.
+func WithTenantName(tenant string) Option {
+	return func(c *Client) error {
+		c.tenantName = tenant
+	}
+}
+
+// NewClient creates new BizFly client.
+func NewClient(options ...Option) (*Client, error) {
+	c := &Client{
+		httpClient: http.DefaultClient,
+		userAgent:  ua,
+	}
+
+	err := WithAPIUrl(defaultAPIURL)(c)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, option := range options {
+		if err := option(c); err != nil {
+			return nil, err
+		}
+	}
+
+	c.Token = &token{client: c}
+
+	return c, nil
+}
+
+// NewRequest creates an API request.
+func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
+	u, err := c.apiURL.Parse(urlStr)
+	if err != nil {
+		return nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	if body != nil {
+		err = json.NewEncoder(buf).Encode(body)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, u.String(), buf)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", mediaType)
+	req.Header.Add("Accept", mediaType)
+	req.Header.Add("User-Agent", c.userAgent)
+	req.Header.Add("X-Tenant-Name", c.tenantName)
+	return req, nil
+}
+
+// Do sends API request.
+func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	return c.httpClient.Do(req)
+}
