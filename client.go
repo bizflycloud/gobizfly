@@ -23,7 +23,8 @@ const (
 
 // Client represents BizFly API client.
 type Client struct {
-	Token TokenService
+	Token        TokenService
+	LoadBalancer LoadBalancerService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -87,6 +88,7 @@ func NewClient(options ...Option) (*Client, error) {
 	}
 
 	c.Token = &token{client: c}
+	c.LoadBalancer = &loadbalancer{client: c}
 
 	return c, nil
 }
@@ -129,3 +131,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, err
 func (c *Client) SetKeystoneToken(s string) {
 	c.keystoneToken = s
 }
+
+// ListOptions specifies the optional parameters for List method.
+type ListOptions struct{}
