@@ -14,6 +14,8 @@ const (
 	tokenPath = "/iaas-cloud/api/token"
 )
 
+var _ TokenService = (*token)(nil)
+
 // TokenService is an interface to interact with BizFly API token endpoint.
 type TokenService interface {
 	Create(ctx context.Context, request *TokenCreateRequest) (*Token, error)
