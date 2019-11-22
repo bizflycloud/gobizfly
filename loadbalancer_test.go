@@ -63,3 +63,41 @@ func TestLoadBalancerList(t *testing.T) {
 	lb := lbs[0]
 	assert.Equal(t, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", lb.ID)
 }
+
+func TestLoadBalancerCreate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(loadBalancerPath, func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+    "loadbalancer": {
+        "description": "My favorite load balancer",
+        "admin_state_up": true,
+        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "provisioning_status": "PENDING_CREATE",
+        "flavor_id": "",
+        "vip_subnet_id": "d4af86e1-0051-488c-b7a0-527f97490c9a",
+        "vip_address": "203.0.113.50",
+        "vip_network_id": "d0d217df-3958-4fbf-a3c2-8dad2908c709",
+        "vip_port_id": "b4ca07d1-a31e-43e2-891a-7d14f419f342",
+        "provider": "octavia",
+        "created_at": "2017-02-28T00:41:44",
+        "updated_at": "2017-02-28T00:43:30",
+        "id": "607226db-27ef-4d41-ae89-f2a800e9c2db",
+        "operating_status": "OFFLINE",
+        "name": "best_load_balancer",
+        "vip_qos_policy_id": "ec4f78ca-8da8-4e99-8a1a-e3b94595a7a3",
+        "tags": ["test_tag"]
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	lb, err := client.LoadBalancer.Create(ctx, &LoadBalancerCreateRequest{})
+	require.NoError(t, err)
+	assert.Equal(t, "607226db-27ef-4d41-ae89-f2a800e9c2db", lb.ID)
+	assert.Equal(t, "PENDING_CREATE", lb.ProvisioningStatus)
+}

@@ -94,7 +94,23 @@ func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBala
 }
 
 func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateRequest) (*LoadBalancer, error) {
-	panic("implement me")
+	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerPath, lbcr)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		LoadBalancer *LoadBalancer `json:"loadbalancer"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.LoadBalancer, err
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
