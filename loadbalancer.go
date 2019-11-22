@@ -116,7 +116,21 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
-	panic("implement me")
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerPath+"/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	lb := &LoadBalancer{}
+	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+		return nil, err
+	}
+	return lb, nil
 }
 
 func (l *loadbalancer) Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error) {

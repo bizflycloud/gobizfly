@@ -101,3 +101,52 @@ func TestLoadBalancerCreate(t *testing.T) {
 	assert.Equal(t, "607226db-27ef-4d41-ae89-f2a800e9c2db", lb.ID)
 	assert.Equal(t, "PENDING_CREATE", lb.ProvisioningStatus)
 }
+
+func TestLoadBalancerCGet(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(loadBalancerPath+"/ae8e2072-31fb-464a-8285-bc2f2a6bab4d", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "created_at": "2018-09-18T03:43:29",
+    "tenant_id": "1e7f10a9850b45b488a3f0417ccb60e0",
+    "type": "small",
+    "pools": [
+        {
+            "id": "1fb271b2-a77e-4afc-8ec6-c6bc110f4c75"
+        }
+    ],
+    "provisioning_status": "ACTIVE",
+    "operating_status": "ONLINE",
+    "name": "sapd-test",
+    "admin_state_up": true,
+    "vip_port_id": "59b5004b-baa7-463d-bab8-409883ce2458",
+    "vip_address": "103.56.156.127",
+    "network_type": "external",
+    "vip_network_id": "9f36fce7-e2c5-44aa-824b-b83c2dca47f6",
+    "vip_qos_policy_id": "94c75cb1-ffe9-4dba-8f37-a375fc10462d",
+    "project_id": "1e7f10a9850b45b488a3f0417ccb60e0",
+    "vip_subnet_id": "bbad9d0a-09ee-4053-a4f8-9cd8e7ea5e86",
+    "listeners": [
+        {
+            "id": "5482c4a4-f822-46d0-9af3-026f7579d653"
+        }
+    ],
+    "updated_at": "2018-09-18T03:45:30",
+    "provider": "amphora",
+    "description": "",
+    "flavor_id": "",
+    "id": "ae8e2072-31fb-464a-8285-bc2f2a6bab4d"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	lb, err := client.LoadBalancer.Get(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d")
+	require.NoError(t, err)
+	assert.Equal(t, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", lb.ID)
+	assert.Equal(t, "ACTIVE", lb.ProvisioningStatus)
+	assert.Equal(t, "ONLINE", lb.OperatingStatus)
+}
