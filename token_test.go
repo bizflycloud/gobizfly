@@ -27,7 +27,7 @@ func TestToken(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	tok, err := client.Token.Create(ctx, &TokenCreateRequest{})
+	tok, err := client.Token.Create(ctx, &TokenCreateRequest{username: "foo@bizflycloud.vn", password: "xxx"})
 	require.NoError(t, err)
 	require.Equal(t, "xxx", tok.KeystoneToken)
 }

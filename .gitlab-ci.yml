@@ -1,0 +1,75 @@
+variables:
+  PROJECT_NAME: bizfly-client-go
+  VERSION: 0.0.1
+  APP_VERSION: 1.13.4
+  TYPE: vm
+  REPO: $CI_REPOSITORY_URL
+  USER: root
+  RUNTIME: go
+  CONTAINER_STAGING_IMAGE: $IMAGE_REPO:s$CI_PIPELINE_ID
+  CONTAINER_PRODUCTION_IMAGE: $IMAGE_REPO:p$CI_PIPELINE_ID
+  RELEASE_NAME: $PROJECT_NAME
+  KUBE_DEPLOYMENT: $PROJECT_NAME
+  PACKAGE_PATH: /go/src/git.paas.vn/BizFly-PaaS-Cloud/bizfly-client-go
+
+stages:
+  - mod
+  - lint
+  - test
+
+.anchors:
+  - &inject-gopath
+      mkdir -p $(dirname ${PACKAGE_PATH})
+      && ln -s ${CI_PROJECT_DIR} ${PACKAGE_PATH}
+      && cd ${PACKAGE_PATH}
+
+mod:
+  stage: mod
+  image: golang:1.13.4
+  script:
+    - GO111MODULE=on go mod download
+    - GO111MODULE=on go mod vendor
+  cache:
+    policy: push
+    paths:
+      - vendor
+  artifacts:
+    paths:
+     - vendor
+  tags:
+    - devops-runner-prod
+
+golint:
+  image: golangci/golangci-lint
+  stage: lint
+  dependencies:
+    - mod
+  script:
+    - GO111MODULE=on golangci-lint run ./...
+  allow_failure: true
+  tags:
+    - devops-runner-prod
+  cache:
+    policy: pull
+    paths:
+      - vendor
+
+
+test:
+  image: golang:1.13.4
+  stage: test
+  dependencies:
+    - mod
+  before_script:
+    - *inject-gopath
+  script:
+    - GO111MODULE=on go test -race -mod=vendor ./...
+  only:
+    - master
+  tags:
+    - devops-runner-prod
+  allow_failure: true
+  cache:
+    policy: pull
+    paths:
+      - vendor/
