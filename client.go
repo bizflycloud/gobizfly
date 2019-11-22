@@ -25,9 +25,10 @@ const (
 type Client struct {
 	Token TokenService
 
-	httpClient *http.Client
-	apiURL     *url.URL
-	userAgent  string
+	httpClient    *http.Client
+	apiURL        *url.URL
+	userAgent     string
+	keystoneToken string
 	// TODO: this will be removed in near future
 	tenantName string
 }
@@ -99,8 +100,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 
 	buf := new(bytes.Buffer)
 	if body != nil {
-		err = json.NewEncoder(buf).Encode(body)
-		if err != nil {
+		if err := json.NewEncoder(buf).Encode(body); err != nil {
 			return nil, err
 		}
 	}
@@ -114,10 +114,18 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Tenant-Name", c.tenantName)
+	if c.keystoneToken != "" {
+		req.Header.Add("X-Auth-Token", "Token "+c.keystoneToken)
+	}
 	return req, nil
 }
 
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	return c.httpClient.Do(req)
+}
+
+// SetKeystoneToken sets keystone token value, which will be used for authentication.
+func (c *Client) SetKeystoneToken(s string) {
+	c.keystoneToken = s
 }

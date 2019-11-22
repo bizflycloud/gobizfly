@@ -24,10 +24,10 @@ func TestToken(t *testing.T) {
     "expires_at": "2019-11-22T15:39:54.000000Z"
 }
 `
-		fmt.Fprint(w, resp)
+		_, _ = fmt.Fprint(w, resp)
 	})
 
 	tok, err := client.Token.Create(ctx, &TokenCreateRequest{})
 	require.NoError(t, err)
-	require.Equal(t, "xxx", tok.Token)
+	require.Equal(t, "xxx", tok.KeystoneToken)
 }
