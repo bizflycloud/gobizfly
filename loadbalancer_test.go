@@ -150,3 +150,15 @@ func TestLoadBalancerCGet(t *testing.T) {
 	assert.Equal(t, "ACTIVE", lb.ProvisioningStatus)
 	assert.Equal(t, "ONLINE", lb.OperatingStatus)
 }
+
+func TestLoadBalancerDelete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(loadBalancerPath+"/ae8e2072-31fb-464a-8285-bc2f2a6bab4d", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	require.NoError(t, client.LoadBalancer.Delete(ctx, &LoadBalancerDeleteRequest{ID: "ae8e2072-31fb-464a-8285-bc2f2a6bab4d"}))
+}

@@ -7,6 +7,8 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
+	"io"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -137,6 +139,16 @@ func (l *loadbalancer) Update(ctx context.Context, id string, req *LoadBalancerU
 	panic("implement me")
 }
 
-func (l *loadbalancer) Delete(ctx context.Context, req *LoadBalancerDeleteRequest) error {
-	panic("implement me")
+func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, loadBalancerPath+"/"+lbdr.ID, lbdr)
+	if err != nil {
+		return err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
 }
