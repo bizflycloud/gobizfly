@@ -102,7 +102,7 @@ func TestLoadBalancerCreate(t *testing.T) {
 	assert.Equal(t, "PENDING_CREATE", lb.ProvisioningStatus)
 }
 
-func TestLoadBalancerCGet(t *testing.T) {
+func TestLoadBalancerGet(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -161,4 +161,18 @@ func TestLoadBalancerDelete(t *testing.T) {
 	})
 
 	require.NoError(t, client.LoadBalancer.Delete(ctx, &LoadBalancerDeleteRequest{ID: "ae8e2072-31fb-464a-8285-bc2f2a6bab4d"}))
+}
+
+func TestLoadBalancerUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(loadBalancerPath+"/ae8e2072-31fb-464a-8285-bc2f2a6bab4d", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPut, r.Method)
+		_, _ = fmt.Fprint(w, `{}`)
+	})
+
+	// TODO(cuonglm): add real test data when clarify Update request payload with @sapd
+	_, err := client.LoadBalancer.Update(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &LoadBalancerUpdateRequest{})
+	require.NoError(t, err)
 }

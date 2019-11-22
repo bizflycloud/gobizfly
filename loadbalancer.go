@@ -135,8 +135,22 @@ func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error
 	return lb, nil
 }
 
-func (l *loadbalancer) Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
-	panic("implement me")
+func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
+	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerPath+"/"+id, lbur)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	lb := &LoadBalancer{}
+	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+		return nil, err
+	}
+	return lb, nil
 }
 
 func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
