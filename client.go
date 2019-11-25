@@ -25,6 +25,7 @@ const (
 type Client struct {
 	Token        TokenService
 	LoadBalancer LoadBalancerService
+	Listener     ListenerService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -89,6 +90,7 @@ func NewClient(options ...Option) (*Client, error) {
 
 	c.Token = &token{client: c}
 	c.LoadBalancer = &loadbalancer{client: c}
+	c.Listener = &listener{client: c}
 
 	return c, nil
 }
