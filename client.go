@@ -27,6 +27,7 @@ type Client struct {
 	LoadBalancer LoadBalancerService
 	Listener     ListenerService
 	Pool         PoolService
+	Member       MemberService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -93,6 +94,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.LoadBalancer = &loadbalancer{client: c}
 	c.Listener = &listener{client: c}
 	c.Pool = &pool{client: c}
+	c.Member = &member{client: c}
 
 	return c, nil
 }
