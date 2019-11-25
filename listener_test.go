@@ -1,6 +1,7 @@
 package gobizfly
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -71,6 +72,13 @@ func TestListenerCreate(t *testing.T) {
 
 	mux.HandleFunc(loadBalancerPath+"/ae8e2072-31fb-464a-8285-bc2f2a6bab4d/listeners", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			Listener *ListenerCreateRequest `json:"listener"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "Test Create Listener", *payload.Listener.Description)
+		assert.Equal(t, "Listener", *payload.Listener.Name)
+
 		resp := `
 {
 	"listener": {
@@ -110,7 +118,12 @@ func TestListenerCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	listener, err := client.Listener.Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListenerCreateRequest{})
+	name := "Listener"
+	desc := "Test Create Listener"
+	listener, err := client.Listener.Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListenerCreateRequest{
+		Description: &desc,
+		Name:        &name,
+	})
 	require.NoError(t, err)
 	assert.Equal(t, "5482c4a4-f822-46d0-9af3-026f7579d653", listener.ID)
 	assert.Equal(t, "HTTP", listener.Protocol)
@@ -171,6 +184,14 @@ func TestListenerUpdate(t *testing.T) {
 
 	mux.HandleFunc(listenerPath+"/023f2e34-7806-443b-bfae-16c324569a3d", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
+
+		var payload struct {
+			Listener *ListenerUpdateRequest `json:"listener"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "Test Update Listener", *payload.Listener.Description)
+		assert.Equal(t, "ListenerUpdated", *payload.Listener.Name)
+
 		resp := `
 {
     "listener": {
@@ -215,7 +236,12 @@ func TestListenerUpdate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.Listener.Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListenerUpdateRequest{})
+	name := "ListenerUpdated"
+	desc := "Test Update Listener"
+	_, err := client.Listener.Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListenerUpdateRequest{
+		Name:        &name,
+		Description: &desc,
+	})
 	require.NoError(t, err)
 }
 

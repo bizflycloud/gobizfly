@@ -30,36 +30,36 @@ type ListenerService interface {
 
 // ListenerCreateRequest represents create new listener request payload.
 type ListenerCreateRequest struct {
-	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
-	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
-	TimeoutClientData      *int               `json:"timeout_client_data,omitempty"`
-	SNIContainerRefs       *[]string          `json:"sni_container_refs,omitempty"`
-	ProtocolPort           int                `json:"protocol_port"`
-	Protocol               string             `json:"protocol"`
-	Name                   *string            `json:"name,omitempty"`
-	Listeners              *Listener          `json:"listeners"`
-	L7Policies             *[]string          `json:"l7policies,omitempty"`
-	InsertHeaders          *map[string]string `json:"insert_headers,omitempty"`
-	Description            *string            `json:"description,omitempty"`
-	DefaultTLSContainerRef *string            `json:"default_tls_container_ref,omitempty"`
-	DefaultPoolID          *string            `json:"default_pool_id,omitempty"`
+	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
+	ProtocolPort           int                    `json:"protocol_port"`
+	Protocol               string                 `json:"protocol"`
+	Name                   *string                `json:"name,omitempty"`
+	Listeners              *Listener              `json:"listeners"`
+	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
+	Description            *string                `json:"description,omitempty"`
+	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
 }
 
 // ListenerUpdateRequest represents update listener request payload.
 type ListenerUpdateRequest struct {
-	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
-	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
-	TimeoutClientData      *int               `json:"timeout_client_data,omitempty"`
-	SNIContainerRefs       *[]string          `json:"sni_container_refs,omitempty"`
-	Name                   *string            `json:"name,omitempty"`
-	L7Policies             *[]string          `json:"l7policies,omitempty"`
-	InsertHeaders          *map[string]string `json:"insert_headers,omitempty"`
-	Description            *string            `json:"description,omitempty"`
-	DefaultTLSContainerRef *string            `json:"default_tls_container_ref,omitempty"`
-	DefaultPoolID          *string            `json:"default_pool_id,omitempty"`
-	AdminStateUp           *bool              `json:"admin_state_up,omitempty"`
+	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
+	Name                   *string                `json:"name,omitempty"`
+	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
+	Description            *string                `json:"description,omitempty"`
+	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
+	AdminStateUp           *bool                  `json:"admin_state_up,omitempty"`
 }
 
 // Listener contains listener information.
@@ -74,7 +74,7 @@ type Listener struct {
 	ProjectID              string                `json:"project_id"`
 	TimeoutMemberData      int                   `json:"timeout_member_data"`
 	TimeoutMemberConnect   int                   `json:"timeout_member_connect"`
-	L7Policies             []string              `json:"l7policies"`
+	L7Policies             []struct{ ID string } `json:"l7policies"`
 	TenandID               string                `json:"tenant_id"`
 	DefaultTLSContainerRef *string               `json:"default_tls_container_ref"`
 	AdminStateUp           bool                  `json:"admin_state_up"`
@@ -117,8 +117,12 @@ func (l *listener) List(ctx context.Context, lbID string, opts *ListOptions) ([]
 }
 
 func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateRequest) (*Listener, error) {
+	var data struct {
+		Listener *ListenerCreateRequest
+	}
+	data.Listener = lcr
 	path := strings.Join([]string{loadBalancerPath, lbID, "listeners"}, "/")
-	req, err := l.client.NewRequest(ctx, http.MethodPost, path, lcr)
+	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &data)
 	if err != nil {
 		return nil, err
 	}
@@ -128,13 +132,13 @@ func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateR
 	}
 	defer resp.Body.Close()
 
-	var data struct {
+	var respData struct {
 		Listener *Listener `json:"listener"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return data.Listener, err
+	return respData.Listener, err
 }
 
 func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
@@ -155,8 +159,12 @@ func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
 	return lb, nil
 }
 
-func (l *listener) Update(ctx context.Context, id string, lbur *ListenerUpdateRequest) (*Listener, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodPut, listenerPath+"/"+id, lbur)
+func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateRequest) (*Listener, error) {
+	var data struct {
+		Listener *ListenerUpdateRequest
+	}
+	data.Listener = lur
+	req, err := l.client.NewRequest(ctx, http.MethodPut, listenerPath+"/"+id, &data)
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +174,13 @@ func (l *listener) Update(ctx context.Context, id string, lbur *ListenerUpdateRe
 	}
 	defer resp.Body.Close()
 
-	lb := &Listener{}
-	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+	var respData struct {
+		Listener *Listener `json:"listener"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return lb, nil
+	return respData.Listener, err
 }
 
 func (l *listener) Delete(ctx context.Context, id string) error {
