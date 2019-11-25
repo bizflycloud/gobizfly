@@ -73,23 +73,26 @@ func TestLoadBalancerCreate(t *testing.T) {
 		resp := `
 {
     "loadbalancer": {
-        "description": "My favorite load balancer",
-        "admin_state_up": true,
-        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "updated_at": null,
+        "vip_address": "45.124.94.216",
         "provisioning_status": "PENDING_CREATE",
-        "flavor_id": "",
-        "vip_subnet_id": "d4af86e1-0051-488c-b7a0-527f97490c9a",
-        "vip_address": "203.0.113.50",
-        "vip_network_id": "d0d217df-3958-4fbf-a3c2-8dad2908c709",
-        "vip_port_id": "b4ca07d1-a31e-43e2-891a-7d14f419f342",
-        "provider": "octavia",
-        "created_at": "2017-02-28T00:41:44",
-        "updated_at": "2017-02-28T00:43:30",
-        "id": "607226db-27ef-4d41-ae89-f2a800e9c2db",
+        "vip_network_id": "180784e0-045d-40bb-adec-fdc3e9d3a32e",
+        "vip_port_id": "7ef6fac8-1a0a-4255-b21c-03d36b1def73",
+        "id": "e389f5eb-07b5-486b-be4d-4d4d1299f0ab",
+        "admin_state_up": true,
+        "listeners": [],
+        "pools": [],
+        "vip_qos_policy_id": "3b70c2d2-5a1f-44e9-9d2f-12aaa2369228",
         "operating_status": "OFFLINE",
-        "name": "best_load_balancer",
-        "vip_qos_policy_id": "ec4f78ca-8da8-4e99-8a1a-e3b94595a7a3",
-        "tags": ["test_tag"]
+        "flavor_id": "",
+        "vip_subnet_id": "75da4441-db7c-4bdb-8ef5-b690c2fa9432",
+        "project_id": "3063ff46d451438dbd19b5b4e48b6aa5",
+        "name": "tsd",
+        "tenant_id": "3063ff46d451438dbd19b5b4e48b6aa5",
+        "description": "",
+        "nova_flavor_id": "f4d23537-8a87-4c32-bb0b-60328e6f4374",
+        "created_at": "2019-11-25T04:20:28",
+        "provider": "amphora"
     }
 }
 `
@@ -98,8 +101,10 @@ func TestLoadBalancerCreate(t *testing.T) {
 
 	lb, err := client.LoadBalancer.Create(ctx, &LoadBalancerCreateRequest{})
 	require.NoError(t, err)
-	assert.Equal(t, "607226db-27ef-4d41-ae89-f2a800e9c2db", lb.ID)
+	assert.Equal(t, "e389f5eb-07b5-486b-be4d-4d4d1299f0ab", lb.ID)
 	assert.Equal(t, "PENDING_CREATE", lb.ProvisioningStatus)
+	assert.Equal(t, "OFFLINE", lb.OperatingStatus)
+	assert.Equal(t, "amphora", lb.Provider)
 }
 
 func TestLoadBalancerGet(t *testing.T) {
