@@ -152,11 +152,11 @@ func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
 	}
 	defer resp.Body.Close()
 
-	lb := &Listener{}
-	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+	listener := &Listener{}
+	if err := json.NewDecoder(resp.Body).Decode(listener); err != nil {
 		return nil, err
 	}
-	return lb, nil
+	return listener, nil
 }
 
 func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateRequest) (*Listener, error) {

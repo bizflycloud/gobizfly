@@ -84,13 +84,13 @@ type pool struct {
 	client *Client
 }
 
-func (l *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
+func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
 	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
-	req, err := l.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := l.client.Do(ctx, req)
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -107,17 +107,17 @@ func (l *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Poo
 	return data.Pools, nil
 }
 
-func (l *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) (*Pool, error) {
+func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) (*Pool, error) {
 	var data struct {
 		Pool *PoolCreateRequest `json:"pool"`
 	}
 	data.Pool = pcr
 	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
-	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &data)
+	req, err := p.client.NewRequest(ctx, http.MethodPost, path, &data)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := l.client.Do(ctx, req)
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -132,34 +132,34 @@ func (l *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 	return respData.Pool, err
 }
 
-func (l *pool) Get(ctx context.Context, id string) (*Pool, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, poolPath+"/"+id, nil)
+func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodGet, poolPath+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := l.client.Do(ctx, req)
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	lb := &Pool{}
-	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+	pool := &Pool{}
+	if err := json.NewDecoder(resp.Body).Decode(pool); err != nil {
 		return nil, err
 	}
-	return lb, nil
+	return pool, nil
 }
 
-func (l *pool) Update(ctx context.Context, id string, lbur *PoolUpdateRequest) (*Pool, error) {
+func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*Pool, error) {
 	var data struct {
 		Pool *PoolUpdateRequest
 	}
-	data.Pool = lbur
-	req, err := l.client.NewRequest(ctx, http.MethodPut, poolPath+"/"+id, data)
+	data.Pool = pur
+	req, err := p.client.NewRequest(ctx, http.MethodPut, poolPath+"/"+id, data)
 	if err != nil {
 		return nil, err
 	}
-	resp, err := l.client.Do(ctx, req)
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -174,12 +174,12 @@ func (l *pool) Update(ctx context.Context, id string, lbur *PoolUpdateRequest) (
 	return respData.Pool, err
 }
 
-func (l *pool) Delete(ctx context.Context, id string) error {
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, poolPath+"/"+id, nil)
+func (p *pool) Delete(ctx context.Context, id string) error {
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, poolPath+"/"+id, nil)
 	if err != nil {
 		return err
 	}
-	resp, err := l.client.Do(ctx, req)
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return err
 	}
