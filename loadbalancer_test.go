@@ -1,6 +1,7 @@
 package gobizfly
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -70,6 +71,13 @@ func TestLoadBalancerCreate(t *testing.T) {
 
 	mux.HandleFunc(loadBalancerPath, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "Test Create LB", payload.LoadBalancer.Description)
+		assert.Equal(t, "LB", payload.LoadBalancer.Name)
+
 		resp := `
 {
     "loadbalancer": {
@@ -99,7 +107,10 @@ func TestLoadBalancerCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	lb, err := client.LoadBalancer.Create(ctx, &LoadBalancerCreateRequest{})
+	lb, err := client.LoadBalancer.Create(ctx, &LoadBalancerCreateRequest{
+		Description: "Test Create LB",
+		Name:        "LB",
+	})
 	require.NoError(t, err)
 	assert.Equal(t, "e389f5eb-07b5-486b-be4d-4d4d1299f0ab", lb.ID)
 	assert.Equal(t, "PENDING_CREATE", lb.ProvisioningStatus)
@@ -172,12 +183,47 @@ func TestLoadBalancerUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(loadBalancerPath+"/ae8e2072-31fb-464a-8285-bc2f2a6bab4d", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(loadBalancerPath+"/8b6fc468-07d5-4d8b-a0b9-695060e72c31", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
-		_, _ = fmt.Fprint(w, `{}`)
+		var payload struct {
+			LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "Temporarily disabled load balancer", *payload.LoadBalancer.Description)
+		assert.Equal(t, "disabled_load_balancer", *payload.LoadBalancer.Name)
+		assert.True(t, *payload.LoadBalancer.AdminStateUp)
+
+		resp := `
+{
+    "loadbalancer": {
+        "description": "Temporarily disabled load balancer",
+        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "provisioning_status": "PENDING_UPDATE",
+        "flavor_id": "",
+        "vip_subnet_id": "d4af86e1-0051-488c-b7a0-527f97490c9a",
+        "vip_address": "203.0.113.50",
+        "vip_network_id": "d0d217df-3958-4fbf-a3c2-8dad2908c709",
+        "vip_port_id": "b4ca07d1-a31e-43e2-891a-7d14f419f342",
+        "provider": "octavia",
+        "created_at": "2017-02-28T00:41:44",
+        "updated_at": "2017-02-28T00:43:30",
+        "id": "8b6fc468-07d5-4d8b-a0b9-695060e72c31",
+        "operating_status": "ONLINE",
+        "name": "disabled_load_balancer"
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
 	})
 
-	// TODO(cuonglm): add real test data when clarify Update request payload with @sapd
-	_, err := client.LoadBalancer.Update(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &LoadBalancerUpdateRequest{})
+	adminStateUp := true
+	desc := "Temporarily disabled load balancer"
+	name := "disabled_load_balancer"
+	lb, err := client.LoadBalancer.Update(ctx, "8b6fc468-07d5-4d8b-a0b9-695060e72c31", &LoadBalancerUpdateRequest{
+		Description:  &desc,
+		Name:         &name,
+		AdminStateUp: &adminStateUp,
+	})
 	require.NoError(t, err)
+	require.Equal(t, "8b6fc468-07d5-4d8b-a0b9-695060e72c31", lb.ID)
 }

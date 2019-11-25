@@ -38,7 +38,11 @@ type LoadBalancerCreateRequest struct {
 }
 
 // LoadBalancerUpdateRequest represents update load balancer request payload.
-type LoadBalancerUpdateRequest struct{}
+type LoadBalancerUpdateRequest struct {
+	Name         *string `json:"name,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	AdminStateUp *bool   `json:"admin_state_up,omitempty"`
+}
 
 // LoadBalancerDeleteRequest represents delete load balancer request payload.
 type LoadBalancerDeleteRequest struct {
@@ -98,7 +102,11 @@ func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBala
 }
 
 func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateRequest) (*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerPath, lbcr)
+	var data struct {
+		LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
+	}
+	data.LoadBalancer = lbcr
+	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerPath, &data)
 	if err != nil {
 		return nil, err
 	}
@@ -108,13 +116,13 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 	}
 	defer resp.Body.Close()
 
-	var data struct {
+	var respData struct {
 		LoadBalancer *LoadBalancer `json:"loadbalancer"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return data.LoadBalancer, err
+	return respData.LoadBalancer, err
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
@@ -136,7 +144,11 @@ func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error
 }
 
 func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerPath+"/"+id, lbur)
+	var data struct {
+		LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
+	}
+	data.LoadBalancer = lbur
+	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerPath+"/"+id, &data)
 	if err != nil {
 		return nil, err
 	}
@@ -146,11 +158,13 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 	}
 	defer resp.Body.Close()
 
-	lb := &LoadBalancer{}
-	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
+	var respData struct {
+		LoadBalancer *LoadBalancer `json:"loadbalancer"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return lb, nil
+	return respData.LoadBalancer, err
 }
 
 func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
