@@ -33,12 +33,12 @@ type LoadBalancerService interface {
 
 // LoadBalancerCreateRequest represents create new load balancer request payload.
 type LoadBalancerCreateRequest struct {
-	Description  string
-	Type         string
-	Listeners    []string
+	Description  string        `json:"description"`
+	Type         string        `json:"type"`
+	Listeners    []string      `json:"listeners"`
 	LoadBalancer *LoadBalancer `json:"loadbalancer"`
-	Name         string
-	NetworkType  string
+	Name         string        `json:"name"`
+	NetworkType  string        `json:"network_type"`
 }
 
 // LoadBalancerUpdateRequest represents update load balancer request payload.
@@ -50,7 +50,7 @@ type LoadBalancerUpdateRequest struct {
 
 // LoadBalancerDeleteRequest represents delete load balancer request payload.
 type LoadBalancerDeleteRequest struct {
-	Cascade bool
+	Cascade bool   `json:"cascade"`
 	ID      string `json:"loadbalancer_id"`
 }
 
@@ -625,7 +625,7 @@ func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
 
 func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*Pool, error) {
 	var data struct {
-		Pool *PoolUpdateRequest
+		Pool *PoolUpdateRequest `json:"pool"`
 	}
 	data.Pool = pur
 	req, err := p.client.NewRequest(ctx, http.MethodPut, poolPath+"/"+id, data)
