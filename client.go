@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 )
@@ -130,7 +131,16 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
-	return c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		defer resp.Body.Close()
+		buf, _ := ioutil.ReadAll(resp.Body)
+		return nil, errors.New(string(buf))
+	}
+	return resp, nil
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
