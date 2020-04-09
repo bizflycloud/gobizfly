@@ -10,10 +10,14 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 const (
 	loadBalancerPath = "/loadbalancers"
+	listenerPath     = "/listeners"
+	memberPath       = "/members"
+	poolPath         = "/pools"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
@@ -173,6 +177,482 @@ func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteReque
 		return err
 	}
 	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+var _ ListenerService = (*listener)(nil)
+
+// ListenerService is an interface to interact with BizFly API Listeners endpoint.
+type ListenerService interface {
+	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Listener, error)
+	Create(ctx context.Context, loadBalancerID string, req *ListenerCreateRequest) (*Listener, error)
+	Get(ctx context.Context, id string) (*Listener, error)
+	Update(ctx context.Context, id string, req *ListenerUpdateRequest) (*Listener, error)
+	Delete(ctx context.Context, id string) error
+}
+
+// ListenerCreateRequest represents create new listener request payload.
+type ListenerCreateRequest struct {
+	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
+	ProtocolPort           int                    `json:"protocol_port"`
+	Protocol               string                 `json:"protocol"`
+	Name                   *string                `json:"name,omitempty"`
+	Listeners              *Listener              `json:"listeners"`
+	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
+	Description            *string                `json:"description,omitempty"`
+	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
+}
+
+// ListenerUpdateRequest represents update listener request payload.
+type ListenerUpdateRequest struct {
+	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
+	Name                   *string                `json:"name,omitempty"`
+	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
+	Description            *string                `json:"description,omitempty"`
+	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
+	AdminStateUp           *bool                  `json:"admin_state_up,omitempty"`
+}
+
+// Listener contains listener information.
+type Listener struct {
+	ID                     string                `json:"id"`
+	TimeoutClientData      int                   `json:"timeout_client_data"`
+	Description            string                `json:"description"`
+	SNIContainerRefs       []string              `json:"sni_container_refs"`
+	Name                   string                `json:"name"`
+	ConnectionLimit        int                   `json:"connection_limit"`
+	UpdatedAt              string                `json:"updated_at"`
+	ProjectID              string                `json:"project_id"`
+	TimeoutMemberData      int                   `json:"timeout_member_data"`
+	TimeoutMemberConnect   int                   `json:"timeout_member_connect"`
+	L7Policies             []struct{ ID string } `json:"l7policies"`
+	TenandID               string                `json:"tenant_id"`
+	DefaultTLSContainerRef *string               `json:"default_tls_container_ref"`
+	AdminStateUp           bool                  `json:"admin_state_up"`
+	CreatedAt              string                `json:"created_at"`
+	OperatingStatus        string                `json:"operating_status"`
+	ProtocolPort           int                   `json:"protocol_port"`
+	LoadBalancers          []struct{ ID string } `json:"loadbalancers"`
+	ProvisoningStatus      string                `json:"provisioning_status"`
+	DefaultPoolID          string                `json:"default_pool_id"`
+	Protocol               string                `json:"protocol"`
+	InsertHeaders          map[string]string     `json:"insert_headers"`
+	TimeoutTCPInspect      int                   `json:"timeout_tcp_inspect"`
+}
+
+type listener struct {
+	client *Client
+}
+
+func (l *listener) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Listener, error) {
+	path := strings.Join([]string{loadBalancerPath, lbID, "listeners"}, "/")
+	req, err := l.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Listeners []*Listener `json:"listeners"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return data.Listeners, nil
+}
+
+func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateRequest) (*Listener, error) {
+	var data struct {
+		Listener *ListenerCreateRequest
+	}
+	data.Listener = lcr
+	path := strings.Join([]string{loadBalancerPath, lbID, "listeners"}, "/")
+	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Listener *Listener `json:"listener"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Listener, err
+}
+
+func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
+	req, err := l.client.NewRequest(ctx, http.MethodGet, listenerPath+"/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	listener := &Listener{}
+	if err := json.NewDecoder(resp.Body).Decode(listener); err != nil {
+		return nil, err
+	}
+	return listener, nil
+}
+
+func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateRequest) (*Listener, error) {
+	var data struct {
+		Listener *ListenerUpdateRequest
+	}
+	data.Listener = lur
+	req, err := l.client.NewRequest(ctx, http.MethodPut, listenerPath+"/"+id, &data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Listener *Listener `json:"listener"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Listener, err
+}
+
+func (l *listener) Delete(ctx context.Context, id string) error {
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, listenerPath+"/"+id, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+var _ MemberService = (*member)(nil)
+
+// MemberService is an interface to interact with BizFly API Members endpoint.
+type MemberService interface {
+	List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error)
+	Get(ctx context.Context, poolID, id string) (*Member, error)
+	Update(ctx context.Context, id string, req *MemberUpdateRequest) (*Member, error)
+	Delete(ctx context.Context, id string) error
+}
+
+// MemberUpdateRequest represents update member request payload.
+type MemberUpdateRequest struct {
+	Name           string  `json:"name"`
+	Weight         int     `json:"weight"`
+	AdminStateUp   bool    `json:"admin_state_up"`
+	MonitorAddress *string `json:"monitor_address"`
+	MonitorPort    *int    `json:"monitor_port"`
+	Backup         bool    `json:"backup"`
+}
+
+// Member contains member information.
+type Member struct {
+	ID                string  `json:"id"`
+	TenandID          string  `json:"tenant_id"`
+	AdminStateUp      bool    `json:"admin_state_up"`
+	Name              string  `json:"name"`
+	UpdatedAt         string  `json:"updated_at"`
+	OperatingStatus   string  `json:"operating_status"`
+	MonitorAddress    *string `json:"monitor_address"`
+	ProvisoningStatus string  `json:"provisioning_status"`
+	ProjectID         string  `json:"project_id"`
+	ProtocolPort      int     `json:"protocol_port"`
+	SubnetID          string  `json:"subnet_id"`
+	MonitorPort       *int    `json:"monitor_port"`
+	Address           string  `json:"address"`
+	Weight            int     `json:"weight"`
+	CreatedAt         string  `json:"created_at"`
+	Backup            bool    `json:"backup"`
+}
+
+type member struct {
+	client *Client
+}
+
+func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error) {
+	path := strings.Join([]string{poolPath, poolID, "members"}, "/")
+	req, err := m.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Members []*Member `json:"members"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return data.Members, nil
+}
+
+func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
+	path := strings.Join([]string{poolPath, poolID, "members", id}, "/")
+	req, err := m.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	mb := &Member{}
+	if err := json.NewDecoder(resp.Body).Decode(mb); err != nil {
+		return nil, err
+	}
+	return mb, nil
+}
+
+func (m *member) Update(ctx context.Context, id string, mur *MemberUpdateRequest) (*Member, error) {
+	var data struct {
+		Member *MemberUpdateRequest `json:"member"`
+	}
+	data.Member = mur
+	req, err := m.client.NewRequest(ctx, http.MethodPut, memberPath+"/"+id, &data)
+	if err != nil {
+
+		return nil, err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Member *Member `json:"member"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Member, err
+}
+
+func (m *member) Delete(ctx context.Context, id string) error {
+	req, err := m.client.NewRequest(ctx, http.MethodDelete, memberPath+"/"+id, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+var _ PoolService = (*pool)(nil)
+
+// PoolService is an interface to interact with BizFly API Pools endpoint.
+type PoolService interface {
+	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Pool, error)
+	Create(ctx context.Context, loadBalancerID string, req *PoolCreateRequest) (*Pool, error)
+	Get(ctx context.Context, id string) (*Pool, error)
+	Update(ctx context.Context, id string, req *PoolUpdateRequest) (*Pool, error)
+	Delete(ctx context.Context, id string) error
+}
+
+// SessionPersistence object controls how LoadBalacner sends request to backend.
+// See https://support.bizflycloud.vn/api/loadbalancer/#post-loadbalancer-load_balancer_id-pools
+type SessionPersistence struct {
+	Type                   string  `json:"type"`
+	CookieName             *string `json:"cookie_name,omitempty"`
+	PersistenceTimeout     *string `json:"persistence_timeout,omitempty"`
+	PersistenceGranularity *string `json:"persistence_granularity,omitempty"`
+}
+
+// PoolCreateRequest represents create new pool request payload.
+type PoolCreateRequest struct {
+	Description        *string             `json:"description,omitempty"`
+	LBAlgorithm        string              `json:"lb_algorithm"`
+	ListenerID         *string             `json:"listener_id"`
+	Name               *string             `json:"name,omitempty"`
+	LoadBalancerID     *string             `json:"load_balancer_id"`
+	Protocol           string              `json:"protocol"`
+	SessionPersistence *SessionPersistence `json:"session_persistence"`
+}
+
+// PoolUpdateRequest represents update pool request payload.
+type PoolUpdateRequest struct {
+	AdminStateUp       *bool               `json:"admin_state_up,omitempty"`
+	Description        *string             `json:"description,omitempty"`
+	LBAlgorithm        *string             `json:"lb_algorithm,omitempty"`
+	Name               *string             `json:"name,omitempty"`
+	SessionPersistence *SessionPersistence `json:"session_persistence"`
+}
+
+// Pool contains pool information.
+type Pool struct {
+	ID          string `json:"id"`
+	TenandID    string `json:"tenant_id"`
+	Description string `json:"description"`
+	LBAlgorithm string `json:"lb_algorithm"`
+	Name        string `json:"name"`
+	// TODO: change later when HealthMonitor entity added
+	HealthMonitor      interface{}           `json:"healthmonitor"`
+	UpdatedAt          string                `json:"updated_at"`
+	OperatingStatus    string                `json:"operating_status"`
+	Listeners          []struct{ ID string } `json:"listeners"`
+	SessionPersistence *SessionPersistence   `json:"session_persistence"`
+	ProvisoningStatus  string                `json:"provisioning_status"`
+	ProjectID          string                `json:"project_id"`
+	LoadBalancers      []struct{ ID string } `json:"loadbalancers"`
+	Members            []string              `json:"memebers"`
+	AdminStateUp       bool                  `json:"admin_state_up"`
+	Protocol           string                `json:"protocol"`
+	CreatedAt          string                `json:"created_at"`
+	HealthMonitorID    string                `json:"healthmonitor_id"`
+}
+
+type pool struct {
+	client *Client
+}
+
+func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
+	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
+	req, err := p.client.NewRequest(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Pools []*Pool `json:"pools"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+
+	return data.Pools, nil
+}
+
+func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) (*Pool, error) {
+	var data struct {
+		Pool *PoolCreateRequest `json:"pool"`
+	}
+	data.Pool = pcr
+	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
+	req, err := p.client.NewRequest(ctx, http.MethodPost, path, &data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Pool *Pool `json:"pool"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Pool, err
+}
+
+func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodGet, poolPath+"/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	pool := &Pool{}
+	if err := json.NewDecoder(resp.Body).Decode(pool); err != nil {
+		return nil, err
+	}
+	return pool, nil
+}
+
+func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*Pool, error) {
+	var data struct {
+		Pool *PoolUpdateRequest
+	}
+	data.Pool = pur
+	req, err := p.client.NewRequest(ctx, http.MethodPut, poolPath+"/"+id, data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Pool *Pool `json:"pool"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Pool, err
+}
+
+func (p *pool) Delete(ctx context.Context, id string) error {
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, poolPath+"/"+id, nil)
+	if err != nil {
+		return err
+	}
+	resp, err := p.client.Do(ctx, req)
 	if err != nil {
 		return err
 	}
