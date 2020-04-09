@@ -53,5 +53,5 @@ func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 
-	return tok, err
+	return tok, nil
 }

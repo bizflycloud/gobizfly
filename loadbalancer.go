@@ -126,7 +126,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.LoadBalancer, err
+	return respData.LoadBalancer, nil
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
@@ -168,7 +168,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.LoadBalancer, err
+	return respData.LoadBalancer, nil
 }
 
 func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
@@ -348,7 +348,7 @@ func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateReq
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Listener, err
+	return respData.Listener, nil
 }
 
 func (l *listener) Delete(ctx context.Context, id string) error {
@@ -473,7 +473,7 @@ func (m *member) Update(ctx context.Context, id string, mur *MemberUpdateRequest
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Member, err
+	return respData.Member, nil
 }
 
 func (m *member) Delete(ctx context.Context, id string) error {
@@ -602,7 +602,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Pool, err
+	return respData.Pool, nil
 }
 
 func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
@@ -644,7 +644,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Pool, err
+	return respData.Pool, nil
 }
 
 func (p *pool) Delete(ctx context.Context, id string) error {
