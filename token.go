@@ -23,14 +23,14 @@ type TokenService interface {
 
 // TokenCreateRequest represents create new token request payload.
 type TokenCreateRequest struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // Token contains token information.
 type Token struct {
 	KeystoneToken string `json:"token"`
-	ExpiresAt     string
+	ExpiresAt     string `json:"expires_at"`
 }
 
 type token struct {
