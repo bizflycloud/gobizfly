@@ -23,8 +23,8 @@ type TokenService interface {
 
 // TokenCreateRequest represents create new token request payload.
 type TokenCreateRequest struct {
-	username string
-	password string
+	Username string
+	Password string
 }
 
 // Token contains token information.
