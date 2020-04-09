@@ -1,7 +1,7 @@
 variables:
   PROJECT_NAME: bizfly-client-go
   VERSION: 0.0.1
-  APP_VERSION: 1.14
+  APP_VERSION: "1.14"
   TYPE: vm
   REPO: $CI_REPOSITORY_URL
   USER: root
