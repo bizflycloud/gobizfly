@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	loadBalancerPath = "/loadbalancers"
-	listenerPath     = "/listeners"
-	memberPath       = "/members"
-	poolPath         = "/pools"
+	loadBalancerPath = "/loadbalancers/api/loadbalancers"
+	listenerPath     = "/loadbalancers/api/listeners"
+	memberPath       = "/loadbalancers/api/members"
+	poolPath         = "/loadbalancers/api/pools"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
