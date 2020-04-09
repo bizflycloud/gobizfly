@@ -124,7 +124,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Tenant-Name", c.tenantName)
 	if c.keystoneToken != "" {
-		req.Header.Add("X-Auth-Token", "Token "+c.keystoneToken)
+		req.Header.Add("X-Auth-Token", c.keystoneToken)
 	}
 	return req, nil
 }
