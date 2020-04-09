@@ -1,7 +1,7 @@
 variables:
   PROJECT_NAME: bizfly-client-go
   VERSION: 0.0.1
-  APP_VERSION: 1.13.4
+  APP_VERSION: 1.14
   TYPE: vm
   REPO: $CI_REPOSITORY_URL
   USER: root
@@ -25,7 +25,7 @@ stages:
 
 mod:
   stage: mod
-  image: golang:1.13.4
+  image: golang:1.14
   script:
     - GO111MODULE=on go mod download
     - GO111MODULE=on go mod vendor
@@ -56,7 +56,7 @@ golint:
 
 
 test:
-  image: golang:1.13.4
+  image: golang:1.14
   stage: test
   dependencies:
     - mod
