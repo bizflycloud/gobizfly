@@ -14,10 +14,11 @@ import (
 )
 
 const (
-	loadBalancerPath = "/loadbalancers/api/loadbalancers"
-	listenerPath     = "/loadbalancers/api/listeners"
-	memberPath       = "/loadbalancers/api/members"
-	poolPath         = "/loadbalancers/api/pools"
+	loadBalancerBasePath     = "/loadbalancers/api"
+	loadBalancersPath        = "loadbalancers"
+	loadBalancerResourcePath = "loadbalancer"
+	listenerPath             = "listener"
+	poolPath                 = "pool"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
@@ -83,8 +84,16 @@ type loadbalancer struct {
 	client *Client
 }
 
+func (l *loadbalancer) resourcePath() string {
+	return strings.Join([]string{loadBalancerBasePath, loadBalancersPath}, "/")
+}
+
+func (l *loadbalancer) itemPath(id string) string {
+	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, id}, "/")
+}
+
 func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerPath, nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, l.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +119,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 		LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
 	}
 	data.LoadBalancer = lbcr
-	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerPath, &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPost, l.resourcePath(), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +139,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerPath+"/"+id, nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +161,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 		LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
 	}
 	data.LoadBalancer = lbur
-	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerPath+"/"+id, &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPut, l.itemPath(id), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +181,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 }
 
 func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, loadBalancerPath+"/"+lbdr.ID, lbdr)
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, l.itemPath(lbdr.ID), lbdr)
 	if err != nil {
 		return err
 	}
@@ -261,9 +270,16 @@ type listener struct {
 	client *Client
 }
 
+func (l *listener) resourcePath(lbID string) string {
+	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, lbID, "listeners"}, "/")
+}
+
+func (l *listener) itemPath(id string) string {
+	return strings.Join([]string{loadBalancerBasePath, listenerPath, id}, "/")
+}
+
 func (l *listener) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Listener, error) {
-	path := strings.Join([]string{loadBalancerPath, lbID, "listeners"}, "/")
-	req, err := l.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, l.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -289,8 +305,7 @@ func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateR
 		Listener *ListenerCreateRequest
 	}
 	data.Listener = lcr
-	path := strings.Join([]string{loadBalancerPath, lbID, "listeners"}, "/")
-	req, err := l.client.NewRequest(ctx, http.MethodPost, path, &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPost, l.resourcePath(lbID), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +325,7 @@ func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateR
 }
 
 func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, listenerPath+"/"+id, nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -332,7 +347,7 @@ func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateReq
 		Listener *ListenerUpdateRequest
 	}
 	data.Listener = lur
-	req, err := l.client.NewRequest(ctx, http.MethodPut, listenerPath+"/"+id, &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPut, l.itemPath(id), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -352,7 +367,7 @@ func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateReq
 }
 
 func (l *listener) Delete(ctx context.Context, id string) error {
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, listenerPath+"/"+id, nil)
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, l.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
@@ -371,8 +386,8 @@ var _ MemberService = (*member)(nil)
 type MemberService interface {
 	List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error)
 	Get(ctx context.Context, poolID, id string) (*Member, error)
-	Update(ctx context.Context, id string, req *MemberUpdateRequest) (*Member, error)
-	Delete(ctx context.Context, id string) error
+	Update(ctx context.Context, poolID, id string, req *MemberUpdateRequest) (*Member, error)
+	Delete(ctx context.Context, poolID, id string) error
 }
 
 // MemberUpdateRequest represents update member request payload.
@@ -409,9 +424,16 @@ type member struct {
 	client *Client
 }
 
+func (m *member) resourcePath(poolID string) string {
+	return strings.Join([]string{loadBalancerBasePath, poolPath, poolID, "member"}, "/")
+}
+
+func (m *member) itemPath(poolID string, id string) string {
+	return strings.Join([]string{loadBalancerBasePath, poolPath, poolID, "member", id}, "/")
+}
+
 func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error) {
-	path := strings.Join([]string{poolPath, poolID, "members"}, "/")
-	req, err := m.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := m.client.NewRequest(ctx, http.MethodGet, m.resourcePath(poolID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -433,8 +455,7 @@ func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]
 }
 
 func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
-	path := strings.Join([]string{poolPath, poolID, "members", id}, "/")
-	req, err := m.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := m.client.NewRequest(ctx, http.MethodGet, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -451,12 +472,12 @@ func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
 	return mb, nil
 }
 
-func (m *member) Update(ctx context.Context, id string, mur *MemberUpdateRequest) (*Member, error) {
+func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdateRequest) (*Member, error) {
 	var data struct {
 		Member *MemberUpdateRequest `json:"member"`
 	}
 	data.Member = mur
-	req, err := m.client.NewRequest(ctx, http.MethodPut, memberPath+"/"+id, &data)
+	req, err := m.client.NewRequest(ctx, http.MethodPut, m.itemPath(poolID, id), &data)
 	if err != nil {
 
 		return nil, err
@@ -476,8 +497,8 @@ func (m *member) Update(ctx context.Context, id string, mur *MemberUpdateRequest
 	return respData.Member, nil
 }
 
-func (m *member) Delete(ctx context.Context, id string) error {
-	req, err := m.client.NewRequest(ctx, http.MethodDelete, memberPath+"/"+id, nil)
+func (m *member) Delete(ctx context.Context, poolID, id string) error {
+	req, err := m.client.NewRequest(ctx, http.MethodDelete, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return err
 	}
@@ -557,9 +578,16 @@ type pool struct {
 	client *Client
 }
 
+func (p *pool) resourcePath(lbID string) string {
+	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, lbID, "pools"}, "/")
+}
+
+func (p *pool) itemPath(id string) string {
+	return strings.Join([]string{loadBalancerBasePath, poolPath, id}, "/")
+}
+
 func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
-	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
-	req, err := p.client.NewRequest(ctx, http.MethodGet, path, nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, p.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -585,8 +613,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 		Pool *PoolCreateRequest `json:"pool"`
 	}
 	data.Pool = pcr
-	path := strings.Join([]string{loadBalancerPath, lbID, "pools"}, "/")
-	req, err := p.client.NewRequest(ctx, http.MethodPost, path, &data)
+	req, err := p.client.NewRequest(ctx, http.MethodPost, p.resourcePath(lbID), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -606,7 +633,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 }
 
 func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodGet, poolPath+"/"+id, nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, p.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -628,7 +655,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 		Pool *PoolUpdateRequest `json:"pool"`
 	}
 	data.Pool = pur
-	req, err := p.client.NewRequest(ctx, http.MethodPut, poolPath+"/"+id, data)
+	req, err := p.client.NewRequest(ctx, http.MethodPut, p.itemPath(id), data)
 	if err != nil {
 		return nil, err
 	}
@@ -648,7 +675,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 }
 
 func (p *pool) Delete(ctx context.Context, id string) error {
-	req, err := p.client.NewRequest(ctx, http.MethodDelete, poolPath+"/"+id, nil)
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, p.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
