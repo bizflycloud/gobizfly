@@ -66,6 +66,7 @@ test:
     - GO111MODULE=on go test -race -mod=vendor ./...
   only:
     - master
+    - merge_requests
   tags:
     - devops-runner-prod
   allow_failure: true
