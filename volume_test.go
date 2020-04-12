@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
+	"strings"
 )
 
 func TestVolumeList(t *testing.T) {
@@ -332,4 +333,124 @@ func TestVolumeCreate(t *testing.T) {
 	assert.Equal(t, 20, volume.Size)
 	assert.Equal(t, "", volume.SnapshotID)
 	assert.Equal(t, "HN1", volume.AvailabilityZone)
+}
+
+func TestVolumeExtend(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(strings.Join([]string{volumeBasePath, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+	"task_id": "3c414504-8fba-4b70-bdcb-a5b44a2ae406"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Volume.ExtendVolume(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", 30)
+	require.NoError(t, err)
+	assert.Equal(t, "3c414504-8fba-4b70-bdcb-a5b44a2ae406", resp.TaskID)
+}
+
+func TestVolumeRestore(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(strings.Join([]string{volumeBasePath, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+	"task_id": "3c414504-8fba-4b70-bdcb-a5b44a2ae406"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Volume.Restore(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "38466e4e-7cca-11ea-a78b-9794b3babf27")
+	require.NoError(t, err)
+	assert.Equal(t, "3c414504-8fba-4b70-bdcb-a5b44a2ae406", resp.TaskID)
+}
+
+func TestVolumeAttach(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(strings.Join([]string{volumeBasePath, "894f0e66-4571-4fea-9766-5fc615aec4a5", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+	"message": "Attach successfully",
+	"volume_detail": {
+		"status": "available",
+		"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+		"attachments": [],
+		"availability_zone": "HN1",
+		"bootable": "false",
+		"encrypted": false,
+		"created_at": "2020-04-12T14:38:42.000000",
+		"description": null,
+		"os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
+		"updated_at": "2020-04-12T14:39:08.000000",
+		"volume_type": "HDD",
+		"name": "sapd-test-2",
+		"replication_status": null,
+		"consistencygroup_id": null,
+		"source_volid": null,
+		"snapshot_id": null,
+		"multiattach": false,
+		"metadata": {
+			"category": "premium"
+		},
+		"id": "894f0e66-4571-4fea-9766-5fc615aec4a5",
+		"size": 20
+	}
+}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Volume.Attach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
+	require.NoError(t, err)
+	assert.Equal(t, "894f0e66-4571-4fea-9766-5fc615aec4a5", resp.VolumeDetail.ID)
+	assert.Equal(t, "Attach successfully", resp.Message)
+}
+
+func TestVolumeDetach(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(strings.Join([]string{volumeBasePath, "894f0e66-4571-4fea-9766-5fc615aec4a5", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+	"message": "Detach successfully",
+	"volume_detail": {
+		"status": "available",
+		"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+		"attachments": [],
+		"availability_zone": "HN1",
+		"bootable": "false",
+		"encrypted": false,
+		"created_at": "2020-04-12T14:38:42.000000",
+		"description": null,
+		"os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
+		"updated_at": "2020-04-12T14:39:08.000000",
+		"volume_type": "HDD",
+		"name": "sapd-test-2",
+		"replication_status": null,
+		"consistencygroup_id": null,
+		"source_volid": null,
+		"snapshot_id": null,
+		"multiattach": false,
+		"metadata": {
+			"category": "premium"
+		},
+		"id": "894f0e66-4571-4fea-9766-5fc615aec4a5",
+		"size": 20
+	}
+}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Volume.Detach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
+	require.NoError(t, err)
+	assert.Equal(t, "894f0e66-4571-4fea-9766-5fc615aec4a5", resp.VolumeDetail.ID)
+	assert.Equal(t, "Detach successfully", resp.Message)
 }
