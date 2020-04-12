@@ -1,13 +1,16 @@
 package gobizfly
 
+// ServerSecurityGroup contains information of security group of a server.
 type ServerSecurityGroup struct {
 	Name string `json:"name"`
 }
 
+// AttachedVolume contains attached volumes of a server.
 type AttachedVolume struct {
 	ID string `json:"id"`
 }
 
+// Server contains server information.
 type Server struct {
 	ID              string                 `json:"id"`
 	Name            string                 `json:"name"`

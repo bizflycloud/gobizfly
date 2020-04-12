@@ -1,4 +1,4 @@
-// Copyright 2019 The BizFly Authors. All rights reserved.
+// Copyright 2020 The BizFly Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -19,6 +19,7 @@ const (
 
 var _ VolumeService = (*volume)(nil)
 
+// VolumeService is an interface to interact with BizFly API Volume endpoint.
 type VolumeService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Volume, error)
 	Create(ctx context.Context, req *VolumeCreateRequest) (*Volume, error)
@@ -30,6 +31,7 @@ type VolumeService interface {
 	Restore(ctx context.Context, id string, snapshotID string) (*Task, error)
 }
 
+// VolumeCreateRequest represents create new volume request payload.
 type VolumeCreateRequest struct {
 	Name             string `json:"name"`
 	Size             int    `json:"size"`
@@ -38,6 +40,7 @@ type VolumeCreateRequest struct {
 	SnapshotID       string `json:"snapshot_id,omitempty"`
 }
 
+// VolumeAttachment contains volume attachment information.
 type VolumeAttachment struct {
 	ServerID     string `json:"server_id"`
 	AttachmentID string `json:"attachment_id"`
@@ -46,6 +49,7 @@ type VolumeAttachment struct {
 	ID           string `json:"id"`
 }
 
+// Volume contains volume information.
 type Volume struct {
 	ID               string            `json:"id"`
 	Size             int               `json:"size"`
@@ -69,6 +73,7 @@ type volume struct {
 	client *Client
 }
 
+// List is a method to list all volumes of users.
 func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath, nil)
 	if err != nil {
@@ -88,6 +93,7 @@ func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error)
 	return volumes, nil
 }
 
+// Create is a method to create a new volume.
 func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPost, volumeBasePath, &vcr)
 	if err != nil {
@@ -108,6 +114,7 @@ func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume,
 	return volumeRespData, nil
 }
 
+// Get is a method to get information of a volume.
 func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath+"/"+id, nil)
 	if err != nil {
@@ -130,6 +137,7 @@ func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
 	return volume, nil
 }
 
+// Delete is a method to delete a volume.
 func (v *volume) Delete(ctx context.Context, id string) error {
 	req, err := v.client.NewRequest(ctx, http.MethodDelete, volumeBasePath+"/"+id, nil)
 
@@ -146,6 +154,7 @@ func (v *volume) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
+// VolumeAction represents volume action request payload.
 type VolumeAction struct {
 	Type       string `json:"type"`
 	NewSize    int    `json:"new_size,omitempty"`
@@ -153,24 +162,28 @@ type VolumeAction struct {
 	SnapshotID string `json:"snapshot_id,omitempty"`
 }
 
+// Task represents task response when perform an action.
 type Task struct {
 	TaskID string `json:"task_id"`
 }
 
+// VolumeAttachDetachResponse contains information when detach or attach a volume from/to a server.
 type VolumeAttachDetachResponse struct {
 	Message      string `json:"message"`
 	VolumeDetail Volume `json:"volume_detail"`
 }
 
+func (v *volume) itemActionPath(id string) string {
+	return strings.Join([]string{volumeBasePath, id, "action"}, "/")
+}
+
+// ExtendVolume is a method to extend capacity of a volume.
 func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Task, error) {
 	var payload = &VolumeAction{
 		Type:    "extend",
 		NewSize: newsize}
 
-	req, err := v.client.NewRequest(
-		ctx, http.MethodPost,
-		strings.Join([]string{volumeBasePath, id, "action"}, "/"),
-		payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -189,15 +202,13 @@ func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Tas
 	return t, nil
 }
 
+// Attach is a method to attach a volume to a server.
 func (v *volume) Attach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
 		Type:     "attach",
 		ServerID: serverID}
 
-	req, err := v.client.NewRequest(
-		ctx, http.MethodPost,
-		strings.Join([]string{volumeBasePath, id, "action"}, "/"),
-		payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -216,15 +227,13 @@ func (v *volume) Attach(ctx context.Context, id string, serverID string) (*Volum
 	return volumeAttachResponse, nil
 }
 
+// Detach is a method to detach a volume from a server.
 func (v *volume) Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
 		Type:     "detach",
 		ServerID: serverID}
 
-	req, err := v.client.NewRequest(
-		ctx, http.MethodPost,
-		strings.Join([]string{volumeBasePath, id, "action"}, "/"),
-		payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -243,15 +252,13 @@ func (v *volume) Detach(ctx context.Context, id string, serverID string) (*Volum
 	return r, nil
 }
 
+// Restore is a method to restore a volume from a snapshot.
 func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Task, error) {
 	var payload = &VolumeAction{
 		Type:       "restore",
 		SnapshotID: snapshotID}
 
-	req, err := v.client.NewRequest(
-		ctx, http.MethodPost,
-		strings.Join([]string{volumeBasePath, id, "action"}, "/"),
-		payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
