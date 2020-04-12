@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
-	"strings"
 )
 
 func TestVolumeList(t *testing.T) {
@@ -338,7 +337,10 @@ func TestVolumeCreate(t *testing.T) {
 func TestVolumeExtend(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{volumeBasePath, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+
+	var v volume
+
+	mux.HandleFunc(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -356,7 +358,9 @@ func TestVolumeExtend(t *testing.T) {
 func TestVolumeRestore(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{volumeBasePath, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+
+	var v volume
+	mux.HandleFunc(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -374,7 +378,9 @@ func TestVolumeRestore(t *testing.T) {
 func TestVolumeAttach(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{volumeBasePath, "894f0e66-4571-4fea-9766-5fc615aec4a5", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+
+	var v volume
+	mux.HandleFunc(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -416,7 +422,9 @@ func TestVolumeAttach(t *testing.T) {
 func TestVolumeDetach(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{volumeBasePath, "894f0e66-4571-4fea-9766-5fc615aec4a5", "action"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+
+	var v volume
+	mux.HandleFunc(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
