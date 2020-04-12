@@ -19,7 +19,7 @@ const (
 	version       = "0.0.1"
 	ua            = "bizfly-client-go/" + version
 	defaultAPIURL = "https://manage.bizflycloud.vn"
-	mediaType     = "application/json"
+	mediaType     = "application/json; charset=utf-8"
 )
 
 // Client represents BizFly API client.
@@ -29,6 +29,8 @@ type Client struct {
 	Listener     ListenerService
 	Pool         PoolService
 	Member       MemberService
+
+	Volume VolumeService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -96,6 +98,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Listener = &listener{client: c}
 	c.Pool = &pool{client: c}
 	c.Member = &member{client: c}
+	c.Volume = &volume{client: c}
 
 	return c, nil
 }
@@ -113,7 +116,6 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 			return nil, err
 		}
 	}
-
 	req, err := http.NewRequest(method, u.String(), buf)
 	if err != nil {
 		return nil, err
