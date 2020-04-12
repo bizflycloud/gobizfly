@@ -7,14 +7,14 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
 const (
-	volumeBasePath	=	"/iaas-cloud/api/volumes"
+	volumeBasePath = "/iaas-cloud/api/volumes"
 )
 
 var _ VolumeService = (*volume)(nil)
@@ -31,40 +31,39 @@ type VolumeService interface {
 }
 
 type VolumeCreateRequest struct {
-	Name 				string		`json:"name"`
-	Size				int			`json:"size"`
-	VolumeType			string		`json:"volume_type"`
-	AvailabilityZone	string		`json:"availability_zone"`
-	SnapshotID			string		`json:"snapshot_id,omitempty"`
+	Name             string `json:"name"`
+	Size             int    `json:"size"`
+	VolumeType       string `json:"volume_type"`
+	AvailabilityZone string `json:"availability_zone"`
+	SnapshotID       string `json:"snapshot_id,omitempty"`
 }
 
 type VolumeAttachment struct {
-	ServerID		string	`json:"server_id"`
-	AttachmentID	string	`json:"attachment_id"`
-	VolumeID		string	`json:"volume_id"`
-	Device			string	`json:"device"`
-	ID				string	`json:"id"`
+	ServerID     string `json:"server_id"`
+	AttachmentID string `json:"attachment_id"`
+	VolumeID     string `json:"volume_id"`
+	Device       string `json:"device"`
+	ID           string `json:"id"`
 }
 
 type Volume struct {
-	ID					string 				`json:"id"`
-	Size				int					`json:"size"`
-	AttachedType		string				`json:"attached_type"`
-	Name				string				`json:"name"`
-	VolumeType			string				`json:"volume_type"`
-	Description			string				`json:"description"`
-	SnapshotID			string				`json:"snapshot_id"`
-	Bootable			string				`json:"bootable"`
-	AvailabilityZone	string				`json:"availability_zone"`
-	Status				string				`json:"status"`
-	UserID				string				`json:"user_id"`
-	ProjectID			string				`json:"os-vol-tenant-attr:tenant_id"`
-	CreatedAt			string				`json:"created_at"`
-	UpdatedAt			string				`json:"updated_at"`
-	Metadata			map[string]string	`json:"metadata"`
-	Attachments			[]Server			`json:"attachments"`
+	ID               string            `json:"id"`
+	Size             int               `json:"size"`
+	AttachedType     string            `json:"attached_type"`
+	Name             string            `json:"name"`
+	VolumeType       string            `json:"volume_type"`
+	Description      string            `json:"description"`
+	SnapshotID       string            `json:"snapshot_id"`
+	Bootable         string            `json:"bootable"`
+	AvailabilityZone string            `json:"availability_zone"`
+	Status           string            `json:"status"`
+	UserID           string            `json:"user_id"`
+	ProjectID        string            `json:"os-vol-tenant-attr:tenant_id"`
+	CreatedAt        string            `json:"created_at"`
+	UpdatedAt        string            `json:"updated_at"`
+	Metadata         map[string]string `json:"metadata"`
+	Attachments      []Server          `json:"attachments"`
 }
-
 
 type volume struct {
 	client *Client
@@ -89,9 +88,8 @@ func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error)
 	return volumes, nil
 }
 
-
 func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume, error) {
-	req, err :=  v.client.NewRequest(ctx, http.MethodPost, volumeBasePath, &vcr)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, volumeBasePath, &vcr)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +99,7 @@ func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume,
 	}
 
 	defer resp.Body.Close()
-	
+
 	var volumeRespData *Volume
 
 	if err := json.NewDecoder(resp.Body).Decode(&volumeRespData); err != nil {
@@ -110,9 +108,8 @@ func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume,
 	return volumeRespData, nil
 }
 
-
 func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath + "/" + id, nil)
+	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +131,7 @@ func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
 }
 
 func (v *volume) Delete(ctx context.Context, id string) error {
-	req, err := v.client.NewRequest(ctx, http.MethodDelete, volumeBasePath + "/" + id, nil)
+	req, err := v.client.NewRequest(ctx, http.MethodDelete, volumeBasePath+"/"+id, nil)
 
 	if err != nil {
 		return err
@@ -149,27 +146,25 @@ func (v *volume) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
-
 type VolumeAction struct {
-	Type 		string	`json:"type"`
-	NewSize		int		`json:"new_size,omitempty"`
-	ServerID	string	`json:"instance_uuid,omitempty"`
-	SnapshotID	string	`json:"snapshot_id,omitempty"`
+	Type       string `json:"type"`
+	NewSize    int    `json:"new_size,omitempty"`
+	ServerID   string `json:"instance_uuid,omitempty"`
+	SnapshotID string `json:"snapshot_id,omitempty"`
 }
 
 type Task struct {
-	TaskID	string	`json:"task_id"`
+	TaskID string `json:"task_id"`
 }
 
-
 type VolumeAttachDetachResponse struct {
-	Message string `json:"message"`
-	VolumeDetail Volume	`json:"volume_detail"`
+	Message      string `json:"message"`
+	VolumeDetail Volume `json:"volume_detail"`
 }
 
 func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Task, error) {
 	var payload = &VolumeAction{
-		Type: "extend",
+		Type:    "extend",
 		NewSize: newsize}
 
 	req, err := v.client.NewRequest(
@@ -196,7 +191,7 @@ func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Tas
 
 func (v *volume) Attach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
-		Type: "attach",
+		Type:     "attach",
 		ServerID: serverID}
 
 	req, err := v.client.NewRequest(
@@ -223,7 +218,7 @@ func (v *volume) Attach(ctx context.Context, id string, serverID string) (*Volum
 
 func (v *volume) Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
-		Type: "detach",
+		Type:     "detach",
 		ServerID: serverID}
 
 	req, err := v.client.NewRequest(
@@ -250,7 +245,7 @@ func (v *volume) Detach(ctx context.Context, id string, serverID string) (*Volum
 
 func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Task, error) {
 	var payload = &VolumeAction{
-		Type: "restore",
+		Type:       "restore",
 		SnapshotID: snapshotID}
 
 	req, err := v.client.NewRequest(
