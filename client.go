@@ -31,6 +31,7 @@ type Client struct {
 	Member       MemberService
 
 	Volume VolumeService
+	Server ServerService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -99,6 +100,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Pool = &pool{client: c}
 	c.Member = &member{client: c}
 	c.Volume = &volume{client: c}
+	c.Server = &server{client: c}
 
 	return c, nil
 }
