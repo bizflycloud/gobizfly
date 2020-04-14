@@ -62,6 +62,7 @@ type ServerService interface {
 	SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error)
 	HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error)
 	Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error)
+	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -81,11 +82,11 @@ type ServerAction struct {
 	ImageID     string   `json:"image,omitempty"`
 	FlavorName  string   `json:"flavor_name,omitempty"`
 	ConsoleType string   `json:"type,omitempty"`
-	FirewallIDs []string `json:"firewall_ids",omitempty`
+	FirewallIDs []string `json:"firewall_ids,omitempty"`
 	NewType     string   `json:"new_type,omitempty"`
-	Type        string   `json:"type"`
 }
 
+// ServerTask contains task information.
 type ServerTask struct {
 	TaskID string `json:"task_id"`
 }
@@ -147,7 +148,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 	var payload []*ServerCreateRequest
 	// payload[0] = scr
 	payload = append(payload, scr)
-	req, err := s.client.NewRequest(ctx, http.MethodPost, serverBasePath, &payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverBasePath, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +165,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 	return task, nil
 }
 
+// Get gets a server.
 func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverBasePath+"/"+id, nil)
 	if err != nil {
@@ -182,6 +184,7 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 	return svr, nil
 }
 
+// Delete deletes a server.
 func (s *server) Delete(ctx context.Context, id string) error {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverBasePath+"/"+id, nil)
 	if err != nil {
@@ -195,6 +198,7 @@ func (s *server) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
+// Resize resizes a server.
 func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error) {
 	var payload = &ServerAction{
 		Action:     "resize",
@@ -217,6 +221,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 	return task, nil
 }
 
+// Start starts a server.
 func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "start"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
@@ -236,6 +241,7 @@ func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 	return svr, nil
 }
 
+// Stop stops a server
 func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "stop"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
@@ -255,6 +261,7 @@ func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 	return svr, nil
 }
 
+// SoftReboot soft reboots a server.
 func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "soft_reboot"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
@@ -274,8 +281,9 @@ func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageRespo
 	return srm, nil
 }
 
+// HardReboot hard reboots a server.
 func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
-	payload := &ServerAction{Action: "soft_reboot"}
+	payload := &ServerAction{Action: "hard_reboot"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
@@ -286,13 +294,14 @@ func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageRespo
 	}
 	defer resp.Body.Close()
 
-	var srm *ServerMessageResponse
-	if err := json.NewDecoder(resp.Body).Decode(&srm); err != nil {
+	var smr *ServerMessageResponse
+	if err := json.NewDecoder(resp.Body).Decode(&smr); err != nil {
 		return nil, err
 	}
-	return srm, nil
+	return smr, nil
 }
 
+// Rebuild rebuilds a server.
 func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error) {
 	var payload = &ServerAction{
 		Action:  "rebuild",
@@ -315,8 +324,11 @@ func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*Serve
 	return task, nil
 }
 
+// GetVNC gets vnc console of a server.
 func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error) {
-	payload := &ServerAction{Action: "get_vnc", Type: "novnc"}
+	payload := &ServerAction{
+		Action:      "get_vnc",
+		ConsoleType: "novnc"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
