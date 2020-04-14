@@ -166,8 +166,7 @@ func TestServerCreate(t *testing.T) {
 	mux.HandleFunc(serverBasePath, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var scr *ServerCreateRequest
-		var payload []*ServerCreateRequest
-		payload = append(payload, scr)
+		payload := []*ServerCreateRequest{scr}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "sapd123", payload[0].Name)
 		assert.Equal(t, "image", payload[0].OS.Type)

@@ -2,11 +2,10 @@ package gobizfly
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
-
-	"encoding/json"
 	"strings"
 )
 
@@ -145,9 +144,7 @@ func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 
 // Create creates a new server.
 func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error) {
-	var payload []*ServerCreateRequest
-	// payload[0] = scr
-	payload = append(payload, scr)
+	payload := []*ServerCreateRequest{scr}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverBasePath, payload)
 	if err != nil {
 		return nil, err
