@@ -11,23 +11,23 @@ import (
 )
 
 var (
-	ctx    = context.TODO()
-	server *httptest.Server
-	mux    *http.ServeMux
-	client *Client
+	ctx        = context.TODO()
+	serverTest *httptest.Server
+	mux        *http.ServeMux
+	client     *Client
 )
 
 func setup() {
 	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
+	serverTest = httptest.NewServer(mux)
 
 	var err error
-	client, err = NewClient(WithAPIUrl(server.URL))
+	client, err = NewClient(WithAPIUrl(serverTest.URL))
 	if err != nil {
 		panic(err)
 	}
 }
 
 func teardown() {
-	server.Close()
+	serverTest.Close()
 }
