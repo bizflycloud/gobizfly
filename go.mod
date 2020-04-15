@@ -1,4 +1,4 @@
-module github.com/bizflycloud/bizfly-client-go
+module github.com/bizflycloud/gobizfly
 
 go 1.13
 
