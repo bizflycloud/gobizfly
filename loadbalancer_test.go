@@ -629,6 +629,57 @@ func TestMemberDelete(t *testing.T) {
 	require.NoError(t, client.Member.Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3"))
 }
 
+func TestMemberCreate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var m member
+	mux.HandleFunc(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			Member *MemberCreateRequest `json:"member"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "web-server-1", payload.Member.Name)
+		assert.Equal(t, 80, payload.Member.ProtocolPort)
+		assert.Equal(t, "192.0.2.16", payload.Member.Address)
+
+		resp := `
+{
+    "member": {
+        "monitor_port": 8080,
+        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "name": "web-server-1",
+        "weight": 20,
+        "backup": false,
+        "admin_state_up": true,
+        "subnet_id": "bbb35f84-35cc-4b2f-84c2-a6a29bba68aa",
+        "created_at": "2017-05-11T17:21:34",
+        "provisioning_status": "ACTIVE",
+        "monitor_address": null,
+        "updated_at": "2017-05-11T17:21:37",
+        "address": "192.0.2.16",
+        "protocol_port": 80,
+        "id": "957a1ace-1bd2-449b-8455-820b6e4b63f3",
+        "operating_status": "NO_MONITOR",
+        "tags": ["test_tag"]
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	mcr := MemberCreateRequest{
+		Name:         "web-server-1",
+		Address:      "192.0.2.16",
+		ProtocolPort: 80,
+	}
+	response, err := client.Member.Create(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &mcr)
+	require.NoError(t, err)
+	assert.Equal(t, "957a1ace-1bd2-449b-8455-820b6e4b63f3", response.ID)
+	assert.Equal(t, "192.0.2.16", response.Address)
+	assert.Equal(t, 80, response.ProtocolPort)
+
+}
 func TestPoolList(t *testing.T) {
 	setup()
 	defer teardown()
