@@ -34,10 +34,9 @@ type LoadBalancerService interface {
 
 // LoadBalancerCreateRequest represents create new load balancer request payload.
 type LoadBalancerCreateRequest struct {
-	Description  string        `json:"description"`
+	Description  string        `json:"description,omitempty"`
 	Type         string        `json:"type"`
-	Listeners    []string      `json:"listeners"`
-	LoadBalancer *LoadBalancer `json:"loadbalancer"`
+	Listeners    []string      `json:"listeners,omitempty"`
 	Name         string        `json:"name"`
 	NetworkType  string        `json:"network_type"`
 }
@@ -215,7 +214,6 @@ type ListenerCreateRequest struct {
 	ProtocolPort           int                    `json:"protocol_port"`
 	Protocol               string                 `json:"protocol"`
 	Name                   *string                `json:"name,omitempty"`
-	Listeners              *Listener              `json:"listeners"`
 	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
 	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
 	Description            *string                `json:"description,omitempty"`
@@ -302,7 +300,7 @@ func (l *listener) List(ctx context.Context, lbID string, opts *ListOptions) ([]
 
 func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateRequest) (*Listener, error) {
 	var data struct {
-		Listener *ListenerCreateRequest
+		Listener *ListenerCreateRequest `json:"listener"`
 	}
 	data.Listener = lcr
 	req, err := l.client.NewRequest(ctx, http.MethodPost, l.resourcePath(lbID), &data)
@@ -572,7 +570,6 @@ type PoolCreateRequest struct {
 	LBAlgorithm        string              `json:"lb_algorithm"`
 	ListenerID         *string             `json:"listener_id"`
 	Name               *string             `json:"name,omitempty"`
-	LoadBalancerID     *string             `json:"load_balancer_id"`
 	Protocol           string              `json:"protocol"`
 	SessionPersistence *SessionPersistence `json:"session_persistence"`
 }
