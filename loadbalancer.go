@@ -388,6 +388,7 @@ type MemberService interface {
 	Get(ctx context.Context, poolID, id string) (*Member, error)
 	Update(ctx context.Context, poolID, id string, req *MemberUpdateRequest) (*Member, error)
 	Delete(ctx context.Context, poolID, id string) error
+	Create(ctx context.Context, poolID string, req *MemberCreateRequest) (*Member, error)
 }
 
 // MemberUpdateRequest represents update member request payload.
@@ -398,6 +399,17 @@ type MemberUpdateRequest struct {
 	MonitorAddress *string `json:"monitor_address"`
 	MonitorPort    *int    `json:"monitor_port"`
 	Backup         bool    `json:"backup"`
+}
+
+// MemberCreateRequest represents create member request payload
+type MemberCreateRequest struct {
+	Name           string `json:"name"`
+	Weight         int    `json:"weight,omitempty"`
+	Address        string `json:"address"`
+	ProtocolPort   int    `json:"protocol_port"`
+	MonitorAddress string `json:"monitor_address,omitempty"`
+	MonitorPort    int    `json:"monitor_port,omitempty"`
+	Backup         bool   `json:"backup,omitempty"`
 }
 
 // Member contains member information.
@@ -509,6 +521,29 @@ func (m *member) Delete(ctx context.Context, poolID, id string) error {
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 
 	return resp.Body.Close()
+}
+
+func (m *member) Create(ctx context.Context, poolID string, mcr *MemberCreateRequest) (*Member, error) {
+	var data struct {
+		Member *MemberCreateRequest `json:"member"`
+	}
+	data.Member = mcr
+	req, err := m.client.NewRequest(ctx, http.MethodPost, m.resourcePath(poolID), &data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var response struct {
+		Member *Member `json:"member"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {
+		return nil, err
+	}
+	return response.Member, nil
 }
 
 var _ PoolService = (*pool)(nil)
