@@ -10,6 +10,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -37,6 +38,8 @@ type Client struct {
 	apiURL        *url.URL
 	userAgent     string
 	keystoneToken string
+	username      string
+	password      string
 	// TODO: this will be removed in near future
 	tenantName string
 }
@@ -133,18 +136,36 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	return req, nil
 }
 
+func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
+	return c.httpClient.Do(req)
+}
+
 // Do sends API request.
-func (c *Client) Do(ctx context.Context, req *http.Request) (*http.Response, error) {
-	resp, err := c.httpClient.Do(req)
+func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
+
+	resp, err = c.do(ctx, req)
 	if err != nil {
-		return nil, err
+		return
+	}
+
+	// If 401, get new token and retry one time.
+	if resp.StatusCode == http.StatusUnauthorized {
+		tok, tokErr := c.Token.Create(ctx, &TokenCreateRequest{Username: c.username, Password: c.password})
+		if tokErr != nil {
+			buf, _ := ioutil.ReadAll(resp.Body)
+			err = fmt.Errorf("%s : %w", string(buf), tokErr)
+			return
+		}
+		c.SetKeystoneToken(tok.KeystoneToken)
+		req.Header.Set("X-Auth-Token", c.keystoneToken)
+		resp, err = c.do(ctx, req)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
-		return nil, errors.New(string(buf))
+		err = errors.New(string(buf))
 	}
-	return resp, nil
+	return
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.

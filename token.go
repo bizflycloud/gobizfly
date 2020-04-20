@@ -53,5 +53,8 @@ func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 
+	t.client.username = tcr.Username
+	t.client.password = tcr.Password
+
 	return tok, nil
 }
