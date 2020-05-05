@@ -42,6 +42,7 @@ type VolumeCreateRequest struct {
 
 // VolumeAttachment contains volume attachment information.
 type VolumeAttachment struct {
+	Server       Server `json:"server"`
 	ServerID     string `json:"server_id"`
 	AttachmentID string `json:"attachment_id"`
 	VolumeID     string `json:"volume_id"`
@@ -51,22 +52,22 @@ type VolumeAttachment struct {
 
 // Volume contains volume information.
 type Volume struct {
-	ID               string            `json:"id"`
-	Size             int               `json:"size"`
-	AttachedType     string            `json:"attached_type"`
-	Name             string            `json:"name"`
-	VolumeType       string            `json:"volume_type"`
-	Description      string            `json:"description"`
-	SnapshotID       string            `json:"snapshot_id"`
-	Bootable         string            `json:"bootable"`
-	AvailabilityZone string            `json:"availability_zone"`
-	Status           string            `json:"status"`
-	UserID           string            `json:"user_id"`
-	ProjectID        string            `json:"os-vol-tenant-attr:tenant_id"`
-	CreatedAt        string            `json:"created_at"`
-	UpdatedAt        string            `json:"updated_at"`
-	Metadata         map[string]string `json:"metadata"`
-	Attachments      []Server          `json:"attachments"`
+	ID               string             `json:"id"`
+	Size             int                `json:"size"`
+	AttachedType     string             `json:"attached_type"`
+	Name             string             `json:"name"`
+	VolumeType       string             `json:"volume_type"`
+	Description      string             `json:"description"`
+	SnapshotID       string             `json:"snapshot_id"`
+	Bootable         string             `json:"bootable"`
+	AvailabilityZone string             `json:"availability_zone"`
+	Status           string             `json:"status"`
+	UserID           string             `json:"user_id"`
+	ProjectID        string             `json:"os-vol-tenant-attr:tenant_id"`
+	CreatedAt        string             `json:"created_at"`
+	UpdatedAt        string             `json:"updated_at"`
+	Metadata         map[string]string  `json:"metadata"`
+	Attachments      []VolumeAttachment `json:"attachments"`
 }
 
 type volume struct {
