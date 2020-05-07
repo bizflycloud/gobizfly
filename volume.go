@@ -36,8 +36,10 @@ type VolumeCreateRequest struct {
 	Name             string `json:"name"`
 	Size             int    `json:"size"`
 	VolumeType       string `json:"volume_type"`
+	VolumeCategory   string `json:"category"`
 	AvailabilityZone string `json:"availability_zone"`
 	SnapshotID       string `json:"snapshot_id,omitempty"`
+	ServerID         string `json:"instance_uuid,omitempty"`
 }
 
 // VolumeAttachment contains volume attachment information.

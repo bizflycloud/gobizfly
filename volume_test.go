@@ -290,6 +290,7 @@ func TestVolumeCreate(t *testing.T) {
 		assert.Equal(t, "sapd-test-goclient", volume.Name)
 		assert.Equal(t, 20, volume.Size)
 		assert.Equal(t, "SSD", volume.VolumeType)
+		assert.Equal(t, "premium", volume.VolumeCategory)
 
 		resp := `
 {
@@ -325,6 +326,7 @@ func TestVolumeCreate(t *testing.T) {
 		Size:             20,
 		VolumeType:       "SSD",
 		AvailabilityZone: "HN1",
+		VolumeCategory:   "premium",
 	})
 
 	require.NoError(t, err)

@@ -34,11 +34,11 @@ type LoadBalancerService interface {
 
 // LoadBalancerCreateRequest represents create new load balancer request payload.
 type LoadBalancerCreateRequest struct {
-	Description  string        `json:"description,omitempty"`
-	Type         string        `json:"type"`
-	Listeners    []string      `json:"listeners,omitempty"`
-	Name         string        `json:"name"`
-	NetworkType  string        `json:"network_type"`
+	Description string   `json:"description,omitempty"`
+	Type        string   `json:"type"`
+	Listeners   []string `json:"listeners,omitempty"`
+	Name        string   `json:"name"`
+	NetworkType string   `json:"network_type"`
 }
 
 // LoadBalancerUpdateRequest represents update load balancer request payload.
