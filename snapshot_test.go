@@ -152,9 +152,10 @@ func TestSnapshotGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(strings.Join([]string{snapshotPath, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"), func(writer http.ResponseWriter, request *http.Request) {
-		require.Equal(t, http.MethodGet, request.Method)
-		resp := `
+	mux.HandleFunc(strings.Join([]string{snapshotPath, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
+		func(writer http.ResponseWriter, request *http.Request) {
+			require.Equal(t, http.MethodGet, request.Method)
+			resp := `
 {
     "status": "available",
     "volume_type_id": "b74a5c89-7293-4069-b87b-cf6867fc574a",
@@ -239,8 +240,8 @@ func TestSnapshotGet(t *testing.T) {
     }
 }
 `
-		_, _ = fmt.Fprint(writer, resp)
-	})
+			_, _ = fmt.Fprint(writer, resp)
+		})
 	snapshot, err := client.Snapshot.Get(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5")
 	require.NoError(t, err)
 	require.Equal(t, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5", snapshot.Id, "check snapshot id")
@@ -250,10 +251,10 @@ func TestSnapshotGet(t *testing.T) {
 func TestSnapshotCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(snapshotPath, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPost, r.Method)
+	mux.HandleFunc(snapshotPath, func(writer http.ResponseWriter, request *http.Request) {
+		require.Equal(t, http.MethodPost, request.Method)
 		var snapshot *SnapshotCreateRequest
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&snapshot))
+		require.NoError(t, json.NewDecoder(request.Body).Decode(&snapshot))
 		assert.Equal(t, "ducpx-test-create-snapshot", snapshot.Name)
 		assert.Equal(t, true, snapshot.Force)
 		assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeId)
@@ -320,7 +321,7 @@ func TestSnapshotCreate(t *testing.T) {
 }
 `
 
-		_, _ = fmt.Fprint(w, resp)
+		_, _ = fmt.Fprint(writer, resp)
 	})
 
 	snapshot, err := client.Snapshot.Create(ctx, &SnapshotCreateRequest{
@@ -336,7 +337,13 @@ func TestSnapshotCreate(t *testing.T) {
 	assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeId)
 }
 
-//
-//func TestSnapshotDelete(t *testing.T) {
-//
-//}
+func TestSnapshotDelete(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(strings.Join([]string{snapshotPath, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
+		func(writer http.ResponseWriter, request *http.Request) {
+			require.Equal(t, http.MethodDelete, request.Method)
+			writer.WriteHeader(http.StatusNoContent)
+		})
+	require.NoError(t, client.Snapshot.Delete(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"))
+}
