@@ -3,7 +3,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -70,21 +69,9 @@ func (s *snapshot) Get(ctx context.Context, id string) (*Snapshot, error) {
 	return snapshot, nil
 }
 
+// Delete deletes a snapshot
 func (s *snapshot) Delete(ctx context.Context, id string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, strings.Join([]string{snapshotPath, id}, "/"), nil)
-
-	if err != nil {
-		return err
-	}
-
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		fmt.Println("error send req")
-		return err
-	}
-	//_, _ = io.Copy(ioutil.Discard, resp.Body)
-	//
-	return resp.Body.Close()
+	panic("implement me")
 }
 
 // Create creates a new snapshot
