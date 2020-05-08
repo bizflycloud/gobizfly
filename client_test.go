@@ -6,11 +6,10 @@ package gobizfly
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -37,5 +36,7 @@ func teardown() {
 
 func TestErrFromStatus(t *testing.T) {
 	err := errorFromStatus(404, "Volume not found")
-	assert.EqualError(t, err, "Volume not found: Resource not found.")
+	if !errors.Is(err, ErrNotFound) {
+		t.Errorf("Error")
+	}
 }
