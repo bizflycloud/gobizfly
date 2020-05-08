@@ -163,14 +163,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		resp, err = c.do(ctx, req)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		fmt.Println(resp.StatusCode)
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
-		if resp.StatusCode == http.StatusNotFound {
-			err = fmt.Errorf("%s: %w ", string(buf), ErrNotFound)
-		} else {
-			err = errors.New(string(buf))
-		}
+		err = errorFromStatus(resp.StatusCode, string(buf))
 
 	}
 	return
@@ -183,3 +178,11 @@ func (c *Client) SetKeystoneToken(s string) {
 
 // ListOptions specifies the optional parameters for List method.
 type ListOptions struct{}
+
+func errorFromStatus(code int, msg string) error {
+	if code == http.StatusNotFound {
+		return fmt.Errorf("%s: %w", msg, ErrNotFound)
+	} else {
+		return errors.New(msg)
+	}
+}
