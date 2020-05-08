@@ -35,16 +35,19 @@ func teardown() {
 }
 
 func TestErrFromStatus(t *testing.T) {
-	err := errorFromStatus(404, "Volume not found")
-	if !errors.Is(err, ErrNotFound) {
-		t.Errorf("Error")
+	tests := []struct {
+		statusCode int
+		msg        string
+		err        error
+	}{
+		{http.StatusBadRequest, "Volume not found", ErrCommon},
+		{http.StatusNotFound, "Permission denied", ErrNotFound},
+		{http.StatusForbidden, "Generic error", ErrPermissionDenied},
 	}
-	err = errorFromStatus(403, "Permission denied")
-	if !errors.Is(err, ErrPermissionDenied) {
-		t.Errorf("Error")
-	}
-	err = errorFromStatus(400, "Client error")
-	if !errors.Is(err, ErrCommon) {
-		t.Errorf("Error")
+
+	for _, tc := range tests {
+		if err := errorFromStatus(tc.statusCode, tc.msg); !errors.Is(err, tc.err) {
+			t.Errorf("unexpected error, want: %v, got: %v", tc.err, err)
+		}
 	}
 }
