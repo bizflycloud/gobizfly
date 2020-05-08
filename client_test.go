@@ -39,4 +39,12 @@ func TestErrFromStatus(t *testing.T) {
 	if !errors.Is(err, ErrNotFound) {
 		t.Errorf("Error")
 	}
+	err = errorFromStatus(403, "Permission denied")
+	if !errors.Is(err, ErrPermissionDenied) {
+		t.Errorf("Error")
+	}
+	err = errorFromStatus(400, "Client error")
+	if !errors.Is(err, ErrCommon) {
+		t.Errorf("Error")
+	}
 }

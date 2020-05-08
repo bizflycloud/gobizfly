@@ -24,8 +24,12 @@ const (
 )
 
 var (
-	ErrNotFound         = errors.New("Resource not found.")
+	// ErrNotFound for resource not found status
+	ErrNotFound = errors.New("Resource not found")
+	// ErrPermissionDenied for permission denied
 	ErrPermissionDenied = errors.New("You are not allowed to do this action")
+	// ErrCommon for common error
+	ErrCommon = errors.New("Client Error")
 )
 
 // Client represents BizFly API client.
@@ -189,6 +193,6 @@ func errorFromStatus(code int, msg string) error {
 	case http.StatusForbidden:
 		return fmt.Errorf("%s: %w", msg, ErrPermissionDenied)
 	default:
-		return errors.New(msg)
+		return fmt.Errorf("%s: %w", msg, ErrCommon)
 	}
 }
