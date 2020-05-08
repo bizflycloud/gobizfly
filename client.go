@@ -29,7 +29,7 @@ var (
 	// ErrPermissionDenied for permission denied
 	ErrPermissionDenied = errors.New("You are not allowed to do this action")
 	// ErrCommon for common error
-	ErrCommon = errors.New("Client Error")
+	ErrCommon = errors.New("Error")
 )
 
 // Client represents BizFly API client.
