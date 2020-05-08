@@ -31,6 +31,8 @@ type Client struct {
 	Pool         PoolService
 	Member       MemberService
 
+	Snapshot SnapshotService
+
 	Volume VolumeService
 	Server ServerService
 
@@ -97,6 +99,7 @@ func NewClient(options ...Option) (*Client, error) {
 		}
 	}
 
+	c.Snapshot = &snapshot{client: c}
 	c.Token = &token{client: c}
 	c.LoadBalancer = &loadbalancer{client: c}
 	c.Listener = &listener{client: c}
