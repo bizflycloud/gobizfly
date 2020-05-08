@@ -23,7 +23,10 @@ const (
 	mediaType     = "application/json; charset=utf-8"
 )
 
-var ErrNotFound = errors.New("Resource not found.")
+var (
+	ErrNotFound         = errors.New("Resource not found.")
+	ErrPermissionDenied = errors.New("You are not allowed to do this action")
+)
 
 // Client represents BizFly API client.
 type Client struct {
@@ -180,9 +183,12 @@ func (c *Client) SetKeystoneToken(s string) {
 type ListOptions struct{}
 
 func errorFromStatus(code int, msg string) error {
-	if code == http.StatusNotFound {
+	switch code {
+	case http.StatusNotFound:
 		return fmt.Errorf("%s: %w", msg, ErrNotFound)
-	} else {
+	case http.StatusForbidden:
+		return fmt.Errorf("%s: %w", msg, ErrPermissionDenied)
+	default:
 		return errors.New(msg)
 	}
 }
