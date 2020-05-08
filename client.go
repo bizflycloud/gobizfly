@@ -23,6 +23,8 @@ const (
 	mediaType     = "application/json; charset=utf-8"
 )
 
+var ErrNotFound = errors.New("Resource not found.")
+
 // Client represents BizFly API client.
 type Client struct {
 	Token        TokenService
@@ -161,9 +163,15 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		resp, err = c.do(ctx, req)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
+		fmt.Println(resp.StatusCode)
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
-		err = errors.New(string(buf))
+		if resp.StatusCode == http.StatusNotFound {
+			err = fmt.Errorf("%s: %w ", string(buf), ErrNotFound)
+		} else {
+			err = errors.New(string(buf))
+		}
+
 	}
 	return
 }
