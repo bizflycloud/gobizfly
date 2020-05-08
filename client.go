@@ -23,6 +23,15 @@ const (
 	mediaType     = "application/json; charset=utf-8"
 )
 
+var (
+	// ErrNotFound for resource not found status
+	ErrNotFound = errors.New("Resource not found")
+	// ErrPermissionDenied for permission denied
+	ErrPermissionDenied = errors.New("You are not allowed to do this action")
+	// ErrCommon for common error
+	ErrCommon = errors.New("Error")
+)
+
 // Client represents BizFly API client.
 type Client struct {
 	Token        TokenService
@@ -166,7 +175,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if resp.StatusCode >= http.StatusBadRequest {
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
-		err = errors.New(string(buf))
+		err = errorFromStatus(resp.StatusCode, string(buf))
+
 	}
 	return
 }
@@ -178,3 +188,14 @@ func (c *Client) SetKeystoneToken(s string) {
 
 // ListOptions specifies the optional parameters for List method.
 type ListOptions struct{}
+
+func errorFromStatus(code int, msg string) error {
+	switch code {
+	case http.StatusNotFound:
+		return fmt.Errorf("%s: %w", msg, ErrNotFound)
+	case http.StatusForbidden:
+		return fmt.Errorf("%s: %w", msg, ErrPermissionDenied)
+	default:
+		return fmt.Errorf("%s: %w", msg, ErrCommon)
+	}
+}

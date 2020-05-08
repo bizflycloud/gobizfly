@@ -6,8 +6,10 @@ package gobizfly
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"testing"
 )
 
 var (
@@ -30,4 +32,19 @@ func setup() {
 
 func teardown() {
 	serverTest.Close()
+}
+
+func TestErrFromStatus(t *testing.T) {
+	err := errorFromStatus(404, "Volume not found")
+	if !errors.Is(err, ErrNotFound) {
+		t.Errorf("Error")
+	}
+	err = errorFromStatus(403, "Permission denied")
+	if !errors.Is(err, ErrPermissionDenied) {
+		t.Errorf("Error")
+	}
+	err = errorFromStatus(400, "Client error")
+	if !errors.Is(err, ErrCommon) {
+		t.Errorf("Error")
+	}
 }
