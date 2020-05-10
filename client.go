@@ -21,16 +21,24 @@ const (
 	ua            = "bizfly-client-go/" + version
 	defaultAPIURL = "https://manage.bizflycloud.vn"
 	mediaType     = "application/json; charset=utf-8"
+
+	volumeDetachedMsg = "Bad request (HTTP volume has already detached)"
 )
 
 var (
 	// ErrNotFound for resource not found status
 	ErrNotFound = errors.New("Resource not found")
 	// ErrPermissionDenied for permission denied
-	ErrPermissionDenied = errors.New("You are not allowed to do this action")
+	ErrPermissionDenied      = errors.New("You are not allowed to do this action")
+	ErrVolumeAlreadyDetached = errors.New("Volume is already detached from a server")
 	// ErrCommon for common error
 	ErrCommon = errors.New("Error")
 )
+
+// ErrMsg represents error message response
+type ErrMsg struct {
+	Message string `json:"message"`
+}
 
 // Client represents BizFly API client.
 type Client struct {
@@ -195,6 +203,15 @@ func errorFromStatus(code int, msg string) error {
 		return fmt.Errorf("%s: %w", msg, ErrNotFound)
 	case http.StatusForbidden:
 		return fmt.Errorf("%s: %w", msg, ErrPermissionDenied)
+	case http.StatusBadRequest:
+		{
+			var errMsg ErrMsg
+			json.Unmarshal([]byte(msg), &errMsg)
+			if errMsg.Message == volumeDetachedMsg {
+				return fmt.Errorf("%s: %w", msg, ErrVolumeAlreadyDetached)
+			}
+			return fmt.Errorf("%s: %w", msg, ErrCommon)
+		}
 	default:
 		return fmt.Errorf("%s: %w", msg, ErrCommon)
 	}
