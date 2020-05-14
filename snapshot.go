@@ -45,7 +45,7 @@ type Snapshot struct {
 	Description      string            `json:"description"`
 	IsUsingAutoscale bool              `json:"is_using_autoscale"`
 	UpdatedAt        string            `json:"updated_at"`
-	CreateAt         string            `json:"create_at"`
+	CreateAt         string            `json:"created_at"`
 	FromVolume       Volume            `json:"volume"`
 }
 
