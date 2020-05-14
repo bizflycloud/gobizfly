@@ -56,8 +56,11 @@ func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 
+	t.client.authMethod = tcr.AuthMethod
 	t.client.username = tcr.Username
 	t.client.password = tcr.Password
+	t.client.appCredID = tcr.AppCredID
+	t.client.appCredSecret = tcr.AppCredSecret
 
 	return tok, nil
 }
