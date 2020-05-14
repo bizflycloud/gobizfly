@@ -13,44 +13,37 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestTokenAuthPassword(t *testing.T) {
-	setup()
-	defer teardown()
+func TestToken(t *testing.T) {
 
-	mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPost, r.Method)
-		resp := `
+	tests := []struct {
+		name          string
+		tcr           *TokenCreateRequest
+		expectedToken string
+	}{
+		{"Auth Password", &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx"}, "auth-password-token"},
+		{"Auth Application Secret", &TokenCreateRequest{AuthMethod: "application_credential", AppCredID: "174b36fd6c9e4a1da2e7c7dbddb89c69", AppCredSecret: "foo"}, "auth-app-token"},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			setup()
+			defer teardown()
+			mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+				require.Equal(t, http.MethodPost, r.Method)
+				resp := fmt.Sprintf(`
 {
-    "token": "xxx",
+    "token": "%s",
     "expires_at": "2019-11-22T15:39:54.000000Z"
 }
-`
-		_, _ = fmt.Fprint(w, resp)
-	})
+`, tc.expectedToken)
+				_, _ = fmt.Fprint(w, resp)
+			})
 
-	tok, err := client.Token.Create(ctx, &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx"})
-	require.NoError(t, err)
-	require.Equal(t, "xxx", tok.KeystoneToken)
-}
-
-func TestTokenAuthApplicationCredential(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPost, r.Method)
-		resp := `
-{
-    "token": "xxx",
-    "expires_at": "2019-11-22T15:39:54.000000Z"
-}
-`
-		_, _ = fmt.Fprint(w, resp)
-	})
-
-	tok, err := client.Token.Create(ctx, &TokenCreateRequest{AuthMethod: "application_credential", AppCredID: "174b36fd6c9e4a1da2e7c7dbddb89c69", AppCredSecret: "xxx"})
-	require.NoError(t, err)
-	require.Equal(t, "xxx", tok.KeystoneToken)
+			tok, err := client.Token.Create(ctx, tc.tcr)
+			require.NoError(t, err)
+			require.Equal(t, tc.expectedToken, tok.KeystoneToken)
+		})
+	}
 }
 
 func TestRetryWhenTokenExpired(t *testing.T) {
