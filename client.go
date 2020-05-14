@@ -164,16 +164,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	}
 
 	// If 401, get new token and retry one time.
-	tcr := &TokenCreateRequest{}
 	if resp.StatusCode == http.StatusUnauthorized {
-		switch c.authMethod {
-		case "password":
-			tcr.Username = c.username
-			tcr.Password = c.password
-		case "application_credential":
-			tcr.AppCredID = c.appCredID
-			tcr.AppCredSecret = c.appCredSecret
-		}
+		tcr := &TokenCreateRequest{AuthMethod: c.authMethod, Username: c.username, Password: c.password, AppCredID: c.appCredID, AppCredSecret: c.appCredSecret}
 		tok, tokErr := c.Token.Create(ctx, tcr)
 		if tokErr != nil {
 			buf, _ := ioutil.ReadAll(resp.Body)
@@ -202,7 +194,6 @@ func (c *Client) SetKeystoneToken(s string) {
 type ListOptions struct{}
 
 func errorFromStatus(code int, msg string) error {
-	fmt.Print(msg)
 	switch code {
 	case http.StatusNotFound:
 		return fmt.Errorf("%s: %w", msg, ErrNotFound)
