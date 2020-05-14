@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	tokenPath = "/iaas-cloud/api/token"
+	tokenPath = "/api/token"
 )
 
 var _ TokenService = (*token)(nil)
@@ -23,8 +23,11 @@ type TokenService interface {
 
 // TokenCreateRequest represents create new token request payload.
 type TokenCreateRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	AuthMethod    string `json:"auth_method"`
+	Username      string `json:"username,omitempty"`
+	Password      string `json:"password,omitempty"`
+	AppCredID     string `json:"credential_id,omitempty"`
+	AppCredSecret string `json:"credential_secret,omitempty"`
 }
 
 // Token contains token information.
