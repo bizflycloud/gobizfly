@@ -165,8 +165,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
-		tcr := &TokenCreateRequest{AuthMethod: c.authMethod, Username: c.username, Password: c.password, AppCredID: c.appCredID, AppCredSecret: c.appCredSecret}
-		tok, tokErr := c.Token.Create(ctx, tcr)
+		tok, tokErr := c.Token.Refresh(ctx)
 		if tokErr != nil {
 			buf, _ := ioutil.ReadAll(resp.Body)
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
