@@ -19,6 +19,7 @@ var _ TokenService = (*token)(nil)
 // TokenService is an interface to interact with BizFly API token endpoint.
 type TokenService interface {
 	Create(ctx context.Context, request *TokenCreateRequest) (*Token, error)
+	Refresh(ctx context.Context) (*Token, error)
 }
 
 // TokenCreateRequest represents create new token request payload.
@@ -40,7 +41,24 @@ type token struct {
 	client *Client
 }
 
+// Create creates new token base on the information in TokenCreateRequest.
 func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+	return t.create(ctx, tcr)
+}
+
+// Refresh retrieves new token base on underlying client information.
+func (t *token) Refresh(ctx context.Context) (*Token, error) {
+	tcr := &TokenCreateRequest{
+		AuthMethod:    t.client.authMethod,
+		Username:      t.client.username,
+		Password:      t.client.password,
+		AppCredID:     t.client.appCredID,
+		AppCredSecret: t.client.appCredSecret,
+	}
+	return t.create(ctx, tcr)
+}
+
+func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	req, err := t.client.NewRequest(ctx, http.MethodPost, tokenPath, tcr)
 	if err != nil {
 		return nil, err
