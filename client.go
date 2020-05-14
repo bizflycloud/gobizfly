@@ -49,8 +49,11 @@ type Client struct {
 	apiURL        *url.URL
 	userAgent     string
 	keystoneToken string
+	authMethod    string
 	username      string
 	password      string
+	appCredID     string
+	appCredSecret string
 	// TODO: this will be removed in near future
 	tenantName string
 }
@@ -162,7 +165,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
-		tok, tokErr := c.Token.Create(ctx, &TokenCreateRequest{Username: c.username, Password: c.password})
+		tcr := &TokenCreateRequest{AuthMethod: c.authMethod, Username: c.username, Password: c.password, AppCredID: c.appCredID, AppCredSecret: c.appCredSecret}
+		tok, tokErr := c.Token.Create(ctx, tcr)
 		if tokErr != nil {
 			buf, _ := ioutil.ReadAll(resp.Body)
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)

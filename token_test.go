@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestToken(t *testing.T) {
+func TestTokenAuthPassword(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -28,7 +28,27 @@ func TestToken(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	tok, err := client.Token.Create(ctx, &TokenCreateRequest{Username: "foo@bizflycloud.vn", Password: "xxx"})
+	tok, err := client.Token.Create(ctx, &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx"})
+	require.NoError(t, err)
+	require.Equal(t, "xxx", tok.KeystoneToken)
+}
+
+func TestTokenAuthApplicationCredential(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+    "token": "xxx",
+    "expires_at": "2019-11-22T15:39:54.000000Z"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	tok, err := client.Token.Create(ctx, &TokenCreateRequest{AuthMethod: "application_credential", AppCredID: "174b36fd6c9e4a1da2e7c7dbddb89c69", AppCredSecret: "xxx"})
 	require.NoError(t, err)
 	require.Equal(t, "xxx", tok.KeystoneToken)
 }
