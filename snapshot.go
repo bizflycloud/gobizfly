@@ -64,6 +64,7 @@ type Snapshot struct {
 	UpdatedAt        string            `json:"updated_at"`
 	CreateAt         string            `json:"created_at"`
 	FromVolume       Volume            `json:"volume"`
+	Category         string            `json:"category"`
 }
 
 type snapshot struct {

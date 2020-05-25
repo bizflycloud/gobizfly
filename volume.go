@@ -71,7 +71,7 @@ type Volume struct {
 	Size             int                `json:"size"`
 	AttachedType     string             `json:"attached_type"`
 	Name             string             `json:"name"`
-	VolumeType       string             `json:"volume_type"`
+	VolumeType       string             `json:"type"`
 	Description      string             `json:"description"`
 	SnapshotID       string             `json:"snapshot_id"`
 	Bootable         string             `json:"bootable"`
@@ -83,6 +83,7 @@ type Volume struct {
 	UpdatedAt        string             `json:"updated_at"`
 	Metadata         map[string]string  `json:"metadata"`
 	Attachments      []VolumeAttachment `json:"attachments"`
+	Category         string             `json:"category"`
 }
 
 type volume struct {
