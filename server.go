@@ -60,7 +60,7 @@ type Server struct {
 	Progress         int                    `json:"progress"`
 	AttachedVolumes  []AttachedVolume       `json:"os-extended-volumes:volumes_attached"`
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
-	Category		 string					`json:"category"`
+	Category         string                 `json:"category"`
 }
 
 type server struct {

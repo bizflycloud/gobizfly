@@ -83,7 +83,7 @@ type Volume struct {
 	UpdatedAt        string             `json:"updated_at"`
 	Metadata         map[string]string  `json:"metadata"`
 	Attachments      []VolumeAttachment `json:"attachments"`
-	Category 		 string				`json:"category"`
+	Category         string             `json:"category"`
 }
 
 type volume struct {

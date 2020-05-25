@@ -53,7 +53,7 @@ type Snapshot struct {
 	Id               string            `json:"id"`
 	Name             string            `json:"name"`
 	Status           string            `json:"status"`
-	VolumeType       string            `json:"type"`
+	VolumeTypeId     string            `json:"volume_type_id"`
 	VolumeId         string            `json:"volume_id"`
 	Size             int               `json:"size"`
 	Progress         string            `json:"os-extended-snapshot-attributes:progress"`
@@ -64,7 +64,7 @@ type Snapshot struct {
 	UpdatedAt        string            `json:"updated_at"`
 	CreateAt         string            `json:"created_at"`
 	FromVolume       Volume            `json:"volume"`
-	Category		 string			   `json:"category"`
+	Category         string            `json:"category"`
 }
 
 type snapshot struct {
