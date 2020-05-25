@@ -151,7 +151,9 @@ func TestSnapshotList(t *testing.T) {
             "bootable": "true",
             "created_at": "2020-04-27T06:59:57.000000",
             "volume_type": "SSD",
-            "attached_type": "rootdisk"
+            "attached_type": "rootdisk",
+        	"type": "HDD",
+        	"category": "premium"
         }
     }
 ]
@@ -253,7 +255,9 @@ func TestSnapshotGet(t *testing.T) {
         "bootable": "true",
         "created_at": "2020-05-06T08:10:29.000000",
         "volume_type": "BASIC_HDD",
-        "attached_type": "rootdisk"
+        "attached_type": "rootdisk",
+		"type": "HDD",
+		"category": "premium"
     }
 }
 `
@@ -333,7 +337,9 @@ func TestSnapshotCreate(t *testing.T) {
         "bootable": "true",
         "created_at": "2018-05-04T01:51:38.000000",
         "volume_type": "HDD",
-        "attached_type": "rootdisk"
+        "attached_type": "rootdisk",
+		"type": "HDD",
+		"category": "premium"
     }
 }
 `

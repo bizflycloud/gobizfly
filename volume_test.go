@@ -131,7 +131,7 @@ func TestVolumeList(t *testing.T) {
 		"description": null,
 		"os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
 		"updated_at": "2020-04-11T17:51:47.000000",
-		"volume_type": "HDD",
+		"type": "HDD",
 		"name": "sapd-vol-1",
 		"replication_status": null,
 		"consistencygroup_id": null,
@@ -144,7 +144,8 @@ func TestVolumeList(t *testing.T) {
 		},
 		"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
 		"size": 20,
-		"attached_type": "datadisk"
+		"attached_type": "datadisk",
+		"category": "premium"
 	}
 ]
 `
@@ -261,7 +262,7 @@ func TestVolumeGet(t *testing.T) {
 	"description": null,
 	"os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
 	"updated_at": "2020-04-11T17:51:47.000000",
-	"volume_type": "HDD",
+	"type": "HDD",
 	"name": "sapd-vol-1",
 	"replication_status": null,
 	"consistencygroup_id": null,
@@ -274,7 +275,8 @@ func TestVolumeGet(t *testing.T) {
 	},
 	"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
 	"size": 20,
-	"attached_type": "datadisk"
+	"attached_type": "datadisk",
+	"category": "premium"
 }		
 `
 		_, _ = fmt.Fprint(w, resp)

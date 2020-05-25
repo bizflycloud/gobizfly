@@ -158,7 +158,8 @@ func TestServerGet(t *testing.T) {
 			"prebuild_app_name": "Jitsi",
 			"service": "prebuild_app"
 		},
-		"ipv6": false
+		"ipv6": false,
+		"category": "premium"
 	}
 ]
 		`
@@ -173,7 +174,7 @@ func TestServerGet(t *testing.T) {
 	assert.Equal(t, "sapd1", server.KeyName)
 	assert.Equal(t, "ACTIVE", server.Status)
 	assert.Equal(t, false, server.IPv6)
-	assert.Equal(t, "premium", server.Metadata["category"])
+	assert.Equal(t, "premium", server.Category)
 
 }
 
