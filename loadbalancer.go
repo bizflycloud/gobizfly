@@ -598,13 +598,12 @@ type PoolUpdateRequest struct {
 
 // Pool contains pool information.
 type Pool struct {
-	ID          string `json:"id"`
-	TenandID    string `json:"tenant_id"`
-	Description string `json:"description"`
-	LBAlgorithm string `json:"lb_algorithm"`
-	Name        string `json:"name"`
-	// TODO: change later when HealthMonitor entity added
-	HealthMonitor      interface{}           `json:"healthmonitor"`
+	ID                 string                `json:"id"`
+	TenandID           string                `json:"tenant_id"`
+	Description        string                `json:"description"`
+	LBAlgorithm        string                `json:"lb_algorithm"`
+	Name               string                `json:"name"`
+	HealthMonitor      *HealthMonitor        `json:"healthmonitor"`
 	UpdatedAt          string                `json:"updated_at"`
 	OperatingStatus    string                `json:"operating_status"`
 	Listeners          []struct{ ID string } `json:"listeners"`
@@ -731,4 +730,155 @@ func (p *pool) Delete(ctx context.Context, id string) error {
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 
 	return resp.Body.Close()
+}
+
+type HealthMonitor struct {
+	Name           string                `json:"name"`
+	Type           string                `json:"type"`
+	Delay          int                   `json:"delay"`
+	MaxRetries     int                   `json:"max_retries"`
+	MaxRetriesDown int                   `json:"max_retries_down"`
+	TimeOut        int                   `json:"timeout"`
+	HTTPMethod     string                `json:"http_method"`
+	UrlPath        string                `json:"url_path"`
+	ExpectedCodes  string                `json:"expected_codes"`
+	HTTPVersion    float32                `json:"http_version"`
+	OpratingStatus string                `json:"oprating_status"`
+	DomainName     string                `json:"domain_name"`
+	ID             string                `json:"id"`
+	CreatedAt      string                `json:"created_at"`
+	UpdatedAt      string                `json:"updated_at"`
+	TenantID       string                `json:"tenant_id"`
+	Pool           []struct{ ID string } `json:"pool"`
+}
+
+type HealthMonitorCreateRequest struct {
+	Name           string `json:"name"`
+	Type           string `json:"type"`
+	TimeOut        int    `json:"timeout"`
+	PoolID         string `json:"pool_id"`
+	Delay          int    `json:"delay"`
+	MaxRetries     int    `json:"max_retries"`
+	MaxRetriesDown int    `json:"max_retries_down"`
+	HTTPMethod     string `json:"http_method"`
+	HTTPVersion    float32 `json:"http_version"`
+	URLPath        string `json:"url_path"`
+	ExpectedCodes  string `json:"expected_codes"`
+	DomainName     string `json:"domain_name"`
+}
+
+type HealthMonitorUpdateRequest struct {
+	Name           string `json:"name"`
+	TimeOut        string `json:"timeout"`
+	PoolID         string `json:"pool_id"`
+	Delay          int    `json:"delay"`
+	MaxRetries     int    `json:"max_retries"`
+	MaxRetriesDown int    `json:"max_retries_down"`
+	HTTPMethod     string `json:"http_method"`
+	HTTPVersion    float32 `json:"http_version"`
+	URLPath        string `json:"url_path"`
+	ExpectedCodes  string `json:"expected_codes"`
+	DomainName     string `json:"domain_name"`
+}
+
+type healthmonitor struct {
+	client *Client
+}
+
+var _ HealthMonitorService = (*healthmonitor)(nil)
+
+// HealthMonitorService is an interface to interact with BizFly API Health Monitor endpoint.
+type HealthMonitorService interface {
+	Get(ctx context.Context, healthMonitorID string) (*HealthMonitor, error)
+	Delete(ctx context.Context, healthMonitorID string) error
+	Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error)
+	Update(Ctx context.Context, healthMonitorID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error)
+}
+
+func (h *healthmonitor) itemPath(hmID string) string {
+	return strings.Join([]string{loadBalancerBasePath, "healthmonitor", hmID}, "/")
+}
+
+// Get gets detail a health monitor
+func (h *healthmonitor) Get(ctx context.Context, hmID string) (*HealthMonitor, error) {
+	req, err := h.client.NewRequest(ctx, http.MethodGet, h.itemPath(hmID), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := h.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	hm := &HealthMonitor{}
+	if err := json.NewDecoder(resp.Body).Decode(hm); err != nil {
+		return nil, err
+	}
+	return hm, nil
+}
+
+// Create creates a health monitor for a pool
+func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error) {
+	var data struct {
+		HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
+	}
+	hmcr.PoolID = poolID
+	data.HealthMonitor = hmcr
+	req, err := h.client.NewRequest(ctx, http.MethodPost, strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), &data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := h.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		HealthMonitor *HealthMonitor `json:"healthmonitor"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.HealthMonitor, nil
+}
+
+// Delete deletes a health monitor
+func (h *healthmonitor) Delete(ctx context.Context, hmID string) error {
+	req, err := h.client.NewRequest(ctx, http.MethodDelete, h.itemPath(hmID), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := h.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+func (h *healthmonitor) Update(ctx context.Context, hmID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error) {
+	var data struct {
+		HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
+	}
+	data.HealthMonitor = hmur
+	req, err := h.client.NewRequest(ctx, http.MethodPut, h.itemPath(hmID), data)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := h.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		HealthMonitor *HealthMonitor `json:"healthmonitor"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.HealthMonitor, nil
 }

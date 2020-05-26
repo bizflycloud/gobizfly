@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -979,4 +980,185 @@ func TestPoolDelete(t *testing.T) {
 	})
 
 	require.NoError(t, client.Pool.Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d"))
+}
+
+func TestHealthMonitorCreate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	poolID := "4029d267-3983-4224-a3d0-afb3fe16a2cd"
+
+	mux.HandleFunc(strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "super-pool-health-monitor", payload.HealthMonitor.Name)
+		assert.Equal(t, "HTTP", payload.HealthMonitor.Type)
+		assert.Equal(t, "200", payload.HealthMonitor.ExpectedCodes)
+
+		resp := `
+{
+    "healthmonitor": {
+        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "name": "super-pool-health-monitor",
+        "admin_state_up": true,
+        "pools": [
+            {
+                "id": "4029d267-3983-4224-a3d0-afb3fe16a2cd"
+            }
+        ],
+        "created_at": "2017-05-11T23:53:47",
+        "provisioning_status": "ACTIVE",
+        "updated_at": "2017-05-11T23:53:47",
+        "delay": 10,
+        "expected_codes": "200",
+        "max_retries": 1,
+        "http_method": "GET",
+        "timeout": 5,
+        "max_retries_down": 3,
+        "url_path": "/",
+        "type": "HTTP",
+        "id": "8ed3c5ac-6efa-420c-bedb-99ba14e58db5",
+        "operating_status": "ONLINE",
+        "tags": ["test_tag"],
+        "http_version": 1.1,
+        "domain_name": "testlab.com"
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	hmcr := HealthMonitorCreateRequest{
+		Name:           "super-pool-health-monitor",
+		Type:           "HTTP",
+		Delay:          10,
+		MaxRetries:     1,
+		MaxRetriesDown: 3,
+		TimeOut:        5,
+		HTTPMethod:     "GET",
+		URLPath:        "/",
+		ExpectedCodes:  "200",
+	}
+
+	hm, err := client.HealthMonitor.Create(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &hmcr)
+	require.NoError(t, err)
+	assert.Equal(t, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", hm.ID)
+	assert.Equal(t, "HTTP", hm.Type)
+	assert.Equal(t, "GET", hm.HTTPMethod)
+}
+
+
+func TestHealthMonitorGet(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var h healthmonitor
+	mux.HandleFunc(h.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "max_retries": 3,
+    "operating_status": "ONLINE",
+    "http_version": null,
+    "id": "06052618-d756-4cf4-8e68-cfe33151eab2",
+    "timeout": 5,
+    "url_path": "/",
+    "project_id": "17a1c3c952c84b3e84a82ddd48364938",
+    "http_method": "GET",
+    "domain_name": null,
+    "admin_state_up": true,
+    "delay": 5,
+    "type": "HTTP",
+    "created_at": "2020-05-23T02:41:52",
+    "pools": [
+        {
+            "id": "745ca8f4-af18-49be-a2f8-9fb39600a66c"
+        }
+    ],
+    "name": "",
+    "updated_at": "2020-05-25T16:59:55",
+    "expected_codes": "200-409",
+    "provisioning_status": "ACTIVE",
+    "max_retries_down": 3,
+    "tags": [],
+    "tenant_id": "17a1c3c952c84b3e84a82ddd48364938"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	hm, err := client.HealthMonitor.Get(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2")
+	require.NoError(t, err)
+	assert.Equal(t, "06052618-d756-4cf4-8e68-cfe33151eab2", hm.ID)
+}
+
+func TestHealthMonitorUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var hm healthmonitor
+	mux.HandleFunc(hm.itemPath("8ed3c5ac-6efa-420c-bedb-99ba14e58db5"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPut, r.Method)
+
+		var payload struct {
+			HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "super-pool-health-monitor-updated", payload.HealthMonitor.Name)
+		assert.Equal(t, "HEAD", payload.HealthMonitor.HTTPMethod)
+
+		resp := `
+{
+    "healthmonitor": {
+        "project_id": "e3cd678b11784734bc366148aa37580e",
+        "name": "super-pool-health-monitor-updated",
+        "admin_state_up": true,
+        "pools": [
+            {
+                "id": "4029d267-3983-4224-a3d0-afb3fe16a2cd"
+            }
+        ],
+        "created_at": "2017-05-11T23:53:47",
+        "provisioning_status": "PENDING_UPDATE",
+        "updated_at": "2017-05-11T23:53:47",
+        "delay": 5,
+        "expected_codes": "200",
+        "max_retries": 2,
+        "http_method": "HEAD",
+        "timeout": 2,
+        "max_retries_down": 2,
+        "url_path": "/index.html",
+        "type": "HTTP",
+        "id": "8ed3c5ac-6efa-420c-bedb-99ba14e58db5",
+        "operating_status": "ONLINE",
+        "tags": ["updated_tag"],
+        "http_version": 1.1,
+        "domain_name": null
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	_, err := client.HealthMonitor.Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
+		Name:        "super-pool-health-monitor-updated",
+		HTTPMethod: "HEAD",
+	})
+	require.NoError(t, err)
+}
+
+func TestHealthMonitorDelete(t *testing.T) {
+	setup()
+	defer teardown()
+	var hm healthmonitor
+
+	mux.HandleFunc(hm.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	require.NoError(t, client.HealthMonitor.Delete(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2"))
 }
