@@ -47,11 +47,12 @@ var (
 
 // Client represents BizFly API client.
 type Client struct {
-	Token        TokenService
-	LoadBalancer LoadBalancerService
-	Listener     ListenerService
-	Pool         PoolService
-	Member       MemberService
+	Token         TokenService
+	LoadBalancer  LoadBalancerService
+	Listener      ListenerService
+	Pool          PoolService
+	Member        MemberService
+	HealthMonitor HealthMonitorService
 
 	Snapshot SnapshotService
 
@@ -129,6 +130,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.LoadBalancer = &loadbalancer{client: c}
 	c.Listener = &listener{client: c}
 	c.Pool = &pool{client: c}
+	c.HealthMonitor = &healthmonitor{client: c}
 	c.Member = &member{client: c}
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
