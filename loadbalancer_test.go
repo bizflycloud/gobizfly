@@ -1050,7 +1050,6 @@ func TestHealthMonitorCreate(t *testing.T) {
 	assert.Equal(t, "GET", hm.HTTPMethod)
 }
 
-
 func TestHealthMonitorGet(t *testing.T) {
 	setup()
 	defer teardown()
@@ -1144,7 +1143,7 @@ func TestHealthMonitorUpdate(t *testing.T) {
 	})
 
 	_, err := client.HealthMonitor.Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
-		Name:        "super-pool-health-monitor-updated",
+		Name:       "super-pool-health-monitor-updated",
 		HTTPMethod: "HEAD",
 	})
 	require.NoError(t, err)

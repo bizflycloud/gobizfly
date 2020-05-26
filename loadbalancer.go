@@ -36,6 +36,10 @@ const (
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
 
+type resourceID struct {
+	ID string
+}
+
 // LoadBalancerService is an interface to interact with BizFly API Load Balancers endpoint.
 type LoadBalancerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error)
@@ -69,27 +73,27 @@ type LoadBalancerDeleteRequest struct {
 
 // LoadBalancer contains load balancer information.
 type LoadBalancer struct {
-	ID                 string                `json:"id"`
-	FlavorID           string                `json:"flavor_id"`
-	Description        string                `json:"description"`
-	Provider           string                `json:"provider"`
-	UpdatedAt          string                `json:"updated_at"`
-	Listeners          []struct{ ID string } `json:"listeners"`
-	VipSubnetID        string                `json:"vip_subnet_id"`
-	ProjectID          string                `json:"project_id"`
-	VipQosPolicyID     string                `json:"vip_qos_policy_id"`
-	VipNetworkID       string                `json:"vip_network_id"`
-	NetworkType        string                `json:"network_type"`
-	VipAddress         string                `json:"vip_address"`
-	VipPortID          string                `json:"vip_port_id"`
-	AdminStateUp       bool                  `json:"admin_state_up"`
-	Name               string                `json:"name"`
-	OperatingStatus    string                `json:"operating_status"`
-	ProvisioningStatus string                `json:"provisioning_status"`
-	Pools              []struct{ ID string } `json:"pools"`
-	Type               string                `json:"type"`
-	TenantID           string                `json:"tenant_id"`
-	CreatedAt          string                `json:"created_at"`
+	ID                 string       `json:"id"`
+	FlavorID           string       `json:"flavor_id"`
+	Description        string       `json:"description"`
+	Provider           string       `json:"provider"`
+	UpdatedAt          string       `json:"updated_at"`
+	Listeners          []resourceID `json:"listeners"`
+	VipSubnetID        string       `json:"vip_subnet_id"`
+	ProjectID          string       `json:"project_id"`
+	VipQosPolicyID     string       `json:"vip_qos_policy_id"`
+	VipNetworkID       string       `json:"vip_network_id"`
+	NetworkType        string       `json:"network_type"`
+	VipAddress         string       `json:"vip_address"`
+	VipPortID          string       `json:"vip_port_id"`
+	AdminStateUp       bool         `json:"admin_state_up"`
+	Name               string       `json:"name"`
+	OperatingStatus    string       `json:"operating_status"`
+	ProvisioningStatus string       `json:"provisioning_status"`
+	Pools              []resourceID `json:"pools"`
+	Type               string       `json:"type"`
+	TenantID           string       `json:"tenant_id"`
+	CreatedAt          string       `json:"created_at"`
 }
 
 type loadbalancer struct {
@@ -219,62 +223,62 @@ type ListenerService interface {
 
 // ListenerCreateRequest represents create new listener request payload.
 type ListenerCreateRequest struct {
-	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
-	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
-	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
-	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
-	ProtocolPort           int                    `json:"protocol_port"`
-	Protocol               string                 `json:"protocol"`
-	Name                   *string                `json:"name,omitempty"`
-	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
-	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
-	Description            *string                `json:"description,omitempty"`
-	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
-	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
+	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int               `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string          `json:"sni_container_refs,omitempty"`
+	ProtocolPort           int                `json:"protocol_port"`
+	Protocol               string             `json:"protocol"`
+	Name                   *string            `json:"name,omitempty"`
+	L7Policies             *[]resourceID      `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string `json:"insert_headers,omitempty"`
+	Description            *string            `json:"description,omitempty"`
+	DefaultTLSContainerRef *string            `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string            `json:"default_pool_id,omitempty"`
 }
 
 // ListenerUpdateRequest represents update listener request payload.
 type ListenerUpdateRequest struct {
-	TimeoutTCPInspect      *int                   `json:"timeout_tcp_inspect,omitempty"`
-	TimeoutMemberData      *int                   `json:"timeout_member_data,omitempty"`
-	TimeoutMemberConnect   *int                   `json:"timeout_member_connect,omitempty"`
-	TimeoutClientData      *int                   `json:"timeout_client_data,omitempty"`
-	SNIContainerRefs       *[]string              `json:"sni_container_refs,omitempty"`
-	Name                   *string                `json:"name,omitempty"`
-	L7Policies             *[]struct{ ID string } `json:"l7policies,omitempty"`
-	InsertHeaders          *map[string]string     `json:"insert_headers,omitempty"`
-	Description            *string                `json:"description,omitempty"`
-	DefaultTLSContainerRef *string                `json:"default_tls_container_ref,omitempty"`
-	DefaultPoolID          *string                `json:"default_pool_id,omitempty"`
-	AdminStateUp           *bool                  `json:"admin_state_up,omitempty"`
+	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
+	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
+	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
+	TimeoutClientData      *int               `json:"timeout_client_data,omitempty"`
+	SNIContainerRefs       *[]string          `json:"sni_container_refs,omitempty"`
+	Name                   *string            `json:"name,omitempty"`
+	L7Policies             *[]resourceID      `json:"l7policies,omitempty"`
+	InsertHeaders          *map[string]string `json:"insert_headers,omitempty"`
+	Description            *string            `json:"description,omitempty"`
+	DefaultTLSContainerRef *string            `json:"default_tls_container_ref,omitempty"`
+	DefaultPoolID          *string            `json:"default_pool_id,omitempty"`
+	AdminStateUp           *bool              `json:"admin_state_up,omitempty"`
 }
 
 // Listener contains listener information.
 type Listener struct {
-	ID                     string                `json:"id"`
-	TimeoutClientData      int                   `json:"timeout_client_data"`
-	Description            string                `json:"description"`
-	SNIContainerRefs       []string              `json:"sni_container_refs"`
-	Name                   string                `json:"name"`
-	ConnectionLimit        int                   `json:"connection_limit"`
-	UpdatedAt              string                `json:"updated_at"`
-	ProjectID              string                `json:"project_id"`
-	TimeoutMemberData      int                   `json:"timeout_member_data"`
-	TimeoutMemberConnect   int                   `json:"timeout_member_connect"`
-	L7Policies             []struct{ ID string } `json:"l7policies"`
-	TenandID               string                `json:"tenant_id"`
-	DefaultTLSContainerRef *string               `json:"default_tls_container_ref"`
-	AdminStateUp           bool                  `json:"admin_state_up"`
-	CreatedAt              string                `json:"created_at"`
-	OperatingStatus        string                `json:"operating_status"`
-	ProtocolPort           int                   `json:"protocol_port"`
-	LoadBalancers          []struct{ ID string } `json:"loadbalancers"`
-	ProvisoningStatus      string                `json:"provisioning_status"`
-	DefaultPoolID          string                `json:"default_pool_id"`
-	Protocol               string                `json:"protocol"`
-	InsertHeaders          map[string]string     `json:"insert_headers"`
-	TimeoutTCPInspect      int                   `json:"timeout_tcp_inspect"`
+	ID                     string            `json:"id"`
+	TimeoutClientData      int               `json:"timeout_client_data"`
+	Description            string            `json:"description"`
+	SNIContainerRefs       []string          `json:"sni_container_refs"`
+	Name                   string            `json:"name"`
+	ConnectionLimit        int               `json:"connection_limit"`
+	UpdatedAt              string            `json:"updated_at"`
+	ProjectID              string            `json:"project_id"`
+	TimeoutMemberData      int               `json:"timeout_member_data"`
+	TimeoutMemberConnect   int               `json:"timeout_member_connect"`
+	L7Policies             []resourceID      `json:"l7policies"`
+	TenandID               string            `json:"tenant_id"`
+	DefaultTLSContainerRef *string           `json:"default_tls_container_ref"`
+	AdminStateUp           bool              `json:"admin_state_up"`
+	CreatedAt              string            `json:"created_at"`
+	OperatingStatus        string            `json:"operating_status"`
+	ProtocolPort           int               `json:"protocol_port"`
+	LoadBalancers          []resourceID      `json:"loadbalancers"`
+	ProvisoningStatus      string            `json:"provisioning_status"`
+	DefaultPoolID          string            `json:"default_pool_id"`
+	Protocol               string            `json:"protocol"`
+	InsertHeaders          map[string]string `json:"insert_headers"`
+	TimeoutTCPInspect      int               `json:"timeout_tcp_inspect"`
 }
 
 type listener struct {
@@ -598,24 +602,24 @@ type PoolUpdateRequest struct {
 
 // Pool contains pool information.
 type Pool struct {
-	ID                 string                `json:"id"`
-	TenandID           string                `json:"tenant_id"`
-	Description        string                `json:"description"`
-	LBAlgorithm        string                `json:"lb_algorithm"`
-	Name               string                `json:"name"`
-	HealthMonitor      *HealthMonitor        `json:"healthmonitor"`
-	UpdatedAt          string                `json:"updated_at"`
-	OperatingStatus    string                `json:"operating_status"`
-	Listeners          []struct{ ID string } `json:"listeners"`
-	SessionPersistence *SessionPersistence   `json:"session_persistence"`
-	ProvisoningStatus  string                `json:"provisioning_status"`
-	ProjectID          string                `json:"project_id"`
-	LoadBalancers      []struct{ ID string } `json:"loadbalancers"`
-	Members            []string              `json:"memebers"`
-	AdminStateUp       bool                  `json:"admin_state_up"`
-	Protocol           string                `json:"protocol"`
-	CreatedAt          string                `json:"created_at"`
-	HealthMonitorID    string                `json:"healthmonitor_id"`
+	ID                 string              `json:"id"`
+	TenandID           string              `json:"tenant_id"`
+	Description        string              `json:"description"`
+	LBAlgorithm        string              `json:"lb_algorithm"`
+	Name               string              `json:"name"`
+	HealthMonitor      *HealthMonitor      `json:"healthmonitor"`
+	UpdatedAt          string              `json:"updated_at"`
+	OperatingStatus    string              `json:"operating_status"`
+	Listeners          []resourceID        `json:"listeners"`
+	SessionPersistence *SessionPersistence `json:"session_persistence"`
+	ProvisoningStatus  string              `json:"provisioning_status"`
+	ProjectID          string              `json:"project_id"`
+	LoadBalancers      []resourceID        `json:"loadbalancers"`
+	Members            []string            `json:"memebers"`
+	AdminStateUp       bool                `json:"admin_state_up"`
+	Protocol           string              `json:"protocol"`
+	CreatedAt          string              `json:"created_at"`
+	HealthMonitorID    string              `json:"healthmonitor_id"`
 }
 
 type pool struct {
@@ -733,52 +737,52 @@ func (p *pool) Delete(ctx context.Context, id string) error {
 }
 
 type HealthMonitor struct {
-	Name           string                `json:"name"`
-	Type           string                `json:"type"`
-	Delay          int                   `json:"delay"`
-	MaxRetries     int                   `json:"max_retries"`
-	MaxRetriesDown int                   `json:"max_retries_down"`
-	TimeOut        int                   `json:"timeout"`
-	HTTPMethod     string                `json:"http_method"`
-	UrlPath        string                `json:"url_path"`
-	ExpectedCodes  string                `json:"expected_codes"`
-	HTTPVersion    float32                `json:"http_version"`
-	OpratingStatus string                `json:"oprating_status"`
-	DomainName     string                `json:"domain_name"`
-	ID             string                `json:"id"`
-	CreatedAt      string                `json:"created_at"`
-	UpdatedAt      string                `json:"updated_at"`
-	TenantID       string                `json:"tenant_id"`
-	Pool           []struct{ ID string } `json:"pool"`
+	Name           string       `json:"name"`
+	Type           string       `json:"type"`
+	Delay          int          `json:"delay"`
+	MaxRetries     int          `json:"max_retries"`
+	MaxRetriesDown int          `json:"max_retries_down"`
+	TimeOut        int          `json:"timeout"`
+	HTTPMethod     string       `json:"http_method"`
+	UrlPath        string       `json:"url_path"`
+	ExpectedCodes  string       `json:"expected_codes"`
+	HTTPVersion    float32      `json:"http_version"`
+	OpratingStatus string       `json:"oprating_status"`
+	DomainName     string       `json:"domain_name"`
+	ID             string       `json:"id"`
+	CreatedAt      string       `json:"created_at"`
+	UpdatedAt      string       `json:"updated_at"`
+	TenantID       string       `json:"tenant_id"`
+	Pool           []resourceID `json:"pool"`
 }
 
 type HealthMonitorCreateRequest struct {
-	Name           string `json:"name"`
-	Type           string `json:"type"`
-	TimeOut        int    `json:"timeout"`
-	PoolID         string `json:"pool_id"`
-	Delay          int    `json:"delay"`
-	MaxRetries     int    `json:"max_retries"`
-	MaxRetriesDown int    `json:"max_retries_down"`
-	HTTPMethod     string `json:"http_method"`
+	Name           string  `json:"name"`
+	Type           string  `json:"type"`
+	TimeOut        int     `json:"timeout"`
+	PoolID         string  `json:"pool_id"`
+	Delay          int     `json:"delay"`
+	MaxRetries     int     `json:"max_retries"`
+	MaxRetriesDown int     `json:"max_retries_down"`
+	HTTPMethod     string  `json:"http_method"`
 	HTTPVersion    float32 `json:"http_version"`
-	URLPath        string `json:"url_path"`
-	ExpectedCodes  string `json:"expected_codes"`
-	DomainName     string `json:"domain_name"`
+	URLPath        string  `json:"url_path"`
+	ExpectedCodes  string  `json:"expected_codes"`
+	DomainName     string  `json:"domain_name"`
 }
 
 type HealthMonitorUpdateRequest struct {
-	Name           string `json:"name"`
-	TimeOut        string `json:"timeout"`
-	PoolID         string `json:"pool_id"`
-	Delay          int    `json:"delay"`
-	MaxRetries     int    `json:"max_retries"`
-	MaxRetriesDown int    `json:"max_retries_down"`
-	HTTPMethod     string `json:"http_method"`
+	Name           string  `json:"name"`
+	TimeOut        string  `json:"timeout"`
+	PoolID         string  `json:"pool_id"`
+	Delay          int     `json:"delay"`
+	MaxRetries     int     `json:"max_retries"`
+	MaxRetriesDown int     `json:"max_retries_down"`
+	HTTPMethod     string  `json:"http_method"`
 	HTTPVersion    float32 `json:"http_version"`
-	URLPath        string `json:"url_path"`
-	ExpectedCodes  string `json:"expected_codes"`
-	DomainName     string `json:"domain_name"`
+	URLPath        string  `json:"url_path"`
+	ExpectedCodes  string  `json:"expected_codes"`
+	DomainName     string  `json:"domain_name"`
 }
 
 type healthmonitor struct {
