@@ -70,7 +70,7 @@ type Client struct {
 	appCredSecret string
 	// TODO: this will be removed in near future
 	tenantName string
-	tenantID	string
+	tenantID   string
 }
 
 // Option set Client specific attributes
