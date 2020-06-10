@@ -70,6 +70,7 @@ type Client struct {
 	appCredSecret string
 	// TODO: this will be removed in near future
 	tenantName string
+	tenantID   string
 }
 
 // Option set Client specific attributes
@@ -103,6 +104,16 @@ func WithHTTPClient(client *http.Client) Option {
 func WithTenantName(tenant string) Option {
 	return func(c *Client) error {
 		c.tenantName = tenant
+		return nil
+	}
+}
+
+// WithTenantID sets the tenant id name option for BizFly client
+//
+// Deprecated: X-Tenant-Id header required will be removed in API server.
+func WithTenantID(id string) Option {
+	return func(c *Client) error {
+		c.tenantID = id
 		return nil
 	}
 }
@@ -160,6 +171,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Tenant-Name", c.tenantName)
+	req.Header.Add("X-Tenant-Id", c.tenantID)
 	if c.keystoneToken != "" {
 		req.Header.Add("X-Auth-Token", c.keystoneToken)
 	}
