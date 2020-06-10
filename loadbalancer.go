@@ -764,11 +764,11 @@ type HealthMonitorCreateRequest struct {
 	Delay          int     `json:"delay"`
 	MaxRetries     int     `json:"max_retries"`
 	MaxRetriesDown int     `json:"max_retries_down"`
-	HTTPMethod     string  `json:"http_method"`
-	HTTPVersion    float32 `json:"http_version"`
-	URLPath        string  `json:"url_path"`
-	ExpectedCodes  string  `json:"expected_codes"`
-	DomainName     string  `json:"domain_name"`
+	HTTPMethod     string  `json:"http_method,omitempty"`
+	HTTPVersion    float32 `json:"http_version,omitempty"`
+	URLPath        string  `json:"url_path,omitempty"`
+	ExpectedCodes  string  `json:"expected_codes,omitempty"`
+	DomainName     string  `json:"domain_name,omitempty"`
 }
 
 type HealthMonitorUpdateRequest struct {
