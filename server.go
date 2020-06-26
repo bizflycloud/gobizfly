@@ -29,6 +29,7 @@ import (
 const (
 	serverBasePath = "/iaas-cloud/api/servers"
 	flavorPath     = "/iaas-cloud/api/flavors"
+	osImagePath    = "/iaas-cloud/api/images"
 )
 
 var _ ServerService = (*server)(nil)
@@ -82,6 +83,7 @@ type ServerService interface {
 	Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error)
 	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
 	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
+	ListOSImages(ctx context.Context) ([]osImageResponse, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -386,4 +388,38 @@ func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, erro
 		return nil, err
 	}
 	return flavors, nil
+}
+
+type osDistributionVersion struct {
+	Name string `json:"name"`
+	ID   string `json:"id"`
+}
+
+type osImageResponse struct {
+	OSDistribution string                  `json:"os"`
+	Version        []osDistributionVersion `json:"versions"`
+}
+
+// ListOSImage list server os images
+func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, osImagePath, nil)
+
+	if err != nil {
+		return nil, err
+	}
+	q := req.URL.Query()
+	q.Add("os_images", "True")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var respPayload struct {
+		OSImages []osImageResponse `json:"os_images"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respPayload); err != nil {
+		return nil, err
+	}
+	return respPayload.OSImages, nil
 }
