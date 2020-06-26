@@ -549,3 +549,101 @@ func TestServerFlavorList(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "1c_1g", flavors[0].Name)
 }
+
+func TestOSImageList(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(osImagePath, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "os_images": [
+        {
+            "os": "Ubuntu",
+            "versions": [
+                {
+                    "name": "18.04 x64",
+                    "id": "d9513b4e-60c4-45c6-a8e0-0d814a7c0799"
+                },
+                {
+                    "name": "16.04 x64",
+                    "id": "ffb85594-a23a-4bc6-bcd5-02039e6d0a03"
+                },
+                {
+                    "name": "14.04 x64",
+                    "id": "83aeff78-14ad-498d-976b-ed15bc5fa5ac"
+                }
+            ]
+        },
+        {
+            "os": "CentOS",
+            "versions": [
+                {
+                    "name": "8.0 x64",
+                    "id": "a992ab85-e8ea-497a-9eba-29a37f7c3151"
+                },
+                {
+                    "name": "7.7 x64",
+                    "id": "eba5353f-8524-4d29-ac68-984b1c80e693"
+                },
+                {
+                    "name": "6.10 x64",
+                    "id": "dd3b7e3d-f8ab-4856-9bb1-9737828bd1b1"
+                },
+                {
+                    "name": "6.8 x64",
+                    "id": "f9dbf562-a637-498b-8af4-b4e7aaf20cdd"
+                }
+            ]
+        },
+        {
+            "os": "Debian",
+            "versions": [
+                {
+                    "name": "9 x64",
+                    "id": "dddc47ec-da9c-4010-ae16-86272bd192eb"
+                },
+                {
+                    "name": "10 x64",
+                    "id": "28333e61-70b6-4bbf-9cbf-33b57194c389"
+                }
+            ]
+        },
+        {
+            "os": "Windows",
+            "versions": [
+                {
+                    "name": "2019 Standard",
+                    "id": "9fabfae0-a06d-44cd-a2ae-c8d38e7ab5be"
+                },
+                {
+                    "name": "2016 Standard",
+                    "id": "9e09a71c-ceed-4f00-aeea-ed3c7d391807"
+                },
+                {
+                    "name": "2016 Datacenter",
+                    "id": "91dff6d8-e26b-4b9a-9299-f74ee8a3de02"
+                },
+                {
+                    "name": "2012 R2 Standard",
+                    "id": "ff9bacce-bce9-4ea1-9a31-93b14b788c48"
+                },
+                {
+                    "name": "2012 R2 Datacenter",
+                    "id": "e18e42bd-4141-45f4-b4c1-8e9e82fd9e87"
+                },
+                {
+                    "name": "2008 R2 Enterprise",
+                    "id": "c900de6e-dc7b-4ab9-8e13-12fdcf5b0f84"
+                }
+            ]
+        }
+    ]
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	osImages, err := client.Server.ListOSImages(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "d9513b4e-60c4-45c6-a8e0-0d814a7c0799", osImages[0].Version[0].ID)
+}
