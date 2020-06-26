@@ -28,6 +28,7 @@ import (
 
 const (
 	serverBasePath = "/iaas-cloud/api/servers"
+	flavorPath     = "/iaas-cloud/api/flavors"
 )
 
 var _ ServerService = (*server)(nil)
@@ -80,6 +81,7 @@ type ServerService interface {
 	HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error)
 	Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error)
 	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
+	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -361,4 +363,27 @@ func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse,
 		return nil, err
 	}
 	return respPayload.Console, nil
+}
+
+type serverFlavorResponse struct {
+	ID   string `json:"_id"`
+	Name string `json:"name"`
+}
+
+// ListFlavors lists server flavors
+func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, flavorPath, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var flavors []*serverFlavorResponse
+
+	if err := json.NewDecoder(resp.Body).Decode(&flavors); err != nil {
+		return nil, err
+	}
+	return flavors, nil
 }

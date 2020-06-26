@@ -524,3 +524,28 @@ func TestServerResize(t *testing.T) {
 	assert.Equal(t, "6ac1c3aa-7e41-11ea-a8b0-9b7b1be3dcee", task.TaskID)
 
 }
+
+func TestServerFlavorList(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(flavorPath, func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		resp := `
+[
+    {
+        "_id": "5d7f58903c4c0127da9896ae",
+        "name": "1c_1g"
+    },
+    {
+        "_id": "5d7f58903c4c0127da9896b5",
+        "name": "2c_4g"
+    }
+]
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	flavors, err := client.Server.ListFlavors(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "1c_1g", flavors[0].Name)
+}
