@@ -380,10 +380,10 @@ func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, erro
 	if err != nil {
 		return nil, err
 	}
-	var Flavors []*serverFlavorResponse
+	var flavors []*serverFlavorResponse
 
-	if err := json.NewDecoder(resp.Body).Decode(&Flavors); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&flavors); err != nil {
 		return nil, err
 	}
-	return Flavors, nil
+	return flavors, nil
 }
