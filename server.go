@@ -29,7 +29,6 @@ import (
 const (
 	serverBasePath = "/iaas-cloud/api/servers"
 	flavorPath     = "/iaas-cloud/api/flavors"
-	imagePath      = "/iaas-cloud/api/images"
 )
 
 var _ ServerService = (*server)(nil)
