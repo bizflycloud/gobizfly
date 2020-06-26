@@ -29,7 +29,7 @@ import (
 const (
 	serverBasePath = "/iaas-cloud/api/servers"
 	flavorPath     = "/iaas-cloud/api/flavors"
-	osImagePath    = "/iaas-cloud/api/images?os_images=True"
+	osImagePath    = "/iaas-cloud/api/images"
 )
 
 var _ ServerService = (*server)(nil)
@@ -403,6 +403,10 @@ type osImageResponse struct {
 // ListOSImage list server os images
 func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, osImagePath, nil)
+	q := req.URL.Query()
+	q.Add("os_images", "True")
+	req.URL.RawQuery = q.Encode()
+
 	if err != nil {
 		return nil, err
 	}

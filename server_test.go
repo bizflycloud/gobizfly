@@ -530,6 +530,7 @@ func TestServerFlavorList(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(flavorPath, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		//TODO assert query paramter
 		resp := `
 [
     {
