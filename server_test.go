@@ -530,7 +530,6 @@ func TestServerFlavorList(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(flavorPath, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		//TODO assert query paramter
 		resp := `
 [
     {
@@ -556,6 +555,7 @@ func TestOSImageList(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(osImagePath, func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
+		assert.Equal(t, "True", r.URL.Query().Get("os_images"))
 		resp := `
 {
     "os_images": [
