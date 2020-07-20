@@ -60,7 +60,7 @@ const (
 	getVerificationPath   = "resend"
 )
 
-// Comparison is ...
+// Comparison is represents comparison payload in alarms
 type Comparison struct {
 	CompareType string  `json:"compare_type"`
 	Measurement string  `json:"measurement"`
@@ -68,26 +68,26 @@ type Comparison struct {
 	Value       float64 `json:"value"`
 }
 
-// Instances is ...
+// Instances is represents instances payload - which servers will be monitored
 type Instances struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
-// Volumes is ...
+// Volumes is represents volumes payload - which volumes will be monitored
 type Volumes struct {
 	ID     string `json:"id"`
 	Name   string `json:"name"`
 	Device string `json:"device"`
 }
 
-// HTTPHeaders is ...
+// HTTPHeaders is is represents http headers - which using call to http_url
 type HTTPHeaders struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
 }
 
-// LoadBalancers is ...
+// LoadBalancers is represents load balancer payload - which load balancer will be monitored
 type LoadBalancers struct {
 	LoadBalancerID   string `json:"load_balancer_id"`
 	LoadBalancerName string `json:"load_balancer_name"`
@@ -96,7 +96,7 @@ type LoadBalancers struct {
 	TargetType       string `json:"target_type"`
 }
 
-// AlarmCreateReceivers is ...
+// AlarmCreateReceivers is represents receiver's payload will be use create alarms
 type AlarmCreateReceivers struct {
 	AutoscaleClusterName string `json:"autoscale_cluster_name,omitempty"`
 	EmailAddress         string `json:"email_address,omitempty"`
@@ -109,7 +109,7 @@ type AlarmCreateReceivers struct {
 	WebhookURL           string `json:"webhook_url,omitempty"`
 }
 
-// AlarmGetReceivers is ...
+// AlarmGetReceivers is represents payload when get alarms
 type AlarmGetReceivers struct {
 	AutoscaleClusterName string `json:"autoscale_cluster_name,omitempty"`
 	EmailAddress         string `json:"email_address,omitempty"`
@@ -225,7 +225,7 @@ type Alarms struct {
 	Volumes          []Volumes           `json:"volumes,omitempty"`
 }
 
-// AlarmsInHistories contains alarm information.
+// AlarmsInHistories contains alarm information in a history
 type AlarmsInHistories struct {
 	AlertInterval    int             `json:"alert_interval"`
 	ClusterID        string          `json:"cluster_id,omitempty"`
@@ -250,7 +250,7 @@ type AlarmsInHistories struct {
 	Volumes      []Volumes `json:"volumes,omitempty"`
 }
 
-// AutoScale is ...
+// AutoScale is represents autoscale payload - which will be use create a receiver
 type AutoScale struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_id"`
@@ -258,7 +258,7 @@ type AutoScale struct {
 	ActionType  string `json:"action_type"`
 }
 
-// Slack is ...
+// Slack is represents slack payload - which will be use create a receiver
 type Slack struct {
 	SlackChannelName string `json:"channel_name"`
 	WebhookURL       string `json:"webhook_url"`
@@ -283,7 +283,7 @@ type Receivers struct {
 	VerifiedTelegramChatID bool      `json:"verified_telegram_chat_id,omitempty"`
 }
 
-// Histories contains receiver information.
+// Histories contains history information.
 type Histories struct {
 	HistoryID   string            `json:"_id"`
 	Name        string            `json:"name"`
@@ -375,7 +375,7 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 	return data.Receivers, nil
 }
 
-// List is function using list histories'
+// List is function using list histories
 func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, error) {
 	req, err := h.client.NewRequest(ctx, http.MethodGet, h.resourcePath(filters), nil)
 	if err != nil {
@@ -536,6 +536,7 @@ func (r *receivers) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
+// ResendVerificationLink is use get a link verification
 func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType string) error {
 	req, err := r.client.NewRequest(ctx, http.MethodGet, fmt.Sprintf("%s?rec_id=%s&rec_type=%s", r.verificationPath(), id, rType), nil)
 	if err != nil {
