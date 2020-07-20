@@ -244,7 +244,7 @@ func Test_receivers_List(t *testing.T) {
 		SlackChannelName: "#focus",
 		WebhookURL:       "fake-webhook-url",
 	}, receiver.Slack)
-	assert.Equal(t, AutoScale{
+	assert.Equal(t, AutoScaleReceiver{
 		ClusterName: "group-01",
 		ClusterID:   "a2018319-4c80-4a52-bfb1-6045b2b01536",
 		ActionID:    "e169f975-a8e0-43d6-a9c9-06140929ab3c",

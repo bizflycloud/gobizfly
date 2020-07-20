@@ -87,8 +87,8 @@ type HTTPHeaders struct {
 	Value string `json:"value"`
 }
 
-// LoadBalancers is represents load balancer payload - which load balancer will be monitored
-type LoadBalancers struct {
+// LoadBalancersMonitor is represents load balancer payload - which load balancer will be monitored
+type LoadBalancersMonitor struct {
 	LoadBalancerID   string `json:"load_balancer_id"`
 	LoadBalancerName string `json:"load_balancer_name"`
 	TargetID         string `json:"target_id"`
@@ -136,32 +136,32 @@ type histories struct {
 
 // AlarmCreateRequest represents create new alarm request payload.
 type AlarmCreateRequest struct {
-	AlertInterval    int                    `json:"alert_interval"`
-	ClusterID        string                 `json:"cluster_id,omitempty"`
-	ClusterName      string                 `json:"cluster_name,omitempty"`
-	Comparison       *Comparison            `json:"comparison,omitempty"`
-	Hostname         string                 `json:"hostname,omitempty"`
-	HTTPExpectedCode int                    `json:"http_expected_code,omitempty"`
-	HTTPHeaders      *[]HTTPHeaders         `json:"http_headers,omitempty"`
-	HTTPURL          string                 `json:"http_url,omitempty"`
-	Instances        *[]Instances           `json:"instances,omitempty"`
-	LoadBalancers    *[]LoadBalancers       `json:"load_balancers,omitempty"`
-	Name             string                 `json:"name"`
-	Receivers        []AlarmCreateReceivers `json:"receivers"`
-	ResourceType     string                 `json:"resource_type"`
-	Volumes          *[]Volumes             `json:"volumes,omitempty"`
+	AlertInterval    int                     `json:"alert_interval"`
+	ClusterID        string                  `json:"cluster_id,omitempty"`
+	ClusterName      string                  `json:"cluster_name,omitempty"`
+	Comparison       *Comparison             `json:"comparison,omitempty"`
+	Hostname         string                  `json:"hostname,omitempty"`
+	HTTPExpectedCode int                     `json:"http_expected_code,omitempty"`
+	HTTPHeaders      *[]HTTPHeaders          `json:"http_headers,omitempty"`
+	HTTPURL          string                  `json:"http_url,omitempty"`
+	Instances        *[]Instances            `json:"instances,omitempty"`
+	LoadBalancers    *[]LoadBalancersMonitor `json:"load_balancers,omitempty"`
+	Name             string                  `json:"name"`
+	Receivers        []AlarmCreateReceivers  `json:"receivers"`
+	ResourceType     string                  `json:"resource_type"`
+	Volumes          *[]Volumes              `json:"volumes,omitempty"`
 }
 
 // ReceiverCreateRequest contains receiver information.
 type ReceiverCreateRequest struct {
-	AutoScale      *AutoScale `json:"autoscale,omitempty"`
-	EmailAddress   string     `json:"email_address,omitempty"`
-	Name           string     `json:"name"`
-	Slack          *Slack     `json:"slack,omitempty"`
-	SMSInterval    string     `json:"sms_interval,omitempty"`
-	SMSNumber      string     `json:"sms_number,omitempty"`
-	TelegramChatID string     `json:"telegram_chat_id,omitempty"`
-	WebhookURL     string     `json:"webhook_url,omitempty"`
+	AutoScale      *AutoScaleReceiver `json:"autoscale,omitempty"`
+	EmailAddress   string             `json:"email_address,omitempty"`
+	Name           string             `json:"name"`
+	Slack          *Slack             `json:"slack,omitempty"`
+	SMSInterval    string             `json:"sms_interval,omitempty"`
+	SMSNumber      string             `json:"sms_number,omitempty"`
+	TelegramChatID string             `json:"telegram_chat_id,omitempty"`
+	WebhookURL     string             `json:"webhook_url,omitempty"`
 }
 
 // AlarmUpdateRequest represents update alarm request payload.
@@ -176,7 +176,7 @@ type AlarmUpdateRequest struct {
 	HTTPHeaders      *[]HTTPHeaders          `json:"http_headers,omitempty"`
 	HTTPURL          string                  `json:"http_url,omitempty"`
 	Instances        *[]Instances            `json:"instances,omitempty"`
-	LoadBalancers    *[]LoadBalancers        `json:"load_balancers,omitempty"`
+	LoadBalancers    *[]LoadBalancersMonitor `json:"load_balancers,omitempty"`
 	Name             string                  `json:"name"`
 	Receivers        *[]AlarmCreateReceivers `json:"receivers,omitempty"`
 	ResourceType     *string                 `json:"resource_type,omitempty"`
@@ -185,14 +185,14 @@ type AlarmUpdateRequest struct {
 
 // ReceiverUpdateRequest contains receiver information.
 type ReceiverUpdateRequest struct {
-	AutoScale      *AutoScale `json:"autoscale,omitempty"`
-	EmailAddress   string     `json:"email_address,omitempty"`
-	Name           string     `json:"name"`
-	Slack          *Slack     `json:"slack,omitempty"`
-	SMSInterval    string     `json:"sms_interval,omitempty"`
-	SMSNumber      string     `json:"sms_number,omitempty"`
-	TelegramChatID string     `json:"telegram_chat_id,omitempty"`
-	WebhookURL     string     `json:"webhook_url,omitempty"`
+	AutoScale      *AutoScaleReceiver `json:"autoscale,omitempty"`
+	EmailAddress   string             `json:"email_address,omitempty"`
+	Name           string             `json:"name"`
+	Slack          *Slack             `json:"slack,omitempty"`
+	SMSInterval    string             `json:"sms_interval,omitempty"`
+	SMSNumber      string             `json:"sms_number,omitempty"`
+	TelegramChatID string             `json:"telegram_chat_id,omitempty"`
+	WebhookURL     string             `json:"webhook_url,omitempty"`
 }
 
 // ResponseRequest represents api's response.
@@ -205,42 +205,42 @@ type ResponseRequest struct {
 
 // Alarms contains alarm information.
 type Alarms struct {
-	AlertInterval    int                 `json:"alert_interval"`
-	ClusterID        string              `json:"cluster_id,omitempty"`
-	ClusterName      string              `json:"cluster_name,omitempty"`
-	Comparison       Comparison          `json:"comparison,omitempty"`
-	Enable           bool                `json:"enable"`
-	Hostname         string              `json:"hostname,omitempty"`
-	HTTPExpectedCode int                 `json:"http_expected_code,omitempty"`
-	HTTPHeaders      []HTTPHeaders       `json:"http_headers,omitempty"`
-	HTTPURL          string              `json:"http_url,omitempty"`
-	ID               string              `json:"_id"`
-	Instances        []Instances         `json:"instances,omitempty"`
-	LoadBalancers    []LoadBalancers     `json:"load_balancers,omitempty"`
-	Name             string              `json:"name"`
-	ProjectID        string              `json:"project_id"`
-	Receivers        []AlarmGetReceivers `json:"receivers"`
-	ResourceType     string              `json:"resource_type"`
-	UserID           string              `json:"user_id"`
-	Volumes          []Volumes           `json:"volumes,omitempty"`
+	AlertInterval    int                    `json:"alert_interval"`
+	ClusterID        string                 `json:"cluster_id,omitempty"`
+	ClusterName      string                 `json:"cluster_name,omitempty"`
+	Comparison       Comparison             `json:"comparison,omitempty"`
+	Enable           bool                   `json:"enable"`
+	Hostname         string                 `json:"hostname,omitempty"`
+	HTTPExpectedCode int                    `json:"http_expected_code,omitempty"`
+	HTTPHeaders      []HTTPHeaders          `json:"http_headers,omitempty"`
+	HTTPURL          string                 `json:"http_url,omitempty"`
+	ID               string                 `json:"_id"`
+	Instances        []Instances            `json:"instances,omitempty"`
+	LoadBalancers    []LoadBalancersMonitor `json:"load_balancers,omitempty"`
+	Name             string                 `json:"name"`
+	ProjectID        string                 `json:"project_id"`
+	Receivers        []AlarmGetReceivers    `json:"receivers"`
+	ResourceType     string                 `json:"resource_type"`
+	UserID           string                 `json:"user_id"`
+	Volumes          []Volumes              `json:"volumes,omitempty"`
 }
 
 // AlarmsInHistories contains alarm information in a history
 type AlarmsInHistories struct {
-	AlertInterval    int             `json:"alert_interval"`
-	ClusterID        string          `json:"cluster_id,omitempty"`
-	ClusterName      string          `json:"cluster_name,omitempty"`
-	Comparison       Comparison      `json:"comparison,omitempty"`
-	Enable           bool            `json:"enable"`
-	Hostname         string          `json:"hostname,omitempty"`
-	HTTPExpectedCode int             `json:"http_expected_code,omitempty"`
-	HTTPHeaders      []HTTPHeaders   `json:"http_headers,omitempty"`
-	HTTPURL          string          `json:"http_url,omitempty"`
-	ID               string          `json:"_id"`
-	Instances        []Instances     `json:"instances,omitempty"`
-	LoadBalancers    []LoadBalancers `json:"load_balancers,omitempty"`
-	Name             string          `json:"name"`
-	ProjectID        string          `json:"project_id"`
+	AlertInterval    int                    `json:"alert_interval"`
+	ClusterID        string                 `json:"cluster_id,omitempty"`
+	ClusterName      string                 `json:"cluster_name,omitempty"`
+	Comparison       Comparison             `json:"comparison,omitempty"`
+	Enable           bool                   `json:"enable"`
+	Hostname         string                 `json:"hostname,omitempty"`
+	HTTPExpectedCode int                    `json:"http_expected_code,omitempty"`
+	HTTPHeaders      []HTTPHeaders          `json:"http_headers,omitempty"`
+	HTTPURL          string                 `json:"http_url,omitempty"`
+	ID               string                 `json:"_id"`
+	Instances        []Instances            `json:"instances,omitempty"`
+	LoadBalancers    []LoadBalancersMonitor `json:"load_balancers,omitempty"`
+	Name             string                 `json:"name"`
+	ProjectID        string                 `json:"project_id"`
 	Receivers        []struct {
 		ReceiverID string   `json:"receiver_id"`
 		Methods    []string `json:"methods"`
@@ -250,8 +250,8 @@ type AlarmsInHistories struct {
 	Volumes      []Volumes `json:"volumes,omitempty"`
 }
 
-// AutoScale is represents autoscale payload - which will be use create a receiver
-type AutoScale struct {
+// AutoScaleReceiver is represents autoscale payload - which will be use create a receiver
+type AutoScaleReceiver struct {
 	ClusterName string `json:"cluster_name"`
 	ClusterID   string `json:"cluster_id"`
 	ActionID    string `json:"action_id"`
@@ -266,21 +266,21 @@ type Slack struct {
 
 // Receivers contains receiver information.
 type Receivers struct {
-	AutoScale              AutoScale `json:"autoscale,omitempty"`
-	EmailAddress           string    `json:"email_address,omitempty"`
-	Name                   string    `json:"name"`
-	ReceiverID             string    `json:"_id"`
-	Slack                  Slack     `json:"slack,omitempty"`
-	SMSInterval            string    `json:"sms_interval,omitempty"`
-	SMSNumber              string    `json:"sms_number,omitempty"`
-	TelegramChatID         string    `json:"telegram_chat_id,omitempty"`
-	WebhookURL             string    `json:"webhook_url,omitempty"`
-	UserID                 string    `json:"user_id,omitempty"`
-	ProjectID              string    `json:"project_id,omitempty"`
-	VerifiedSMSNumber      bool      `json:"verified_sms_number,omitempty"`
-	VerifiedEmailDddress   bool      `json:"verified_email_address,omitempty"`
-	VerifiedWebhookURL     bool      `json:"verified_webhook_url,omitempty"`
-	VerifiedTelegramChatID bool      `json:"verified_telegram_chat_id,omitempty"`
+	AutoScale              AutoScaleReceiver `json:"autoscale,omitempty"`
+	EmailAddress           string            `json:"email_address,omitempty"`
+	Name                   string            `json:"name"`
+	ReceiverID             string            `json:"_id"`
+	Slack                  Slack             `json:"slack,omitempty"`
+	SMSInterval            string            `json:"sms_interval,omitempty"`
+	SMSNumber              string            `json:"sms_number,omitempty"`
+	TelegramChatID         string            `json:"telegram_chat_id,omitempty"`
+	WebhookURL             string            `json:"webhook_url,omitempty"`
+	UserID                 string            `json:"user_id,omitempty"`
+	ProjectID              string            `json:"project_id,omitempty"`
+	VerifiedSMSNumber      bool              `json:"verified_sms_number,omitempty"`
+	VerifiedEmailDddress   bool              `json:"verified_email_address,omitempty"`
+	VerifiedWebhookURL     bool              `json:"verified_webhook_url,omitempty"`
+	VerifiedTelegramChatID bool              `json:"verified_telegram_chat_id,omitempty"`
 }
 
 // Histories contains history information.
