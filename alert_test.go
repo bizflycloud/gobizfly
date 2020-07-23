@@ -45,7 +45,7 @@ func Test_alarms_List(t *testing.T) {
 		        "user_id": "fake-user-id",
 		        "name": "iops300",
 		        "receivers": [{
-		            "_id": "5ee9841f83019d000e8fb2c4",
+		            "receiver_id": "5ee9841f83019d000e8fb2c4",
 		            "autoscale_cluster_name": "group-01",
 		            "email_address": "example@domain.com",
 		            "name": "telegram",
@@ -163,7 +163,7 @@ func Test_alarms_List(t *testing.T) {
 		"<",
 	}, alarm.Comparison.CompareType)
 
-	assert.Equal(t, Comparison{
+	assert.Equal(t, &Comparison{
 		CompareType: ">=",
 		Measurement: "iops",
 		RangeTime:   300,
@@ -240,11 +240,11 @@ func Test_receivers_List(t *testing.T) {
 	assert.Equal(t, "fake-telegram-chat-id", receiver.TelegramChatID)
 	assert.Equal(t, "fake-sms-number", receiver.SMSNumber)
 	assert.Equal(t, "example@domain.com", receiver.EmailAddress)
-	assert.Equal(t, Slack{
+	assert.Equal(t, &Slack{
 		SlackChannelName: "#focus",
 		WebhookURL:       "fake-webhook-url",
 	}, receiver.Slack)
-	assert.Equal(t, AutoScaleReceiver{
+	assert.Equal(t, &AutoScalingWebhook{
 		ClusterName: "group-01",
 		ClusterID:   "a2018319-4c80-4a52-bfb1-6045b2b01536",
 		ActionID:    "e169f975-a8e0-43d6-a9c9-06140929ab3c",

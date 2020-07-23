@@ -47,6 +47,7 @@ var (
 
 // Client represents BizFly API client.
 type Client struct {
+	AutoScaling   AutoScalingService
 	Alert         AlertService
 	Token         TokenService
 	LoadBalancer  LoadBalancerService
@@ -137,6 +138,7 @@ func NewClient(options ...Option) (*Client, error) {
 		}
 	}
 
+	c.AutoScaling = &autoscalingService{client: c}
 	c.Alert = &alertService{client: c}
 	c.Snapshot = &snapshot{client: c}
 	c.Token = &token{client: c}
