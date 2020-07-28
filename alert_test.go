@@ -30,7 +30,7 @@ func Test_alarms_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var a alarms
-	mux.HandleFunc(a.resourcePath(nil), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(a.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
@@ -175,7 +175,7 @@ func Test_receivers_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var r receivers
-	mux.HandleFunc(r.resourcePath(nil), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(r.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
@@ -256,7 +256,7 @@ func Test_histories_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var h histories
-	mux.HandleFunc(h.resourcePath(nil), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(h.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
