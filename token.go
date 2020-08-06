@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	tokenPath = "/api/token"
+	tokenPath = "/token"
 )
 
 var _ TokenService = (*token)(nil)
@@ -72,7 +72,7 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 }
 
 func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
-	req, err := t.client.NewRequest(ctx, http.MethodPost, tokenPath, tcr)
+	req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
 	if err != nil {
 		return nil, err
 	}

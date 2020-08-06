@@ -30,10 +30,15 @@ import (
 )
 
 const (
-	version       = "0.0.1"
-	ua            = "bizfly-client-go/" + version
-	defaultAPIURL = "https://manage.bizflycloud.vn"
-	mediaType     = "application/json; charset=utf-8"
+	version                 = "0.0.1"
+	ua                      = "bizfly-client-go/" + version
+	defaultAPIURL           = "https://manage.bizflycloud.vn"
+	mediaType               = "application/json; charset=utf-8"
+	loadBalancerServiceName = "load_balancer"
+	serverServiceName       = "cloud_server"
+	autoScalingServiceName  = "auto_scaling"
+	alertServiceName        = "alert"
+	authServiceName         = "auth"
 )
 
 var (
@@ -61,6 +66,8 @@ type Client struct {
 	Volume VolumeService
 	Server ServerService
 
+	Service ServiceInterface
+
 	httpClient    *http.Client
 	apiURL        *url.URL
 	userAgent     string
@@ -73,6 +80,7 @@ type Client struct {
 	// TODO: this will be removed in near future
 	tenantName string
 	tenantID   string
+	regionName string
 }
 
 // Option set Client specific attributes
@@ -149,13 +157,23 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Member = &member{client: c}
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
-
+	c.Service = &service{client: c}
 	return c, nil
 }
 
 // NewRequest creates an API request.
-func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
-	u, err := c.apiURL.Parse(urlStr)
+func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
+
+	serviceUrl, err := c.Service.GetEndpoint(ctx, serviceName, c.regionName)
+	if err != nil {
+		return nil, err
+	}
+	url, _ := url.Parse(serviceUrl)
+
+	if err != nil {
+		return nil, err
+	}
+	u, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}

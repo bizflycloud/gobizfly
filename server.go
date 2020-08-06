@@ -27,9 +27,9 @@ import (
 )
 
 const (
-	serverBasePath = "/iaas-cloud/api/servers"
-	flavorPath     = "/iaas-cloud/api/flavors"
-	osImagePath    = "/iaas-cloud/api/images"
+	serverBasePath = "/servers"
+	flavorPath     = "/flavors"
+	osImagePath    = "/images"
 )
 
 var _ ServerService = (*server)(nil)
@@ -145,7 +145,7 @@ func (s *server) itemActionPath(id string) string {
 // List lists all servers.
 func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error) {
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverBasePath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 // Create creates a new server.
 func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error) {
 	payload := []*ServerCreateRequest{scr}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, serverBasePath, payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, serverBasePath, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 
 // Get gets a server.
 func (s *server) Get(ctx context.Context, id string) (*Server, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverBasePath+"/"+id, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +205,7 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 
 // Delete deletes a server.
 func (s *server) Delete(ctx context.Context, id string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverBasePath+"/"+id, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, nil)
 	if err != nil {
 		return err
 	}
@@ -222,7 +222,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 	var payload = &ServerAction{
 		Action:     "resize",
 		FlavorName: newFlavor}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +243,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 // Start starts a server.
 func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "start"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +263,7 @@ func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 // Stop stops a server
 func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "stop"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +283,7 @@ func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 // SoftReboot soft reboots a server.
 func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "soft_reboot"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageRespo
 // HardReboot hard reboots a server.
 func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "hard_reboot"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +325,7 @@ func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*Serve
 	var payload = &ServerAction{
 		Action:  "rebuild",
 		ImageID: imageID}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -348,7 +348,7 @@ func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse,
 	payload := &ServerAction{
 		Action:      "get_vnc",
 		ConsoleType: "novnc"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -374,7 +374,7 @@ type serverFlavorResponse struct {
 
 // ListFlavors lists server flavors
 func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, flavorPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, flavorPath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +402,7 @@ type osImageResponse struct {
 
 // ListOSImage list server os images
 func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, osImagePath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, osImagePath, nil)
 
 	if err != nil {
 		return nil, err

@@ -105,11 +105,11 @@ func (l *loadbalancer) resourcePath() string {
 }
 
 func (l *loadbalancer) itemPath(id string) string {
-	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, id}, "/")
+	return strings.Join([]string{loadBalancerResourcePath, id}, "/")
 }
 
 func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, l.resourcePath(), nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 		LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
 	}
 	data.LoadBalancer = lbcr
-	req, err := l.client.NewRequest(ctx, http.MethodPost, l.resourcePath(), &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, l.resourcePath(), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 }
 
 func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, l.itemPath(id), nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 		LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
 	}
 	data.LoadBalancer = lbur
-	req, err := l.client.NewRequest(ctx, http.MethodPut, l.itemPath(id), &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, l.itemPath(id), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 }
 
 func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, l.itemPath(lbdr.ID), lbdr)
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, l.itemPath(lbdr.ID), lbdr)
 	if err != nil {
 		return err
 	}
@@ -286,15 +286,15 @@ type listener struct {
 }
 
 func (l *listener) resourcePath(lbID string) string {
-	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, lbID, "listeners"}, "/")
+	return strings.Join([]string{loadBalancerResourcePath, lbID, "listeners"}, "/")
 }
 
 func (l *listener) itemPath(id string) string {
-	return strings.Join([]string{loadBalancerBasePath, listenerPath, id}, "/")
+	return strings.Join([]string{listenerPath, id}, "/")
 }
 
 func (l *listener) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Listener, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, l.resourcePath(lbID), nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +320,7 @@ func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateR
 		Listener *ListenerCreateRequest `json:"listener"`
 	}
 	data.Listener = lcr
-	req, err := l.client.NewRequest(ctx, http.MethodPost, l.resourcePath(lbID), &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, l.resourcePath(lbID), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +340,7 @@ func (l *listener) Create(ctx context.Context, lbID string, lcr *ListenerCreateR
 }
 
 func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
-	req, err := l.client.NewRequest(ctx, http.MethodGet, l.itemPath(id), nil)
+	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -362,7 +362,7 @@ func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateReq
 		Listener *ListenerUpdateRequest
 	}
 	data.Listener = lur
-	req, err := l.client.NewRequest(ctx, http.MethodPut, l.itemPath(id), &data)
+	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, l.itemPath(id), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +382,7 @@ func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateReq
 }
 
 func (l *listener) Delete(ctx context.Context, id string) error {
-	req, err := l.client.NewRequest(ctx, http.MethodDelete, l.itemPath(id), nil)
+	req, err := l.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, l.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
@@ -452,15 +452,15 @@ type member struct {
 }
 
 func (m *member) resourcePath(poolID string) string {
-	return strings.Join([]string{loadBalancerBasePath, poolPath, poolID, "member"}, "/")
+	return strings.Join([]string{poolPath, poolID, "member"}, "/")
 }
 
 func (m *member) itemPath(poolID string, id string) string {
-	return strings.Join([]string{loadBalancerBasePath, poolPath, poolID, "member", id}, "/")
+	return strings.Join([]string{poolPath, poolID, "member", id}, "/")
 }
 
 func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error) {
-	req, err := m.client.NewRequest(ctx, http.MethodGet, m.resourcePath(poolID), nil)
+	req, err := m.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, m.resourcePath(poolID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -482,7 +482,7 @@ func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]
 }
 
 func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
-	req, err := m.client.NewRequest(ctx, http.MethodGet, m.itemPath(poolID, id), nil)
+	req, err := m.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -504,7 +504,7 @@ func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdat
 		Member *MemberUpdateRequest `json:"member"`
 	}
 	data.Member = mur
-	req, err := m.client.NewRequest(ctx, http.MethodPut, m.itemPath(poolID, id), &data)
+	req, err := m.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, m.itemPath(poolID, id), &data)
 	if err != nil {
 
 		return nil, err
@@ -525,7 +525,7 @@ func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdat
 }
 
 func (m *member) Delete(ctx context.Context, poolID, id string) error {
-	req, err := m.client.NewRequest(ctx, http.MethodDelete, m.itemPath(poolID, id), nil)
+	req, err := m.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return err
 	}
@@ -543,7 +543,7 @@ func (m *member) Create(ctx context.Context, poolID string, mcr *MemberCreateReq
 		Member *MemberCreateRequest `json:"member"`
 	}
 	data.Member = mcr
-	req, err := m.client.NewRequest(ctx, http.MethodPost, m.resourcePath(poolID), &data)
+	req, err := m.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, m.resourcePath(poolID), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -627,15 +627,15 @@ type pool struct {
 }
 
 func (p *pool) resourcePath(lbID string) string {
-	return strings.Join([]string{loadBalancerBasePath, loadBalancerResourcePath, lbID, "pools"}, "/")
+	return strings.Join([]string{loadBalancerResourcePath, lbID, "pools"}, "/")
 }
 
 func (p *pool) itemPath(id string) string {
-	return strings.Join([]string{loadBalancerBasePath, poolPath, id}, "/")
+	return strings.Join([]string{poolPath, id}, "/")
 }
 
 func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodGet, p.resourcePath(lbID), nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -661,7 +661,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 		Pool *PoolCreateRequest `json:"pool"`
 	}
 	data.Pool = pcr
-	req, err := p.client.NewRequest(ctx, http.MethodPost, p.resourcePath(lbID), &data)
+	req, err := p.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, p.resourcePath(lbID), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -681,7 +681,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 }
 
 func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodGet, p.itemPath(id), nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -703,7 +703,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 		Pool *PoolUpdateRequest `json:"pool"`
 	}
 	data.Pool = pur
-	req, err := p.client.NewRequest(ctx, http.MethodPut, p.itemPath(id), data)
+	req, err := p.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, p.itemPath(id), data)
 	if err != nil {
 		return nil, err
 	}
@@ -723,7 +723,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 }
 
 func (p *pool) Delete(ctx context.Context, id string) error {
-	req, err := p.client.NewRequest(ctx, http.MethodDelete, p.itemPath(id), nil)
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, p.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
@@ -805,7 +805,7 @@ func (h *healthmonitor) itemPath(hmID string) string {
 
 // Get gets detail a health monitor
 func (h *healthmonitor) Get(ctx context.Context, hmID string) (*HealthMonitor, error) {
-	req, err := h.client.NewRequest(ctx, http.MethodGet, h.itemPath(hmID), nil)
+	req, err := h.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, h.itemPath(hmID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -829,7 +829,7 @@ func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthM
 	}
 	hmcr.PoolID = poolID
 	data.HealthMonitor = hmcr
-	req, err := h.client.NewRequest(ctx, http.MethodPost, strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), &data)
+	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), &data)
 	if err != nil {
 		return nil, err
 	}
@@ -850,7 +850,7 @@ func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthM
 
 // Delete deletes a health monitor
 func (h *healthmonitor) Delete(ctx context.Context, hmID string) error {
-	req, err := h.client.NewRequest(ctx, http.MethodDelete, h.itemPath(hmID), nil)
+	req, err := h.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, h.itemPath(hmID), nil)
 	if err != nil {
 		return err
 	}
@@ -868,7 +868,7 @@ func (h *healthmonitor) Update(ctx context.Context, hmID string, hmur *HealthMon
 		HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
 	}
 	data.HealthMonitor = hmur
-	req, err := h.client.NewRequest(ctx, http.MethodPut, h.itemPath(hmID), data)
+	req, err := h.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, h.itemPath(hmID), data)
 	if err != nil {
 		return nil, err
 	}
