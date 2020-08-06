@@ -29,10 +29,10 @@ import (
 )
 
 const (
+	statusError                      = "Error"
+	statusActive                     = "Active"
 	autoscalingGroupResourcePath     = "groups"
 	autoscalingServiceBasePath       = "/auto-scaling/api"
-	launchConfigActiveStatus         = "Active"
-	launchConfigErrorStatus          = "Error"
 	launchConfigurationsResourcePath = "launch_configs"
 	webhooksResourcePath             = "webhooks"
 	eventsResourcePath               = "events"
@@ -501,16 +501,8 @@ func (c *common) usingResourcePath() string {
 	return strings.Join([]string{autoscalingServiceBasePath, usingResourcePath}, "/")
 }
 
-func (c *common) quotasResourcePath() string {
-	return getQuotasResourcePath()
-}
-
 func getQuotasResourcePath() string {
 	return strings.Join([]string{autoscalingServiceBasePath, quotasResourcePath}, "/")
-}
-
-func (c *common) suggestionResourcePath() string {
-	return getSuggestionResourcePath()
 }
 
 func getSuggestionResourcePath() string {
@@ -575,9 +567,9 @@ func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchCon
 
 	for _, LaunchConfiguration := range data.LaunchConfigurations {
 		if LaunchConfiguration.OperatingSystem.Error != "" {
-			LaunchConfiguration.Status = "Error"
+			LaunchConfiguration.Status = statusError
 		} else {
-			LaunchConfiguration.Status = "Active"
+			LaunchConfiguration.Status = statusActive
 		}
 	}
 	return data.LaunchConfigurations, nil
@@ -755,9 +747,9 @@ func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*Laun
 	}
 
 	if data.OperatingSystem.Error != "" {
-		data.Status = launchConfigErrorStatus
+		data.Status = statusError
 	} else {
-		data.Status = launchConfigActiveStatus
+		data.Status = statusActive
 	}
 	return data, nil
 }

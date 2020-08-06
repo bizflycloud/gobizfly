@@ -207,7 +207,6 @@ func TestServerCreate(t *testing.T) {
 		Type:             "premium",
 		AvailabilityZone: "HN1",
 		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
-		DataDisks:        []*ServerDisk{{40, "HDD"}},
 	}
 	task, err := client.Server.Create(ctx, scr)
 	require.NoError(t, err)
