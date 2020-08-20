@@ -40,33 +40,33 @@ func setup() {
 	testRegion := "HN"
 	client, err = NewClient(WithAPIUrl(serverTest.URL), WithRegionName(testRegion))
 	services := []*Service{
-		&Service{Name: "Cloud Server",
+		{Name: "Cloud Server",
 			CanonicalName: serverServiceName,
 			ServiceUrl:    serverTest.URL + "/iaas-cloud/api",
 			Region:        testRegion},
-		&Service{
+		{
 			Name:          "Load Balancer",
 			CanonicalName: loadBalancerServiceName,
-			ServiceUrl:    serverTest.URL  + "/api/loadbalancers",
-			Region: testRegion,
+			ServiceUrl:    serverTest.URL + "/api/loadbalancers",
+			Region:        testRegion,
 		},
-		&Service{
-			Name: "Alert",
+		{
+			Name:          "Alert",
 			CanonicalName: alertServiceName,
-			ServiceUrl: serverTest.URL + "/api/alert",
-			Region: testRegion,
+			ServiceUrl:    serverTest.URL + "/api/alert",
+			Region:        testRegion,
 		},
-		&Service{
-			Name: "Auto Scaling",
+		{
+			Name:          "Auto Scaling",
 			CanonicalName: autoScalingServiceName,
-			ServiceUrl: serverTest.URL + "/api/auto-scaling",
-			Region: testRegion,
+			ServiceUrl:    serverTest.URL + "/api/auto-scaling",
+			Region:        testRegion,
 		},
-		&Service{
-			Name: "Auth",
+		{
+			Name:          "Auth",
 			CanonicalName: authServiceName,
-			ServiceUrl: serverTest.URL + "/api",
-			Region: testRegion,
+			ServiceUrl:    serverTest.URL + "/api",
+			Region:        testRegion,
 		},
 	}
 	client.services = services

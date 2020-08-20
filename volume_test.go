@@ -165,7 +165,7 @@ func TestVolumeGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath + "/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath+"/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -294,7 +294,7 @@ func TestVolumeGet(t *testing.T) {
 func TestVolumeDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath + "/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath+"/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})

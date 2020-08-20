@@ -12,7 +12,7 @@ func AlertURL(path string) string {
 	return "/api/alert" + path
 }
 
-func AutoScalingURL(path string) string{
+func AutoScalingURL(path string) string {
 	return "/api/auto-scaling" + path
 }
 
