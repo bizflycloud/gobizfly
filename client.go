@@ -32,7 +32,7 @@ import (
 const (
 	version                 = "0.0.1"
 	ua                      = "bizfly-client-go/" + version
-	defaultAPIURL           = "https://manage.bizflycloud.vn"
+	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
 	mediaType               = "application/json; charset=utf-8"
 	loadBalancerServiceName = "load_balancer"
 	serverServiceName       = "cloud_server"
@@ -81,6 +81,7 @@ type Client struct {
 	tenantName string
 	tenantID   string
 	regionName string
+	services []*Service
 }
 
 // Option set Client specific attributes
@@ -104,6 +105,14 @@ func WithHTTPClient(client *http.Client) Option {
 
 		c.httpClient = client
 
+		return nil
+	}
+}
+
+// WithRegionName sets the client region for BizFly client.
+func WithRegionName(region string) Option {
+	return func(c *Client) error {
+		c.regionName = region
 		return nil
 	}
 }
@@ -161,22 +170,27 @@ func NewClient(options ...Option) (*Client, error) {
 	return c, nil
 }
 
+func (c *Client) GetServiceUrl(serviceName string) string {
+	if serviceName == authServiceName {
+		return defaultAPIURL
+	}
+	for _, service := range c.services {
+		fmt.Printf("Service %s URL %s\n", service.CanonicalName, service.ServiceUrl)
+		if service.CanonicalName == serviceName && service.Region == c.regionName {
+			return service.ServiceUrl
+		}
+	}
+	return defaultAPIURL
+}
+
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
 
-	serviceUrl, err := c.Service.GetEndpoint(ctx, serviceName, c.regionName)
-	if err != nil {
-		return nil, err
-	}
-	url, _ := url.Parse(serviceUrl)
+	serviceUrl := c.GetServiceUrl(serviceName)
 
-	if err != nil {
-		return nil, err
-	}
-	u, err := url.Parse(urlStr)
-	if err != nil {
-		return nil, err
-	}
+	fmt.Printf("Service url for %s is %s\n", serviceName, serviceUrl)
+	url := serviceUrl + urlStr
+	fmt.Printf("Endpoint for resource %s\n", url)
 
 	buf := new(bytes.Buffer)
 	if body != nil {
@@ -184,7 +198,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 			return nil, err
 		}
 	}
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, url, buf)
 	if err != nil {
 		return nil, err
 	}

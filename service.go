@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -33,7 +32,7 @@ type Service struct {
 	Name          string `json:"name"`
 	Code          string `json:"code"`
 	CanonicalName string `json:"canonical_name"`
-	Id            string `json:"id"`
+	Id            int `json:"id"`
 	Region        string `json:"region"`
 	Icon          string `json:"icon"`
 	Description   string `json:"description"`
@@ -50,57 +49,31 @@ type service struct {
 }
 
 type ServiceInterface interface {
-	//List(ctx context.Context) (ServiceList, error)
-	GetEndpoint(ctx context.Context, name string, region string) (string, error)
+	List(ctx context.Context) ([]*Service, error)
+	//GetEndpoint(ctx context.Context, name string, region string) (string, error)
 }
 
-//func (s *service) List(ctx context.Context) ([]*Service, error) {
-//	req, err := s.client.NewRequest(ctx, http.MethodGet, serviceUrl, nil)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	resp, err := s.client.Do(ctx, req)
-//	if err != nil {
-//		return nil, err
-//	}
-//	defer resp.Body.Close()
-//	var services ServiceList
-//
-//	if err := json.NewDecoder(resp.Body).Decode(&services); err != nil {
-//		return nil, err
-//	}
-//
-//	return services.Services, nil
-//}
-
-func (s *service) GetEndpoint(ctx context.Context, name string, region string) (string, error) {
+func (s *service) List(ctx context.Context) ([]*Service, error) {
 	u, err := s.client.apiURL.Parse(serviceUrl)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	buf := new(bytes.Buffer)
 
 	req, err := http.NewRequest("GET", u.String(), buf)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	var services ServiceList
 
 	if err := json.NewDecoder(resp.Body).Decode(&services); err != nil {
-		return "", err
+		return nil, err
 	}
-
-	for _, service := range services.Services {
-		if service.Name == name && service.Region == region {
-			return service.ServiceUrl, nil
-		}
-	}
-	return "", fmt.Errorf("There is no service name %s in region %s.", name, region)
+	return services.Services, nil
 }
