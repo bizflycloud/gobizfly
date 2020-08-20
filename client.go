@@ -30,10 +30,15 @@ import (
 )
 
 const (
-	version       = "0.0.1"
-	ua            = "bizfly-client-go/" + version
-	defaultAPIURL = "https://manage.bizflycloud.vn"
-	mediaType     = "application/json; charset=utf-8"
+	version                 = "0.0.1"
+	ua                      = "bizfly-client-go/" + version
+	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
+	mediaType               = "application/json; charset=utf-8"
+	loadBalancerServiceName = "load_balancer"
+	serverServiceName       = "cloud_server"
+	autoScalingServiceName  = "auto_scaling"
+	alertServiceName        = "alert"
+	authServiceName         = "auth"
 )
 
 var (
@@ -61,6 +66,8 @@ type Client struct {
 	Volume VolumeService
 	Server ServerService
 
+	Service ServiceInterface
+
 	httpClient    *http.Client
 	apiURL        *url.URL
 	userAgent     string
@@ -73,6 +80,8 @@ type Client struct {
 	// TODO: this will be removed in near future
 	tenantName string
 	tenantID   string
+	regionName string
+	services   []*Service
 }
 
 // Option set Client specific attributes
@@ -96,6 +105,14 @@ func WithHTTPClient(client *http.Client) Option {
 
 		c.httpClient = client
 
+		return nil
+	}
+}
+
+// WithRegionName sets the client region for BizFly client.
+func WithRegionName(region string) Option {
+	return func(c *Client) error {
+		c.regionName = region
 		return nil
 	}
 }
@@ -149,16 +166,23 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Member = &member{client: c}
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
-
+	c.Service = &service{client: c}
 	return c, nil
 }
 
-// NewRequest creates an API request.
-func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body interface{}) (*http.Request, error) {
-	u, err := c.apiURL.Parse(urlStr)
-	if err != nil {
-		return nil, err
+func (c *Client) GetServiceUrl(serviceName string) string {
+	for _, service := range c.services {
+		if service.CanonicalName == serviceName && service.Region == c.regionName {
+			return service.ServiceUrl
+		}
 	}
+	return defaultAPIURL
+}
+
+// NewRequest creates an API request.
+func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
+	serviceUrl := c.GetServiceUrl(serviceName)
+	url := serviceUrl + urlStr
 
 	buf := new(bytes.Buffer)
 	if body != nil {
@@ -166,7 +190,7 @@ func (c *Client) NewRequest(ctx context.Context, method, urlStr string, body int
 			return nil, err
 		}
 	}
-	req, err := http.NewRequest(method, u.String(), buf)
+	req, err := http.NewRequest(method, url, buf)
 	if err != nil {
 		return nil, err
 	}

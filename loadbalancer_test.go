@@ -20,6 +20,7 @@ package gobizfly
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"strings"
 	"testing"
@@ -34,7 +35,7 @@ func TestLoadBalancerList(t *testing.T) {
 	defer teardown()
 
 	var l loadbalancer
-	mux.HandleFunc(l.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -89,7 +90,7 @@ func TestLoadBalancerCreate(t *testing.T) {
 	defer teardown()
 
 	var l loadbalancer
-	mux.HandleFunc(l.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
@@ -143,7 +144,7 @@ func TestLoadBalancerGet(t *testing.T) {
 	defer teardown()
 
 	var l loadbalancer
-	mux.HandleFunc(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -193,7 +194,7 @@ func TestLoadBalancerDelete(t *testing.T) {
 	defer teardown()
 
 	var l loadbalancer
-	mux.HandleFunc(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -206,7 +207,7 @@ func TestLoadBalancerUpdate(t *testing.T) {
 	defer teardown()
 
 	var l loadbalancer
-	mux.HandleFunc(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 		var payload struct {
 			LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
@@ -256,7 +257,7 @@ func TestListenerList(t *testing.T) {
 	defer teardown()
 
 	var l listener
-	mux.HandleFunc(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -312,7 +313,7 @@ func TestListenerCreate(t *testing.T) {
 	defer teardown()
 
 	var l listener
-	mux.HandleFunc(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			Listener *ListenerCreateRequest `json:"listener"`
@@ -377,7 +378,7 @@ func TestListenerGet(t *testing.T) {
 	defer teardown()
 
 	var l listener
-	mux.HandleFunc(l.itemPath("5482c4a4-f822-46d0-9af3-026f7579d653"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("5482c4a4-f822-46d0-9af3-026f7579d653")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -426,7 +427,7 @@ func TestListenerUpdate(t *testing.T) {
 	defer teardown()
 
 	var l listener
-	mux.HandleFunc(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
@@ -494,7 +495,7 @@ func TestListenerDelete(t *testing.T) {
 	defer teardown()
 
 	var l listener
-	mux.HandleFunc(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -507,7 +508,7 @@ func TestMemberList(t *testing.T) {
 	defer teardown()
 
 	var m member
-	mux.HandleFunc(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -565,7 +566,7 @@ func TestMemberGet(t *testing.T) {
 	defer teardown()
 
 	var m member
-	mux.HandleFunc(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -600,7 +601,7 @@ func TestMemberUpdate(t *testing.T) {
 	defer teardown()
 
 	var m member
-	mux.HandleFunc(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		resp := `
@@ -639,7 +640,7 @@ func TestMemberDelete(t *testing.T) {
 	defer teardown()
 
 	var m member
-	mux.HandleFunc(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -652,7 +653,7 @@ func TestMemberCreate(t *testing.T) {
 	defer teardown()
 
 	var m member
-	mux.HandleFunc(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			Member *MemberCreateRequest `json:"member"`
@@ -703,7 +704,7 @@ func TestPoolList(t *testing.T) {
 	defer teardown()
 
 	var p pool
-	mux.HandleFunc(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -754,7 +755,7 @@ func TestPoolCreate(t *testing.T) {
 	defer teardown()
 
 	var p pool
-	mux.HandleFunc(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			Pool *PoolCreateRequest `json:"pool"`
@@ -846,7 +847,7 @@ func TestPoolGet(t *testing.T) {
 	defer teardown()
 
 	var p pool
-	mux.HandleFunc(p.itemPath("1fb271b2-a77e-4afc-8ec6-c6bc110f4c75"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("1fb271b2-a77e-4afc-8ec6-c6bc110f4c75")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -914,7 +915,7 @@ func TestPoolUpdate(t *testing.T) {
 	defer teardown()
 
 	var p pool
-	mux.HandleFunc(p.itemPath("4029d267-3983-4224-a3d0-afb3fe16a2cd"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("4029d267-3983-4224-a3d0-afb3fe16a2cd")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
@@ -974,7 +975,7 @@ func TestPoolDelete(t *testing.T) {
 	defer teardown()
 	var p pool
 
-	mux.HandleFunc(p.itemPath("023f2e34-7806-443b-bfae-16c324569a3d"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -988,7 +989,7 @@ func TestHealthMonitorCreate(t *testing.T) {
 
 	poolID := "4029d267-3983-4224-a3d0-afb3fe16a2cd"
 
-	mux.HandleFunc(strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
@@ -1055,7 +1056,7 @@ func TestHealthMonitorGet(t *testing.T) {
 	defer teardown()
 
 	var h healthmonitor
-	mux.HandleFunc(h.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(h.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -1099,7 +1100,7 @@ func TestHealthMonitorUpdate(t *testing.T) {
 	defer teardown()
 
 	var hm healthmonitor
-	mux.HandleFunc(hm.itemPath("8ed3c5ac-6efa-420c-bedb-99ba14e58db5"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(hm.itemPath("8ed3c5ac-6efa-420c-bedb-99ba14e58db5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
@@ -1154,7 +1155,7 @@ func TestHealthMonitorDelete(t *testing.T) {
 	defer teardown()
 	var hm healthmonitor
 
-	mux.HandleFunc(hm.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(hm.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})

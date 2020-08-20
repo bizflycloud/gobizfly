@@ -28,7 +28,7 @@ import (
 )
 
 const (
-	snapshotPath = "/iaas-cloud/api/snapshots"
+	snapshotPath = "/snapshots"
 )
 
 var _ SnapshotService = (*snapshot)(nil)
@@ -74,7 +74,7 @@ type snapshot struct {
 // Get gets a snapshot
 func (s *snapshot) Get(ctx context.Context, id string) (*Snapshot, error) {
 	var snapshot *Snapshot
-	req, err := s.client.NewRequest(ctx, http.MethodGet, strings.Join([]string{snapshotPath, id}, "/"), nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, strings.Join([]string{snapshotPath, id}, "/"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +92,7 @@ func (s *snapshot) Get(ctx context.Context, id string) (*Snapshot, error) {
 
 // Delete deletes a snapshot
 func (s *snapshot) Delete(ctx context.Context, id string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, strings.Join([]string{snapshotPath, id}, "/"), nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, strings.Join([]string{snapshotPath, id}, "/"), nil)
 
 	if err != nil {
 		return err
@@ -111,7 +111,7 @@ func (s *snapshot) Delete(ctx context.Context, id string) error {
 // Create creates a new snapshot
 func (s *snapshot) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Snapshot, error) {
 	var snapshot *Snapshot
-	req, err := s.client.NewRequest(ctx, http.MethodPost, snapshotPath, &scr)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, snapshotPath, &scr)
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +129,7 @@ func (s *snapshot) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Sna
 
 // List lists all snapshot of user
 func (s *snapshot) List(ctx context.Context, opts *ListOptions) ([]*Snapshot, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, snapshotPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, snapshotPath, nil)
 	if err != nil {
 		return nil, err
 	}

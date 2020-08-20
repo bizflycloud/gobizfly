@@ -20,6 +20,7 @@ package gobizfly
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"testing"
 
@@ -30,7 +31,7 @@ import (
 func TestServerGet(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(serverBasePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL("/servers"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 [
@@ -181,7 +182,7 @@ func TestServerGet(t *testing.T) {
 func TestServerCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(serverBasePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL("/servers"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var scr *ServerCreateRequest
 		payload := []*ServerCreateRequest{scr}
@@ -217,7 +218,7 @@ func TestServerCreate(t *testing.T) {
 func TestServerDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(serverBasePath+"/"+"c0f541d1-385a-4b0f-8c9a-5bd583475477", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL("/servers")+"/"+"c0f541d1-385a-4b0f-8c9a-5bd583475477", func(w http.ResponseWriter, r *http.Request) {
 
 		resp := `test
 		`
@@ -233,7 +234,7 @@ func TestServerSoftReboot(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -256,7 +257,7 @@ func TestServerHardReboot(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -278,7 +279,7 @@ func TestServerStart(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -366,7 +367,7 @@ func TestServerStop(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -454,7 +455,7 @@ func TestServerRebuild(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -478,7 +479,7 @@ func TestServerGetVNC(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -505,7 +506,7 @@ func TestServerResize(t *testing.T) {
 	setup()
 	defer teardown()
 	var svr *server
-	mux.HandleFunc(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
@@ -528,7 +529,7 @@ func TestServerResize(t *testing.T) {
 func TestServerFlavorList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(flavorPath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(flavorPath), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		resp := `
 [
@@ -553,7 +554,7 @@ func TestServerFlavorList(t *testing.T) {
 func TestOSImageList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(osImagePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(osImagePath), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "True", r.URL.Query().Get("os_images"))
 		resp := `
