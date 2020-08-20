@@ -53,6 +53,27 @@ func TestToken(t *testing.T) {
 				_, _ = fmt.Fprint(w, resp)
 			})
 
+			mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+				require.Equal(t, http.MethodGet, r.Method)
+				resp := `
+{
+  "services": [
+    {
+      "canonical_name": "cloud_server", 
+      "code": "CS", 
+      "description": "Cloud Server", 
+      "enabled": true, 
+      "icon": "https://manage.bizflycloud.vn/iaas-cloud/api", 
+      "id": 2, 
+      "name": "Cloud Server", 
+      "region": "HN", 
+      "service_url": "https://manage.bizflycloud.vn/iaas-cloud/api"
+    }
+  ]
+}`
+				_, _ = fmt.Fprint(w, resp)
+			})
+
 			tok, err := client.Token.Create(ctx, tc.tcr)
 			require.NoError(t, err)
 			require.Equal(t, tc.expectedToken, tok.KeystoneToken)
@@ -88,6 +109,27 @@ func TestRetryWhenTokenExpired(t *testing.T) {
     "loadbalancers": []
 }
 `
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+  "services": [
+    {
+      "canonical_name": "cloud_server", 
+      "code": "CS", 
+      "description": "Cloud Server", 
+      "enabled": true, 
+      "icon": "https://manage.bizflycloud.vn/iaas-cloud/api", 
+      "id": 2, 
+      "name": "Cloud Server", 
+      "region": "HN", 
+      "service_url": "https://manage.bizflycloud.vn/iaas-cloud/api"
+    }
+  ]
+}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 
