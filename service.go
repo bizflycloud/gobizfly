@@ -32,7 +32,7 @@ type Service struct {
 	Name          string `json:"name"`
 	Code          string `json:"code"`
 	CanonicalName string `json:"canonical_name"`
-	Id            int `json:"id"`
+	Id            int    `json:"id"`
 	Region        string `json:"region"`
 	Icon          string `json:"icon"`
 	Description   string `json:"description"`

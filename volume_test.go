@@ -26,12 +26,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/bizflycloud/gobizfly/testlib"
 )
 
 func TestVolumeList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(volumeBasePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 [
@@ -163,7 +165,7 @@ func TestVolumeGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(volumeBasePath+"/"+"7b099bbb-21e9-48f9-8cec-4076d78fa201", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath + "/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -292,7 +294,7 @@ func TestVolumeGet(t *testing.T) {
 func TestVolumeDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(volumeBasePath+"/"+"7b099bbb-21e9-48f9-8cec-4076d78fa201", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath + "/7b099bbb-21e9-48f9-8cec-4076d78fa201"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
@@ -302,7 +304,7 @@ func TestVolumeDelete(t *testing.T) {
 func TestVolumeCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(volumeBasePath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var volume *VolumeCreateRequest
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&volume))
@@ -360,8 +362,7 @@ func TestVolumeExtend(t *testing.T) {
 	defer teardown()
 
 	var v volume
-
-	mux.HandleFunc(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -381,7 +382,7 @@ func TestVolumeRestore(t *testing.T) {
 	defer teardown()
 
 	var v volume
-	mux.HandleFunc(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -401,7 +402,7 @@ func TestVolumeAttach(t *testing.T) {
 	defer teardown()
 
 	var v volume
-	mux.HandleFunc(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -445,7 +446,7 @@ func TestVolumeDetach(t *testing.T) {
 	defer teardown()
 
 	var v volume
-	mux.HandleFunc(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {

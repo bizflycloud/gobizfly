@@ -19,6 +19,7 @@ package gobizfly
 
 import (
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"testing"
 
@@ -41,7 +42,7 @@ func TestToken(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			setup()
 			defer teardown()
-			mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(testlib.AuthURL(tokenPath), func(w http.ResponseWriter, r *http.Request) {
 				require.Equal(t, http.MethodPost, r.Method)
 				resp := fmt.Sprintf(`
 {
@@ -63,7 +64,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AuthURL(tokenPath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -75,7 +76,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 	})
 
 	var l loadbalancer
-	mux.HandleFunc(l.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		token := r.Header.Get("X-Auth-Token")
 		if token != "xxx" {

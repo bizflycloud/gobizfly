@@ -81,7 +81,7 @@ type Client struct {
 	tenantName string
 	tenantID   string
 	regionName string
-	services []*Service
+	services   []*Service
 }
 
 // Option set Client specific attributes
@@ -171,9 +171,6 @@ func NewClient(options ...Option) (*Client, error) {
 }
 
 func (c *Client) GetServiceUrl(serviceName string) string {
-	if serviceName == authServiceName {
-		return defaultAPIURL
-	}
 	for _, service := range c.services {
 		if service.CanonicalName == serviceName && service.Region == c.regionName {
 			return service.ServiceUrl

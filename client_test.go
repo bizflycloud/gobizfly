@@ -37,17 +37,37 @@ func setup() {
 	serverTest = httptest.NewServer(mux)
 
 	var err error
-	client, err = NewClient(WithAPIUrl(serverTest.URL), WithRegionName("HN"))
-
+	testRegion := "HN"
+	client, err = NewClient(WithAPIUrl(serverTest.URL), WithRegionName(testRegion))
 	services := []*Service{
 		&Service{Name: "Cloud Server",
-			CanonicalName: "cloud_server",
-			ServiceUrl: "https://manage.bizflycloud.vn/iaas-cloud/api",
-			Region: "HN"},
-			&Service{
-			Name: "Load Balancer",
-			CanonicalName: "load_balancer",
-			ServiceUrl: "https://manage.bizflycloud.vn/api/loadbalancers"},
+			CanonicalName: serverServiceName,
+			ServiceUrl:    serverTest.URL + "/iaas-cloud/api",
+			Region:        testRegion},
+		&Service{
+			Name:          "Load Balancer",
+			CanonicalName: loadBalancerServiceName,
+			ServiceUrl:    serverTest.URL  + "/api/loadbalancers",
+			Region: testRegion,
+		},
+		&Service{
+			Name: "Alert",
+			CanonicalName: alertServiceName,
+			ServiceUrl: serverTest.URL + "/api/alert",
+			Region: testRegion,
+		},
+		&Service{
+			Name: "Auto Scaling",
+			CanonicalName: autoScalingServiceName,
+			ServiceUrl: serverTest.URL + "/api/auto-scaling",
+			Region: testRegion,
+		},
+		&Service{
+			Name: "Auth",
+			CanonicalName: authServiceName,
+			ServiceUrl: serverTest.URL + "/api",
+			Region: testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {

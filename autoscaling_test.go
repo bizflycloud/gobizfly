@@ -20,6 +20,7 @@ package gobizfly
 import (
 	"context"
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"reflect"
 	"testing"
@@ -32,7 +33,7 @@ func Test_autoScalingGroup_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var asg autoScalingGroup
-	mux.HandleFunc(asg.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(asg.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
         {
@@ -125,7 +126,7 @@ func Test_launchConfiguration_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var lc launchConfiguration
-	mux.HandleFunc(lc.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(lc.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
           "profiles": [
@@ -194,7 +195,7 @@ func Test_webhook_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var wh webhook
-	mux.HandleFunc(wh.resourcePath("da6d6ab3-f765-46d0-ad6d-b5bfa237b920"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(wh.resourcePath("da6d6ab3-f765-46d0-ad6d-b5bfa237b920")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `[
           {
@@ -227,7 +228,7 @@ func Test_event_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var e event
-	mux.HandleFunc(e.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7", 1, 10), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(e.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7", 1, 10)), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := ` {
           "_meta": {
@@ -270,7 +271,7 @@ func Test_policy_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var p policy
-	mux.HandleFunc(p.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(p.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
           "scale_out_info": [
@@ -314,7 +315,7 @@ func Test_node_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var n node
-	mux.HandleFunc(n.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(n.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
           "nodes": [
@@ -370,7 +371,7 @@ func Test_schedule_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var s schedule
-	mux.HandleFunc(s.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(s.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
             "cron_triggers": [{
@@ -433,7 +434,7 @@ func Test_common_UsingResource(t *testing.T) {
 	setup()
 	defer teardown()
 	var c common
-	mux.HandleFunc(c.usingResourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(c.usingResourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
           "ssh_keys": [
@@ -459,7 +460,7 @@ func Test_common_UsingResource(t *testing.T) {
 func TestIsValidQuotas(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(getQuotasResourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AutoScalingURL(getQuotasResourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `{
             "message": {
