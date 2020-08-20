@@ -175,7 +175,6 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 		return defaultAPIURL
 	}
 	for _, service := range c.services {
-		fmt.Printf("Service %s URL %s\n", service.CanonicalName, service.ServiceUrl)
 		if service.CanonicalName == serviceName && service.Region == c.regionName {
 			return service.ServiceUrl
 		}
@@ -185,12 +184,8 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
-
 	serviceUrl := c.GetServiceUrl(serviceName)
-
-	fmt.Printf("Service url for %s is %s\n", serviceName, serviceUrl)
 	url := serviceUrl + urlStr
-	fmt.Printf("Endpoint for resource %s\n", url)
 
 	buf := new(bytes.Buffer)
 	if body != nil {
