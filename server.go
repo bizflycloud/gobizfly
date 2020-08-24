@@ -59,6 +59,14 @@ type IPAddress struct {
 	WanV6Addresses []IP `json:"WAN_V6"`
 }
 
+// Flavor contains flavor information.
+type Flavor struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Ram  int    `json:"ram"`
+	VCPU int    `json:"vcpu"`
+}
+
 // Server contains server information.
 type Server struct {
 	ID               string                 `json:"id"`
@@ -73,7 +81,7 @@ type Server struct {
 	SecurityGroup    []ServerSecurityGroup  `json:"security_group"`
 	Addresses        map[string]interface{} `json:"addresses"` // Deprecated: This field will be removed in the near future
 	Metadata         map[string]string      `json:"metadata"`
-	Flavor           map[string]interface{} `json:"flavor"`
+	Flavor           Flavor                 `json:"flavor"`
 	Progress         int                    `json:"progress"`
 	AttachedVolumes  []AttachedVolume       `json:"os-extended-volumes:volumes_attached"`
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
