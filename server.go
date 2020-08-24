@@ -44,6 +44,21 @@ type AttachedVolume struct {
 	ID string `json:"id"`
 }
 
+// IP represents the IP address, version and mac address of a port
+type IP struct {
+	Version    string `json:"version"`
+	Address    string `json:"addr"`
+	Type       string `json:"OS-EXT-IPS:type"`
+	MacAddress string `json:"0S-EXT-IPS-MAC:mac_addr"`
+}
+
+// IPAddresses contains LAN & WAN Ip address of a Cloud Server
+type IPAddress struct {
+	LanAddresses   []IP `json:"LAN"`
+	WanV4Addresses []IP `json:"WAN_V4"`
+	WanV6Addresses []IP `json:"WAN_V6"`
+}
+
 // Server contains server information.
 type Server struct {
 	ID               string                 `json:"id"`
@@ -56,13 +71,14 @@ type Server struct {
 	Status           string                 `json:"status"`
 	IPv6             bool                   `json:"ipv6"`
 	SecurityGroup    []ServerSecurityGroup  `json:"security_group"`
-	Addresses        map[string]interface{} `json:"addresses"`
+	Addresses        map[string]interface{} `json:"addresses"` // Deprecated: This field will be removed in the near future
 	Metadata         map[string]string      `json:"metadata"`
 	Flavor           map[string]interface{} `json:"flavor"`
 	Progress         int                    `json:"progress"`
 	AttachedVolumes  []AttachedVolume       `json:"os-extended-volumes:volumes_attached"`
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
 	Category         string                 `json:"category"`
+	IPAddresses      IPAddress              `json:"ip_addresses"`
 }
 
 type server struct {
