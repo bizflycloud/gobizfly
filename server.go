@@ -46,7 +46,7 @@ type AttachedVolume struct {
 
 // IP represents the IP address, version and mac address of a port
 type IP struct {
-	Version    string `json:"version"`
+	Version    int    `json:"version"`
 	Address    string `json:"addr"`
 	Type       string `json:"OS-EXT-IPS:type"`
 	MacAddress string `json:"0S-EXT-IPS-MAC:mac_addr"`
