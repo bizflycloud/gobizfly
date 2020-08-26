@@ -989,7 +989,7 @@ func TestHealthMonitorCreate(t *testing.T) {
 
 	poolID := "4029d267-3983-4224-a3d0-afb3fe16a2cd"
 
-	mux.HandleFunc(testlib.LoadBalancerURL(strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL("/" + strings.Join([]string{"pool", poolID, "healthmonitor"}, "/")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
 			HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`

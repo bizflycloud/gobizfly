@@ -27,11 +27,10 @@ import (
 )
 
 const (
-	loadBalancerBasePath     = "/loadbalancers/api"
-	loadBalancersPath        = "loadbalancers"
-	loadBalancerResourcePath = "loadbalancer"
-	listenerPath             = "listener"
-	poolPath                 = "pool"
+	loadBalancersPath        = "/loadbalancers"
+	loadBalancerResourcePath = "/loadbalancer"
+	listenerPath             = "/listener"
+	poolPath                 = "/pool"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
@@ -101,7 +100,7 @@ type loadbalancer struct {
 }
 
 func (l *loadbalancer) resourcePath() string {
-	return strings.Join([]string{loadBalancerBasePath, loadBalancersPath}, "/")
+	return loadBalancersPath
 }
 
 func (l *loadbalancer) itemPath(id string) string {
@@ -800,7 +799,7 @@ type HealthMonitorService interface {
 }
 
 func (h *healthmonitor) itemPath(hmID string) string {
-	return strings.Join([]string{loadBalancerBasePath, "healthmonitor", hmID}, "/")
+	return strings.Join([]string{"healthmonitor", hmID}, "/")
 }
 
 // Get gets detail a health monitor
@@ -829,7 +828,7 @@ func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthM
 	}
 	hmcr.PoolID = poolID
 	data.HealthMonitor = hmcr
-	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, strings.Join([]string{loadBalancerBasePath, "pool", poolID, "healthmonitor"}, "/"), &data)
+	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, "/" + strings.Join([]string{"pool", poolID, "healthmonitor"}, "/"), &data)
 	if err != nil {
 		return nil, err
 	}
