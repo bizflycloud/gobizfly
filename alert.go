@@ -52,10 +52,10 @@ func (as *alertService) Histories() *histories {
 }
 
 const (
-	alarmsResourcePath    = "alarms"
-	receiversResourcePath = "receivers"
-	historiesResourcePath = "histories"
-	getVerificationPath   = "resend"
+	alarmsResourcePath    = "/alarms"
+	receiversResourcePath = "/receivers"
+	historiesResourcePath = "/histories"
+	getVerificationPath   = "/resend"
 )
 
 // Comparison is represents comparison payload in alarms
