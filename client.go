@@ -66,7 +66,8 @@ type Client struct {
 	Volume VolumeService
 	Server ServerService
 
-	Service ServiceInterface
+	Service  ServiceInterface
+	Firewall FirewallService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -167,6 +168,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
 	c.Service = &service{client: c}
+	c.Firewall = &firewall{client: c}
 	return c, nil
 }
 
