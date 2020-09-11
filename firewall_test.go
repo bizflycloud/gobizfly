@@ -787,3 +787,67 @@ func TestRemoveServerFirewall(t *testing.T) {
 	assert.Len(t, fw.Servers, 0)
 	assert.Equal(t, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", fw.ID)
 }
+
+func TestDeleteFirewallRule(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(firewallBasePath+"/48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		resp := `
+{
+	"message": "Deleted Firewall Rule"
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Firewall.DeleteRule(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0")
+	require.NoError(t, err)
+	assert.Equal(t, "Deleted Firewall Rule", resp.Message)
+}
+
+func TestCreateFirewallRule(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(firewallBasePath+"/f09bfc4b-92a9-468a-b41d-6ba8d4bd7552/rules"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+    "security_group_rule": {
+        "id": "45c37e35-86ff-4fc6-9285-0bb9f5110db8",
+        "tenant_id": "a7d1e56edcac40d0896d2b97f414afc5",
+        "security_group_id": "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552",
+        "ethertype": "IPv4",
+        "direction": "ingress",
+        "protocol": "udp",
+        "port_range_min": 80,
+        "port_range_max": 90,
+        "remote_ip_prefix": "0.0.0.0/0",
+        "remote_group_id": null,
+        "description": "CUSTOM",
+        "created_at": "2020-09-11T07:27:21Z",
+        "updated_at": "2020-09-11T07:27:21Z",
+        "revision_number": 0,
+        "project_id": "a7d1e56edcac40d0896d2b97f414afc5"
+    }
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	var fsrcr = FirewallSingleRuleCreateRequest{
+		Direction: "ingress",
+		FirewallRuleCreateRequest: FirewallRuleCreateRequest{
+			CIDR:      "0.0.0.0/0",
+			Protocol:  "UDP",
+			Type:      "CUSTOM",
+			PortRange: "80-90",
+		},
+	}
+	resp, err := client.Firewall.CreateRule(ctx, "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552", &fsrcr)
+	require.NoError(t, err)
+	assert.Equal(t, "45c37e35-86ff-4fc6-9285-0bb9f5110db8", resp.ID)
+	assert.Equal(t, "ingress", resp.Direction)
+	assert.Equal(t, "IPv4", resp.EtherType)
+	assert.Equal(t, "udp", resp.Protocol)
+}
