@@ -86,6 +86,11 @@ type FirewallRuleCreateRequest struct {
 	CIDR      string `json:"cidr"`
 }
 
+type FirewallSingleRuleCreateRequest struct {
+	FirewallRuleCreateRequest
+	Direction string `json:"direction"`
+}
+
 type FirewallCreateRequest struct {
 	Name     string                      `json:"name"`
 	InBound  []FirewallRuleCreateRequest `json:"inbound"`
@@ -106,6 +111,11 @@ type FirewallUpdateRequest struct {
 	Outbound []FirewallRuleCreateRequest `json:"outbound"`
 	Targets  []string                    `json:"targets"`
 }
+
+type FirewallRuleCreateResponse struct {
+	Rule FirewallRule `json:"security_group_rule"`
+}
+
 type FirewallService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Firewall, error)
 	Create(ctx context.Context, fcr *FirewallCreateRequest) (*Firewall, error)
@@ -113,6 +123,8 @@ type FirewallService interface {
 	Delete(ctx context.Context, id string) (*FirewallDeleteResponse, error)
 	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
 	Update(ctx context.Context, id string, ufr *FirewallUpdateRequest) (*FirewallDetail, error)
+	DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error)
+	CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error)
 }
 
 // List lists all firewall.
@@ -248,4 +260,48 @@ func (f *firewall) Delete(ctx context.Context, id string) (*FirewallDeleteRespon
 	}
 
 	return dwr, nil
+}
+
+// Delete a rule in a firewall
+func (f *firewall) DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error) {
+	req, err := f.client.NewRequest(ctx, http.MethodDelete, serverServiceName, firewallBasePath+"/"+id, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := f.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var dwr *FirewallDeleteResponse
+
+	if err := json.NewDecoder(resp.Body).Decode(&dwr); err != nil {
+		return nil, err
+	}
+
+	return dwr, nil
+}
+
+// Create a new rule in a firewall
+func (f *firewall) CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error) {
+	req, err := f.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{firewallBasePath, fwID, "rules"}, "/"), fsrcr)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := f.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var firewallRuleCreateResponse struct {
+		Rule *FirewallRule `json:"security_group_rule"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&firewallRuleCreateResponse); err != nil {
+		return nil, err
+	}
+	return firewallRuleCreateResponse.Rule, nil
 }
