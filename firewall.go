@@ -93,9 +93,9 @@ type FirewallSingleRuleCreateRequest struct {
 
 type FirewallCreateRequest struct {
 	Name     string                      `json:"name"`
-	InBound  []FirewallRuleCreateRequest `json:"inbound"`
-	OutBound []FirewallRuleCreateRequest `json:"outbound"`
-	Targets  []string                    `json:"targets"`
+	InBound  []FirewallRuleCreateRequest `json:"inbound,omitempty"`
+	OutBound []FirewallRuleCreateRequest `json:"outbound,omitempty"`
+	Targets  []string                    `json:"targets,omitempty"`
 }
 
 type FirewallDeleteResponse struct {
