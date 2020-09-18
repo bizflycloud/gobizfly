@@ -96,7 +96,7 @@ type server struct {
 // ServerService is an interface to interact with BizFly Cloud API.
 type ServerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
-	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error)
+	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
 	Delete(ctx context.Context, id string) error
 	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
@@ -136,6 +136,11 @@ type ServerTask struct {
 	TaskID string `json:"task_id"`
 }
 
+// ServerCreateResponse contains response tasks when create server
+type ServerCreateResponse struct {
+	Task []string `json:"task_id"`
+}
+
 // ServerDisk contains server's disk information.
 type ServerDisk struct {
 	Size int    `json:"size"`
@@ -159,6 +164,7 @@ type ServerCreateRequest struct {
 	Type             string        `json:"type"`
 	AvailabilityZone string        `json:"availability_zone"`
 	OS               *ServerOS     `json:"os"`
+	Quantity         int           `json:"quantity,omitempty"`
 }
 
 // itemActionPath return http path of server action
@@ -189,7 +195,7 @@ func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 }
 
 // Create creates a new server.
-func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error) {
+func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error) {
 	payload := []*ServerCreateRequest{scr}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, serverBasePath, payload)
 	if err != nil {
@@ -201,7 +207,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 	}
 
 	defer resp.Body.Close()
-	var task *ServerTask
+	var task *ServerCreateResponse
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
 		return nil, err
 	}
