@@ -828,7 +828,7 @@ func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthM
 	}
 	hmcr.PoolID = poolID
 	data.HealthMonitor = hmcr
-	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, "/" + strings.Join([]string{"pool", poolID, "healthmonitor"}, "/"), &data)
+	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, "/"+strings.Join([]string{"pool", poolID, "healthmonitor"}, "/"), &data)
 	if err != nil {
 		return nil, err
 	}
