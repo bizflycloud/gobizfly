@@ -194,7 +194,9 @@ func TestServerCreate(t *testing.T) {
 		assert.Equal(t, 40, payload[0].RootDisk.Size)
 		resp := `
 {
-	"task_id": "71b9caeb-1df3-4a60-8741-fdea426fed4c"
+	"task_id": [
+		"71b9caeb-1df3-4a60-8741-fdea426fed4c"
+	]
 }
 `
 		_, _ = fmt.Fprint(w, resp)
@@ -211,7 +213,7 @@ func TestServerCreate(t *testing.T) {
 	}
 	task, err := client.Server.Create(ctx, scr)
 	require.NoError(t, err)
-	assert.Equal(t, "71b9caeb-1df3-4a60-8741-fdea426fed4c", task.TaskID)
+	assert.Equal(t, "71b9caeb-1df3-4a60-8741-fdea426fed4c", task.Task[0])
 
 }
 
