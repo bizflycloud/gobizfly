@@ -30,6 +30,7 @@ const (
 	serverBasePath = "/servers"
 	flavorPath     = "/flavors"
 	osImagePath    = "/images"
+	taskPath       = "/tasks"
 )
 
 var _ ServerService = (*server)(nil)
@@ -108,6 +109,7 @@ type ServerService interface {
 	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
 	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
 	ListOSImages(ctx context.Context) ([]osImageResponse, error)
+	GetTask(ctx context.Context, id string) (*ServerTaskResponse, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -452,4 +454,33 @@ func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
 		return nil, err
 	}
 	return respPayload.OSImages, nil
+}
+
+type ServerTaskResult struct {
+	Action   string `json:"action"`
+	Progress int    `json:"progress"`
+	Success  bool   `json:"success"`
+	Server
+}
+
+type ServerTaskResponse struct {
+	Ready  bool             `json:"ready"`
+	Result ServerTaskResult `json:"result"`
+}
+
+// GetTask get tasks result from Server API
+func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, taskPath+"/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var str *ServerTaskResponse
+	if err := json.NewDecoder(resp.Body).Decode(&str); err != nil {
+		return nil, err
+	}
+	return str, nil
 }
