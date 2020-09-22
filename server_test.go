@@ -651,3 +651,196 @@ func TestOSImageList(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "d9513b4e-60c4-45c6-a8e0-0d814a7c0799", osImages[0].Version[0].ID)
 }
+
+func TestGetServerTaskResponseNotReady(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(taskPath+"/7b1759dd-6e52-4799-b1ed-6441cbec1efb"), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "ready": false,
+    "result": {
+        "action": "create_server",
+        "progress": 100
+    }
+}
+
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Server.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
+	require.NoError(t, err)
+	assert.Equal(t, false, resp.Ready)
+}
+
+func TestGetServerTaskResponseReady(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(taskPath+"/7b1759dd-6e52-4799-b1ed-6441cbec1efb"), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "ready": true,
+    "result": {
+        "id": "366d5fa3-49d2-4c0d-bde5-f542bddb212a",
+        "name": "multi-server-TNnUw4Im",
+        "status": "ACTIVE",
+        "tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
+        "user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+        "metadata": {
+            "category": "premium",
+            "os_type": "Ubuntu 18.04"
+        },
+        "hostId": "8b22a6409fb25479713094dd4ebd424fdf237fb372fb38a2b5417e19",
+        "flavor": {
+            "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
+            "name": "nix.2c_2g",
+            "ram": 2048,
+            "disk": 0,
+            "swap": "",
+            "OS-FLV-EXT-DATA:ephemeral": 0,
+            "OS-FLV-DISABLED:disabled": false,
+            "vcpus": 2,
+            "os-flavor-access:is_public": true,
+            "rxtx_factor": 1.0
+        },
+        "created": "2020-09-22T09:48:18Z",
+        "updated": "2020-09-22T09:48:35Z",
+        "addresses": {
+            "priv_sapd@vccloud.vn": [
+                {
+                    "version": 4,
+                    "addr": "10.20.165.67",
+                    "OS-EXT-IPS:type": "fixed",
+                    "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:a5:01:9b"
+                }
+            ],
+            "EXT_DIRECTNET_2": [
+                {
+                    "version": 4,
+                    "addr": "103.56.156.109",
+                    "OS-EXT-IPS:type": "fixed",
+                    "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:1c:25:8e"
+                }
+            ]
+        },
+        "accessIPv4": "",
+        "accessIPv6": "",
+        "OS-DCF:diskConfig": "MANUAL",
+        "progress": 0,
+        "OS-EXT-AZ:availability_zone": "HN1",
+        "config_drive": "",
+        "key_name": "sapd1",
+        "OS-SRV-USG:launched_at": "2020-09-22T09:48:35.000000",
+        "OS-SRV-USG:terminated_at": null,
+        "security_groups": [
+            {
+                "name": "default"
+            },
+            {
+                "name": "default"
+            }
+        ],
+        "OS-EXT-STS:task_state": null,
+        "OS-EXT-STS:vm_state": "active",
+        "OS-EXT-STS:power_state": 1,
+        "os-extended-volumes:volumes_attached": [
+            {
+                "id": "4ca864a0-b546-4373-bda5-f338656d23d7",
+                "status": "in-use",
+                "size": 20,
+                "availability_zone": "HN1",
+                "created_at": "2020-09-22T09:47:46.000000",
+                "updated_at": "2020-09-22T09:48:24.000000",
+                "attachments": [
+                    {
+                        "id": "4ca864a0-b546-4373-bda5-f338656d23d7",
+                        "attachment_id": "ca7872d6-94e6-43ad-8165-8de0acac4ea8",
+                        "volume_id": "4ca864a0-b546-4373-bda5-f338656d23d7",
+                        "server_id": "366d5fa3-49d2-4c0d-bde5-f542bddb212a",
+                        "host_name": "thor-compute-033",
+                        "device": "/dev/vda",
+                        "attached_at": "2020-09-22T09:48:24.000000"
+                    }
+                ],
+                "name": "multi-server-TNnUw4Im_rootdisk",
+                "description": null,
+                "volume_type": "PREMIUM_HDD",
+                "snapshot_id": null,
+                "source_volid": null,
+                "metadata": {
+                    "category": "premium"
+                },
+                "user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+                "bootable": "true",
+                "encrypted": false,
+                "replication_status": null,
+                "consistencygroup_id": null,
+                "multiattach": false,
+                "os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
+                "volume_image_metadata": {
+                    "base_image_ref": "e410a263-b265-492d-9bb1-cd8e75fc3e92",
+                    "boot_roles": "member,reader,admin",
+                    "image_location": "snapshot",
+                    "image_state": "available",
+                    "image_type": "image",
+                    "instance_uuid": "498059da-ce21-498b-990b-c0f44a95cc3d",
+                    "owner_id": "159c53f12fc24afc88c945e9bc6cc57d",
+                    "owner_project_name": "Packer-Images",
+                    "owner_user_name": "image-builder",
+                    "user_id": "5676103832f14c129306bf525ec7b2de",
+                    "image_id": "82774ccd-f0f7-4858-9367-fd1cd819d8a9",
+                    "image_name": "Ubuntu 18.04",
+                    "checksum": "dc6b626e835035be71436b35c97c330d",
+                    "container_format": "bare",
+                    "disk_format": "raw",
+                    "min_disk": "5",
+                    "min_ram": "0",
+                    "size": "5368709120"
+                },
+                "attached_type": "rootdisk",
+                "type": "HDD",
+                "category": "premium",
+                "snapshots": []
+            }
+        ],
+        "category": "premium",
+        "ip_addresses": {
+            "LAN": [
+                {
+                    "version": 4,
+                    "addr": "10.20.165.67",
+                    "OS-EXT-IPS:type": "fixed",
+                    "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:a5:01:9b"
+                }
+            ],
+            "WAN_V4": [
+                {
+                    "version": 4,
+                    "addr": "103.56.156.109",
+                    "OS-EXT-IPS:type": "fixed",
+                    "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:1c:25:8e"
+                }
+            ],
+            "WAN_V6": []
+        },
+        "zone_name": "HN1",
+        "region_name": "HaNoi",
+        "autoscale_service": {},
+        "ipv6": false,
+        "success": true
+    }
+}
+
+
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	resp, err := client.Server.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
+	require.NoError(t, err)
+	assert.Equal(t, true, resp.Ready)
+	assert.Equal(t, "366d5fa3-49d2-4c0d-bde5-f542bddb212a", resp.Result.Server.ID)
+}
