@@ -110,6 +110,7 @@ type ServerService interface {
 	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
 	ListOSImages(ctx context.Context) ([]osImageResponse, error)
 	GetTask(ctx context.Context, id string) (*ServerTaskResponse, error)
+	ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -483,4 +484,25 @@ func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, e
 		return nil, err
 	}
 	return str, nil
+}
+
+func (s server) ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error) {
+	payload := &ServerAction{
+		Action:  "change_type",
+		NewType: newCategory}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var svt *ServerTask
+	if err := json.NewDecoder(resp.Body).Decode(&svt); err != nil {
+		return nil, err
+	}
+	return svt, nil
 }

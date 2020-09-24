@@ -844,3 +844,27 @@ func TestGetServerTaskResponseReady(t *testing.T) {
 	assert.Equal(t, true, resp.Ready)
 	assert.Equal(t, "366d5fa3-49d2-4c0d-bde5-f542bddb212a", resp.Result.Server.ID)
 }
+
+func TestServerChangeCategory(t *testing.T) {
+	setup()
+	defer teardown()
+	var svr *server
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		var sa *ServerAction
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&sa))
+		assert.Equal(t, "change_type", sa.Action)
+		assert.Equal(t, "enterprise", sa.NewType)
+		resp := `
+{
+	"task_id": "f188d844-7e3f-11ea-a878-17c5949416eb"
+}
+		`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	task, err := client.Server.ChangeCategory(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "enterprise")
+	require.NoError(t, err)
+	assert.Equal(t, "f188d844-7e3f-11ea-a878-17c5949416eb", task.TaskID)
+
+}
