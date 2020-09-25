@@ -74,7 +74,7 @@ type Volume struct {
 	VolumeType       string             `json:"type"`
 	Description      string             `json:"description"`
 	SnapshotID       string             `json:"snapshot_id"`
-	Bootable         string             `json:"bootable"`
+	Bootable         bool               `json:"bootable"`
 	AvailabilityZone string             `json:"availability_zone"`
 	Status           string             `json:"status"`
 	UserID           string             `json:"user_id"`
