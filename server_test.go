@@ -160,7 +160,8 @@ func TestServerGet(t *testing.T) {
 			"service": "prebuild_app"
 		},
 		"ipv6": false,
-		"category": "premium"
+		"category": "premium",
+		"region_name": "HaNoi"
 	}
 ]
 		`
@@ -354,7 +355,9 @@ func TestServerStart(t *testing.T) {
 		"category": "premium",
 		"os_type": "Ubuntu 18.04"
 	},
-	"ipv6": false
+	"ipv6": false,
+	"category": "premium",
+	"region_name": "HaNoi"
 }`
 		_, _ = fmt.Fprint(w, resp)
 	})
@@ -442,7 +445,9 @@ func TestServerStop(t *testing.T) {
 		"category": "premium",
 		"os_type": "Ubuntu 18.04"
 	},
-	"ipv6": false
+	"ipv6": false,
+	"category": "premium",
+	"region_name": "HaNoi"
 }`
 		_, _ = fmt.Fprint(w, resp)
 	})
