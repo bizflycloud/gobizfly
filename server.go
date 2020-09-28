@@ -42,7 +42,12 @@ type ServerSecurityGroup struct {
 
 // AttachedVolume contains attached volumes of a server.
 type AttachedVolume struct {
-	ID string `json:"id"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Size         int    `json:"size"`
+	AttachedType string `json:"attached_type"`
+	Type         string `json:"type"`
+	Category     string `json:"category"`
 }
 
 // IP represents the IP address, version and mac address of a port
@@ -88,6 +93,7 @@ type Server struct {
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
 	Category         string                 `json:"category"`
 	IPAddresses      IPAddress              `json:"ip_addresses"`
+	RegionName       string                 `json:"region_name"`
 }
 
 type server struct {
