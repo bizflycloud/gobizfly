@@ -68,6 +68,7 @@ type Client struct {
 
 	Service  ServiceInterface
 	Firewall FirewallService
+	SSHKey   SSHKeyService
 
 	httpClient    *http.Client
 	apiURL        *url.URL
@@ -169,6 +170,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Server = &server{client: c}
 	c.Service = &service{client: c}
 	c.Firewall = &firewall{client: c}
+	c.SSHKey = &sshkey{client: c}
 	return c, nil
 }
 
