@@ -118,7 +118,7 @@ type FirewallRuleCreateResponse struct {
 
 type FirewallService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Firewall, error)
-	Create(ctx context.Context, fcr *FirewallCreateRequest) (*Firewall, error)
+	Create(ctx context.Context, fcr *FirewallCreateRequest) (*FirewallDetail, error)
 	Get(ctx context.Context, id string) (*FirewallDetail, error)
 	Delete(ctx context.Context, id string) (*FirewallDeleteResponse, error)
 	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
@@ -150,7 +150,7 @@ func (f *firewall) List(ctx context.Context, opts *ListOptions) ([]*Firewall, er
 }
 
 // Create a firewall.
-func (f *firewall) Create(ctx context.Context, fcr *FirewallCreateRequest) (*Firewall, error) {
+func (f *firewall) Create(ctx context.Context, fcr *FirewallCreateRequest) (*FirewallDetail, error) {
 
 	req, err := f.client.NewRequest(ctx, http.MethodPost, serverServiceName, firewallBasePath, fcr)
 	if err != nil {
@@ -162,7 +162,7 @@ func (f *firewall) Create(ctx context.Context, fcr *FirewallCreateRequest) (*Fir
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var firewall *Firewall
+	var firewall *FirewallDetail
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
 		return nil, err
