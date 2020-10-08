@@ -674,7 +674,7 @@ func TestFirewallCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	fcr := FirewallCreateRequest{
+	fcr := FirewallRequestPayload{
 		Name: "bizflycloud-firewall",
 		InBound: []FirewallRuleCreateRequest{
 			{
@@ -828,10 +828,10 @@ func TestUpdateFirewall(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	fur := FirewallUpdateRequest{
+	fur := FirewallRequestPayload{
 		Targets:  []string{"b6c43097-27b2-4f09-8498-b7f4067909a0"},
-		Inbound:  []FirewallRuleCreateRequest{},
-		Outbound: []FirewallRuleCreateRequest{},
+		InBound:  []FirewallRuleCreateRequest{},
+		OutBound: []FirewallRuleCreateRequest{},
 	}
 	fw, err := client.Firewall.Update(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", &fur)
 	require.NoError(t, err)
