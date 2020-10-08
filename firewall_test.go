@@ -475,7 +475,91 @@ func TestFirewallCreate(t *testing.T) {
     "revision_number": 8,
     "project_id": "17a1c3c952c84b3e84a82ddd48364938",
     "servers_count": 0,
-    "servers": [],
+    "servers": [
+		{
+            "id": "6ee4ed07-ba59-4dd9-a0ca-cbc21861ca4b",
+            "name": "sapd-tf-server-2",
+            "status": "ACTIVE",
+            "tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
+            "user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+            "metadata": {
+                "category": "premium",
+                "os_type": "Ubuntu 18.04"
+            },
+            "hostId": "84bf6a43769bd4c041c75c1737c38d4b8df5faf6916f9f603b4702d8",
+            "flavor": {
+                "id": "f4d23537-8a87-4c32-bb0b-60328e6f4374",
+                "name": "nix.4c_2g",
+                "ram": 2048,
+                "disk": 0,
+                "swap": "",
+                "OS-FLV-EXT-DATA:ephemeral": 0,
+                "OS-FLV-DISABLED:disabled": false,
+                "vcpus": 4,
+                "os-flavor-access:is_public": true,
+                "rxtx_factor": 1.0
+            },
+            "created": "2020-10-07T04:41:12Z",
+            "updated": "2020-10-07T04:41:31Z",
+            "addresses": {
+                "priv_sapd@vccloud.vn": [
+                    {
+                        "version": 4,
+                        "addr": "10.20.165.89",
+                        "OS-EXT-IPS:type": "fixed",
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:f0:b2:cd"
+                    }
+                ],
+                "EXT_DIRECTNET_11": [
+                    {
+                        "version": 4,
+                        "addr": "123.30.234.210",
+                        "OS-EXT-IPS:type": "fixed",
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:10:22:0a"
+                    }
+                ]
+            },
+            "accessIPv4": "",
+            "accessIPv6": "",
+            "OS-DCF:diskConfig": "MANUAL",
+            "progress": 0,
+            "OS-EXT-AZ:availability_zone": "HN1",
+            "config_drive": "",
+            "key_name": "sapd1",
+            "OS-SRV-USG:launched_at": "2020-10-07T04:41:30.000000",
+            "OS-SRV-USG:terminated_at": null,
+            "OS-EXT-STS:task_state": null,
+            "OS-EXT-STS:vm_state": "active",
+            "OS-EXT-STS:power_state": 1,
+            "os-extended-volumes:volumes_attached": [
+                {
+                    "id": "364ee097-190d-482a-ba8f-87ef75d07e46"
+                }
+            ],
+            "ip_addresses": {
+                "LAN": [
+                    {
+                        "version": 4,
+                        "addr": "10.20.165.89",
+                        "OS-EXT-IPS:type": "fixed",
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:f0:b2:cd"
+                    }
+                ],
+                "WAN_V4": [
+                    {
+                        "version": 4,
+                        "addr": "123.30.234.210",
+                        "OS-EXT-IPS:type": "fixed",
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:10:22:0a"
+                    }
+                ],
+                "WAN_V6": []
+            },
+            "zone_name": "HN1",
+            "region_name": "HaNoi",
+            "category": "premium"
+        }
+	],
     "rules_count": 5,
     "inbound": [
         {
@@ -625,7 +709,9 @@ func TestFirewallCreate(t *testing.T) {
 				CIDR:      "192.168.0.0/28",
 			},
 		},
-		Targets: []string{},
+		Targets: []string{
+			"6ee4ed07-ba59-4dd9-a0ca-cbc21861ca4b",
+		},
 	}
 	fw, err := client.Firewall.Create(ctx, &fcr)
 	require.NoError(t, err)
