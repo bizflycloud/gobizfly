@@ -91,7 +91,7 @@ type FirewallSingleRuleCreateRequest struct {
 	Direction string `json:"direction"`
 }
 
-type FirewallCreateRequest struct {
+type FirewallRequestPayload struct {
 	Name     string                      `json:"name"`
 	InBound  []FirewallRuleCreateRequest `json:"inbound,omitempty"`
 	OutBound []FirewallRuleCreateRequest `json:"outbound,omitempty"`
@@ -106,11 +106,6 @@ type FirewallRemoveServerRequest struct {
 	Servers []string `json:"servers"`
 }
 
-type FirewallUpdateRequest struct {
-	Inbound  []FirewallRuleCreateRequest `json:"inbound"`
-	Outbound []FirewallRuleCreateRequest `json:"outbound"`
-	Targets  []string                    `json:"targets"`
-}
 
 type FirewallRuleCreateResponse struct {
 	Rule FirewallRule `json:"security_group_rule"`
@@ -118,11 +113,11 @@ type FirewallRuleCreateResponse struct {
 
 type FirewallService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Firewall, error)
-	Create(ctx context.Context, fcr *FirewallCreateRequest) (*FirewallDetail, error)
+	Create(ctx context.Context, fcr *FirewallRequestPayload) (*FirewallDetail, error)
 	Get(ctx context.Context, id string) (*FirewallDetail, error)
 	Delete(ctx context.Context, id string) (*FirewallDeleteResponse, error)
 	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
-	Update(ctx context.Context, id string, ufr *FirewallUpdateRequest) (*FirewallDetail, error)
+	Update(ctx context.Context, id string, ufr *FirewallRequestPayload) (*FirewallDetail, error)
 	DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error)
 	CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error)
 }
@@ -150,7 +145,7 @@ func (f *firewall) List(ctx context.Context, opts *ListOptions) ([]*Firewall, er
 }
 
 // Create a firewall.
-func (f *firewall) Create(ctx context.Context, fcr *FirewallCreateRequest) (*FirewallDetail, error) {
+func (f *firewall) Create(ctx context.Context, fcr *FirewallRequestPayload) (*FirewallDetail, error) {
 
 	req, err := f.client.NewRequest(ctx, http.MethodPost, serverServiceName, firewallBasePath, fcr)
 	if err != nil {
@@ -217,7 +212,7 @@ func (f *firewall) RemoveServer(ctx context.Context, id string, rsfr *FirewallRe
 }
 
 // Update Firewall
-func (f *firewall) Update(ctx context.Context, id string, ufr *FirewallUpdateRequest) (*FirewallDetail, error) {
+func (f *firewall) Update(ctx context.Context, id string, ufr *FirewallRequestPayload) (*FirewallDetail, error) {
 
 	req, err := f.client.NewRequest(ctx, http.MethodPatch, serverServiceName, firewallBasePath+"/"+id, ufr)
 
