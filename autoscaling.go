@@ -167,10 +167,19 @@ type ASAlarms struct {
 	ScaleOut ASAlarm `json:"scale_out"`
 }
 
+// taskResult - Struct of data was returned by workers
+type taskResult struct {
+	Action   string      `json:"action,omitempty"`
+	Data     interface{} `json:"data,omitempty"`
+	Message  string      `json:"message,omitempty"`
+	Progress int         `json:"progress,omitempty"`
+	Success  bool        `json:"success,omitempty"`
+}
+
 // ASTask is information of doing task
 type ASTask struct {
-	Ready  bool        `json:"ready"`
-	Result interface{} `json:"result"`
+	Ready  bool       `json:"ready"`
+	Result taskResult `json:"result"`
 }
 
 // ASMetadata - Medata of an auto scaling group
