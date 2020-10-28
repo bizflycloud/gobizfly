@@ -759,11 +759,11 @@ type HealthMonitor struct {
 type HealthMonitorCreateRequest struct {
 	Name           string  `json:"name"`
 	Type           string  `json:"type"`
-	TimeOut        int     `json:"timeout"`
+	TimeOut        int     `json:"timeout,omitempty"`
 	PoolID         string  `json:"pool_id"`
-	Delay          int     `json:"delay"`
-	MaxRetries     int     `json:"max_retries"`
-	MaxRetriesDown int     `json:"max_retries_down"`
+	Delay          int     `json:"delay,omitempty"`
+	MaxRetries     int     `json:"max_retries,omitempty"`
+	MaxRetriesDown int     `json:"max_retries_down,omitempty"`
 	HTTPMethod     string  `json:"http_method,omitempty"`
 	HTTPVersion    float32 `json:"http_version,omitempty"`
 	URLPath        string  `json:"url_path,omitempty"`
@@ -773,15 +773,15 @@ type HealthMonitorCreateRequest struct {
 
 type HealthMonitorUpdateRequest struct {
 	Name           string  `json:"name"`
-	TimeOut        int     `json:"timeout"`
-	Delay          int     `json:"delay"`
-	MaxRetries     int     `json:"max_retries"`
-	MaxRetriesDown int     `json:"max_retries_down"`
-	HTTPMethod     string  `json:"http_method"`
-	HTTPVersion    float32 `json:"http_version"`
-	URLPath        string  `json:"url_path"`
-	ExpectedCodes  string  `json:"expected_codes"`
-	DomainName     string  `json:"domain_name"`
+	TimeOut        int     `json:"timeout,omitempty"`
+	Delay          int     `json:"delay,omitempty"`
+	MaxRetries     int     `json:"max_retries,omitempty"`
+	MaxRetriesDown int     `json:"max_retries_down,omitempty"`
+	HTTPMethod     string  `json:"http_method,omitempty"`
+	HTTPVersion    float32 `json:"http_version,omitempty"`
+	URLPath        string  `json:"url_path,omitempty"`
+	ExpectedCodes  string  `json:"expected_codes,omitempty"`
+	DomainName     string  `json:"domain_name,omitempty"`
 }
 
 type healthmonitor struct {
