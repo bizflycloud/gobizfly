@@ -31,6 +31,7 @@ const (
 	loadBalancerResourcePath = "/loadbalancer"
 	listenerPath             = "/listener"
 	poolPath                 = "/pool"
+	healthMonitorPath        = "/healthmonitor"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
@@ -799,7 +800,7 @@ type HealthMonitorService interface {
 }
 
 func (h *healthmonitor) itemPath(hmID string) string {
-	return strings.Join([]string{"healthmonitor", hmID}, "/")
+	return strings.Join([]string{healthMonitorPath, hmID}, "/")
 }
 
 // Get gets detail a health monitor
