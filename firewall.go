@@ -106,7 +106,6 @@ type FirewallRemoveServerRequest struct {
 	Servers []string `json:"servers"`
 }
 
-
 type FirewallRuleCreateResponse struct {
 	Rule FirewallRule `json:"security_group_rule"`
 }
