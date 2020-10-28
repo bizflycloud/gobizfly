@@ -774,7 +774,6 @@ type HealthMonitorCreateRequest struct {
 type HealthMonitorUpdateRequest struct {
 	Name           string  `json:"name"`
 	TimeOut        int     `json:"timeout"`
-	PoolID         string  `json:"pool_id"`
 	Delay          int     `json:"delay"`
 	MaxRetries     int     `json:"max_retries"`
 	MaxRetriesDown int     `json:"max_retries_down"`
