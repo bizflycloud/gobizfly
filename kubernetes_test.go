@@ -224,6 +224,10 @@ func TestAddWorkerPool(t *testing.T) {
 	var c kubernetesEngineService
 	mux.HandleFunc(testlib.K8sURL(c.itemPath("ji84wqtzr77ogo6b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			WorkerPools *[]WorkerPool `json:"worker_pools"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		resp := `
 {
   "worker_pools": [
