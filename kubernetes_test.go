@@ -72,7 +72,55 @@ func TestClusterGet(t *testing.T) {
 	mux.HandleFunc(testlib.K8sURL(c.itemPath("ji84wqtzr77ogo6b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
-{"uid": "ji84wqtzr77ogo6b", "name": "deploy_test", "version": {"id": "5f7d3a91d857155ad4993a32", "name": "v1.18.6-5f7d3a91", "description": null, "kubernetes_version": "v1.18.6"}, "auto_upgrade": true, "tags": [], "provision_status": "PROVISIONED", "cluster_status": "PROVISIONED", "created_at": "2020-10-25T15:47:22.611000", "created_by": "svtt.tungds@vccloud.vn", "worker_pools_count": 1, "worker_pools": [{"id": "5f959e0ac0b18944d0a4f13a", "name": "pool-curdcqn2", "version": "v1.18.6", "flavor": "3c_6g_enterprise", "flavor_detail": {"name": "3c_6g_enterprise", "vcpus": 3, "ram": 6144}, "profile_type": "enterprise", "volume_type": "ENTERPRISE-SSD1", "volume_size": 50, "availability_zone": "HN1", "desired_size": 1, "enable_autoscaling": false, "min_size": 1, "max_size": 1, "tags": [], "provision_status": "PROVISIONED", "launch_config_id": "5a5c240f-e161-47c3-9214-b5ce7d2cda66", "autoscaling_group_id": "524cc8ce-4f88-47ce-ae16-a3b45e9dd89b", "created_at": "2020-10-25T15:47:22.608000"}], "stats": {"worker_pools": 1, "total_cpu": null, "total_memory": null, "total_disk": {}}}
+{
+  "uid": "ji84wqtzr77ogo6b",
+  "name": "deploy_test",
+  "version": {
+    "id": "5f7d3a91d857155ad4993a32",
+    "name": "v1.18.6-5f7d3a91",
+    "description": null,
+    "kubernetes_version": "v1.18.6"
+  },
+  "auto_upgrade": true,
+  "tags": [],
+  "provision_status": "PROVISIONED",
+  "cluster_status": "PROVISIONED",
+  "created_at": "2020-10-25T15:47:22.611000",
+  "created_by": "svtt.tungds@vccloud.vn",
+  "worker_pools_count": 1,
+  "worker_pools": [
+    {
+      "id": "5f959e0ac0b18944d0a4f13a",
+      "name": "pool-curdcqn2",
+      "version": "v1.18.6",
+      "flavor": "3c_6g_enterprise",
+      "flavor_detail": {
+        "name": "3c_6g_enterprise",
+        "vcpus": 3,
+        "ram": 6144
+      },
+      "profile_type": "enterprise",
+      "volume_type": "ENTERPRISE-SSD1",
+      "volume_size": 50,
+      "availability_zone": "HN1",
+      "desired_size": 1,
+      "enable_autoscaling": false,
+      "min_size": 1,
+      "max_size": 1,
+      "tags": [],
+      "provision_status": "PROVISIONED",
+      "launch_config_id": "5a5c240f-e161-47c3-9214-b5ce7d2cda66",
+      "autoscaling_group_id": "524cc8ce-4f88-47ce-ae16-a3b45e9dd89b",
+      "created_at": "2020-10-25T15:47:22.608000"
+    }
+  ],
+  "stats": {
+    "worker_pools": 1,
+    "total_cpu": null,
+    "total_memory": null,
+    "total_disk": {}
+  }
+}
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
@@ -176,10 +224,6 @@ func TestAddWorkerPool(t *testing.T) {
 	var c kubernetesEngineService
 	mux.HandleFunc(testlib.K8sURL(c.itemPath("ji84wqtzr77ogo6b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
-		var payload struct {
-			WorkerPools *[]WorkerPool `json:"worker_pools"`
-		}
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		resp := `
 {
   "worker_pools": [
@@ -245,4 +289,83 @@ func TestRecycleNode(t *testing.T) {
 	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 	})
+}
+
+func TestDeleteClusterWorkerPool(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+	})
+	err := client.KubernetesEngine.DeleteClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "ji84wqtzr77ogo6b")
+	require.NoError(t, err)
+}
+
+func TestGetClusterWorkerPool(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+  "id": "5f959e0ac0b18944d0a4f13a",
+  "name": "pool-curdcqn2",
+  "version": "v1.18.6",
+  "flavor": "3c_6g_enterprise",
+  "flavor_detail": {
+    "name": "3c_6g_enterprise",
+    "vcpus": 3,
+    "ram": 6144
+  },
+  "profile_type": "enterprise",
+  "volume_type": "ENTERPRISE-SSD1",
+  "volume_size": 50,
+  "availability_zone": "HN1",
+  "desired_size": 1,
+  "enable_autoscaling": false,
+  "min_size": 1,
+  "max_size": 1,
+  "tags": [],
+  "provision_status": "PROVISIONED",
+  "launch_config_id": "5a5c240f-e161-47c3-9214-b5ce7d2cda66",
+  "autoscaling_group_id": "524cc8ce-4f88-47ce-ae16-a3b45e9dd89b",
+  "created_at": "2020-10-25T15:47:22.608000",
+  "nodes": []
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	workerpool, err := client.KubernetesEngine.GetClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a")
+	require.NoError(t, err)
+	assert.Equal(t, "pool-curdcqn2", workerpool.Name)
+}
+
+func TestDeleteClusterWorkerNode(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+	})
+	err := client.KubernetesEngine.DeleteClusterWorkerPoolNode(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a")
+	require.NoError(t, err)
+}
+
+func TestUpdateClusterWorkerPool(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPatch, r.Method)
+	})
+
+	err := client.KubernetesEngine.UpdateClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a", &UpdateWorkerPoolRequest{
+		DesiredSize:       1,
+		EnableAutoScaling: true,
+		MinSize:           4,
+		MaxSize:           5,
+	})
+	require.NoError(t, err)
 }

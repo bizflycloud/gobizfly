@@ -44,6 +44,10 @@ type KubernetesEngineService interface {
 	Delete(ctx context.Context, id string) error
 	AddWorkerPools(ctx context.Context, id string, awp *AddWorkerPoolsRequest) ([]*ExtendedWorkerPool, error)
 	RecycleNode(ctx context.Context, clusterUID string, PoolID string, NodePhysicalID string) error
+	DeleteClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) error
+	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
+	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
+	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 }
 
 type WorkerPool struct {
@@ -125,6 +129,27 @@ type ClusterCreateRequest struct {
 
 type AddWorkerPoolsRequest struct {
 	WorkerPools []WorkerPool `json:"worker_pools"`
+}
+
+type PoolNode struct {
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	PhysicalID   string   `json:"physical_id"`
+	IPAddresses  []string `json:"ip_addresses"`
+	Status       string   `json:"status"`
+	StatusReason string   `json:"status_reason"`
+}
+
+type WorkerPoolWithNodes struct {
+	ExtendedWorkerPool
+	Nodes []PoolNode `json:"nodes"`
+}
+
+type UpdateWorkerPoolRequest struct {
+	DesiredSize       int  `json:"desired_size"`
+	EnableAutoScaling bool `json:"enable_autoscaling"`
+	MinSize           int  `json:"min_size"`
+	MaxSize           int  `json:"max_size"`
 }
 
 func (c *kubernetesEngineService) resourcePath() string {
@@ -225,6 +250,62 @@ func (c *kubernetesEngineService) AddWorkerPools(ctx context.Context, id string,
 
 func (c *kubernetesEngineService) RecycleNode(ctx context.Context, clusterUID string, poolID string, nodePhysicalID string) error {
 	req, err := c.client.NewRequest(ctx, http.MethodPut, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, poolID, nodePhysicalID}, "/"), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) DeleteClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) error {
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, PoolID}, "/"), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error) {
+	var pool *WorkerPoolWithNodes
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, PoolID}, "/"), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
+		return nil, err
+	}
+	return pool, nil
+}
+
+func (c *kubernetesEngineService) UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error {
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, PoolID}, "/"), &uwp)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error {
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/"), nil)
 	if err != nil {
 		return err
 	}
