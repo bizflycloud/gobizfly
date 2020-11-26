@@ -39,6 +39,7 @@ const (
 	autoScalingServiceName  = "auto_scaling"
 	alertServiceName        = "alert"
 	authServiceName         = "auth"
+	kubernetsServiceName    = "kubernetes_engine"
 )
 
 var (
@@ -52,14 +53,15 @@ var (
 
 // Client represents BizFly API client.
 type Client struct {
-	AutoScaling   AutoScalingService
-	Alert         AlertService
-	Token         TokenService
-	LoadBalancer  LoadBalancerService
-	Listener      ListenerService
-	Pool          PoolService
-	Member        MemberService
-	HealthMonitor HealthMonitorService
+	AutoScaling      AutoScalingService
+	Alert            AlertService
+	Token            TokenService
+	LoadBalancer     LoadBalancerService
+	Listener         ListenerService
+	Pool             PoolService
+	Member           MemberService
+	HealthMonitor    HealthMonitorService
+	KubernetesEngine KubernetesEngineService
 
 	Snapshot SnapshotService
 
@@ -171,6 +173,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Service = &service{client: c}
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
+	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	return c, nil
 }
 

@@ -19,3 +19,7 @@ func AutoScalingURL(path string) string {
 func AuthURL(path string) string {
 	return "/api" + path
 }
+
+func K8sURL(path string) string {
+	return "/api/kubernetes-engine" + path
+}
