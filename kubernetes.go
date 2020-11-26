@@ -44,13 +44,10 @@ type KubernetesEngineService interface {
 	Delete(ctx context.Context, id string) error
 	AddWorkerPools(ctx context.Context, id string, awp *AddWorkerPoolsRequest) ([]*ExtendedWorkerPool, error)
 	RecycleNode(ctx context.Context, clusterUID string, PoolID string, NodePhysicalID string) error
-<<<<<<< HEAD
 	DeleteClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) error
 	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
-=======
->>>>>>> Feat: add the kubernetes client
 }
 
 type WorkerPool struct {
@@ -134,7 +131,6 @@ type AddWorkerPoolsRequest struct {
 	WorkerPools []WorkerPool `json:"worker_pools"`
 }
 
-<<<<<<< HEAD
 type PoolNode struct {
 	ID           string   `json:"id"`
 	Name         string   `json:"name"`
@@ -156,8 +152,6 @@ type UpdateWorkerPoolRequest struct {
 	MaxSize           int  `json:"max_size"`
 }
 
-=======
->>>>>>> Feat: add the kubernetes client
 func (c *kubernetesEngineService) resourcePath() string {
 	return clusterPath
 }
@@ -167,11 +161,7 @@ func (c *kubernetesEngineService) itemPath(id string) string {
 }
 
 func (c *kubernetesEngineService) List(ctx context.Context, opts *ListOptions) ([]*Cluster, error) {
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.resourcePath(), nil)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetsServiceName, c.resourcePath(), nil)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return nil, err
 	}
@@ -191,11 +181,7 @@ func (c *kubernetesEngineService) List(ctx context.Context, opts *ListOptions) (
 
 func (c *kubernetesEngineService) Create(ctx context.Context, clcr *ClusterCreateRequest) (*ExtendedCluster, error) {
 	var cluster *ExtendedCluster
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.resourcePath(), &clcr)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetsServiceName, c.resourcePath(), &clcr)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return nil, err
 	}
@@ -212,11 +198,7 @@ func (c *kubernetesEngineService) Create(ctx context.Context, clcr *ClusterCreat
 
 func (c *kubernetesEngineService) Get(ctx context.Context, id string) (*FullCluster, error) {
 	var cluster *FullCluster
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(id), nil)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetsServiceName, c.itemPath(id), nil)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return nil, err
 	}
@@ -233,11 +215,7 @@ func (c *kubernetesEngineService) Get(ctx context.Context, id string) (*FullClus
 }
 
 func (c *kubernetesEngineService) Delete(ctx context.Context, id string) error {
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodDelete, kubernetesServiceName, c.itemPath(id), nil)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodDelete, kubernetsServiceName, c.itemPath(id), nil)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return err
 	}
@@ -252,11 +230,7 @@ func (c *kubernetesEngineService) Delete(ctx context.Context, id string) error {
 }
 
 func (c *kubernetesEngineService) AddWorkerPools(ctx context.Context, id string, awp *AddWorkerPoolsRequest) ([]*ExtendedWorkerPool, error) {
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(id), &awp)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetsServiceName, c.itemPath(id), &awp)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +249,6 @@ func (c *kubernetesEngineService) AddWorkerPools(ctx context.Context, id string,
 }
 
 func (c *kubernetesEngineService) RecycleNode(ctx context.Context, clusterUID string, poolID string, nodePhysicalID string) error {
-<<<<<<< HEAD
 	req, err := c.client.NewRequest(ctx, http.MethodPut, kubernetesServiceName, strings.Join([]string{clusterPath, clusterUID, poolID, nodePhysicalID}, "/"), nil)
 	if err != nil {
 		return err
@@ -333,9 +306,6 @@ func (c *kubernetesEngineService) UpdateClusterWorkerPool(ctx context.Context, c
 
 func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error {
 	req, err := c.client.NewRequest(ctx, http.MethodDelete, kubernetesServiceName, strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/"), nil)
-=======
-	req, err := c.client.NewRequest(ctx, http.MethodPut, kubernetsServiceName, strings.Join([]string{clusterPath, clusterUID, poolID, nodePhysicalID}, "/"), nil)
->>>>>>> Feat: add the kubernetes client
 	if err != nil {
 		return err
 	}
@@ -346,3 +316,4 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Contex
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
 }
+

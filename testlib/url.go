@@ -23,7 +23,6 @@ func AuthURL(path string) string {
 func K8sURL(path string) string {
 	return "/api/kubernetes-engine" + path
 }
-<<<<<<< HEAD
 
 func RegistryURL(path string) string {
 	return "/api/container-registry" + path
@@ -32,5 +31,3 @@ func RegistryURL(path string) string {
 func CDNURL(path string) string {
 	return "/api/cdn" + path
 }
-=======
->>>>>>> Feat: add the kubernetes client
