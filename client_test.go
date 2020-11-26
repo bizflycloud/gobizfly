@@ -70,6 +70,7 @@ func setup() {
 		},
 		{
 			Name:          "Kubernetes",
+<<<<<<< HEAD
 			CanonicalName: kubernetesServiceName,
 			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
 			Region:        testRegion,
@@ -86,6 +87,12 @@ func setup() {
 			ServiceUrl:    serverTest.URL + "/api/cdn",
 			Region:        testRegion,
 		},
+=======
+			CanonicalName: kubernetsServiceName,
+			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
+			Region:        testRegion,
+		},
+>>>>>>> Feat: add the kubernetes client
 	}
 	client.services = services
 	if err != nil {
