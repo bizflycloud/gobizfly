@@ -33,7 +33,6 @@ const (
 	statusError                      = "Error"
 	statusActive                     = "Active"
 	autoscalingGroupResourcePath     = "groups"
-	autoscalingServiceBasePath       = "/auto-scaling/api"
 	launchConfigurationsResourcePath = "launch_configs"
 	webhooksResourcePath             = "webhooks"
 	eventsResourcePath               = "events"
@@ -452,76 +451,76 @@ type AutoScalingSchdeule struct {
 
 // Auto Scaling Group path
 func (asg *autoScalingGroup) resourcePath() string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath}, "/")
 }
 
 func (asg *autoScalingGroup) itemPath(id string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, id}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, id}, "/")
 }
 
 // Launch Configurations path
 func (lc *launchConfiguration) resourcePath() string {
-	return strings.Join([]string{autoscalingServiceBasePath, launchConfigurationsResourcePath}, "/")
+	return strings.Join([]string{launchConfigurationsResourcePath}, "/")
 }
 
 func (lc *launchConfiguration) itemPath(id string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, launchConfigurationsResourcePath, id}, "/")
+	return strings.Join([]string{launchConfigurationsResourcePath, id}, "/")
 }
 
 // Webhook path
 func (wh *webhook) resourcePath(clusterID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, webhooksResourcePath}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, webhooksResourcePath}, "/")
 }
 
 // Events path
 func (e *event) resourcePath(clusterID string, page, total int) string {
-	return strings.Join([]string{autoscalingServiceBasePath, eventsResourcePath}, "/")
+	return strings.Join([]string{eventsResourcePath}, "/")
 }
 
 // Policy path
 func (p *policy) resourcePath(clusterID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, policiesResourcePath}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, policiesResourcePath}, "/")
 }
 
 func (p *policy) itemPath(clusterID, policyID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, policiesResourcePath, policyID}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, policiesResourcePath, policyID}, "/")
 }
 
 // Node path
 func (n *node) resourcePath(clusterID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, nodesResourcePath}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, nodesResourcePath}, "/")
 }
 
 // Schedule path
 func (s *schedule) resourcePath(clusterID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, schedulesResourcePath}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, schedulesResourcePath}, "/")
 }
 
 func (s *schedule) itemPath(clusterID, scheduleID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, autoscalingGroupResourcePath, clusterID, schedulesResourcePath, scheduleID}, "/")
+	return strings.Join([]string{autoscalingGroupResourcePath, clusterID, schedulesResourcePath, scheduleID}, "/")
 }
 
 // Task path
 func (t *task) resourcePath(taskID string) string {
-	return strings.Join([]string{autoscalingServiceBasePath, tasksResourcePath, taskID, "status"}, "/")
+	return strings.Join([]string{tasksResourcePath, taskID, "status"}, "/")
 }
 
 // Using Resource path
 func (c *common) usingResourcePath() string {
-	return strings.Join([]string{autoscalingServiceBasePath, usingResourcePath}, "/")
+	return strings.Join([]string{usingResourcePath}, "/")
 }
 
 func getQuotasResourcePath() string {
-	return strings.Join([]string{autoscalingServiceBasePath, quotasResourcePath}, "/")
+	return strings.Join([]string{quotasResourcePath}, "/")
 }
 
 func getSuggestionResourcePath() string {
-	return strings.Join([]string{autoscalingServiceBasePath, suggestionResourcePath}, "/")
+	return strings.Join([]string{suggestionResourcePath}, "/")
 }
 
 // List
 func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScalingGroup, error) {
-	req, err := asg.client.NewRequest(ctx, http.MethodGet, asg.resourcePath(), nil)
+	req, err := asg.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, asg.resourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -553,7 +552,7 @@ func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScaling
 }
 
 func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchConfiguration, error) {
-	req, err := lc.client.NewRequest(ctx, http.MethodGet, lc.resourcePath(), nil)
+	req, err := lc.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, lc.resourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -596,7 +595,7 @@ func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWe
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
 
-	req, err := wh.client.NewRequest(ctx, http.MethodGet, wh.resourcePath(clusterID), nil)
+	req, err := wh.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, wh.resourcePath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -623,7 +622,7 @@ func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
 
-	req, err := e.client.NewRequest(ctx, http.MethodGet, e.resourcePath(clusterID, page, total), nil)
+	req, err := e.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, e.resourcePath(clusterID, page, total), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -659,7 +658,7 @@ func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolici
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
 
-	req, err := p.client.NewRequest(ctx, http.MethodGet, p.resourcePath(clusterID), nil)
+	req, err := p.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, p.resourcePath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -686,7 +685,7 @@ func (n *node) List(ctx context.Context, clusterID string) ([]*AutoScalingNode, 
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
 
-	req, err := n.client.NewRequest(ctx, http.MethodGet, n.resourcePath(clusterID), nil)
+	req, err := n.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, n.resourcePath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -715,7 +714,7 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, s.resourcePath(clusterID), nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, s.resourcePath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -741,7 +740,7 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 
 // Get
 func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoScalingGroup, error) {
-	req, err := asg.client.NewRequest(ctx, http.MethodGet, asg.itemPath(clusterID), nil)
+	req, err := asg.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, asg.itemPath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -764,7 +763,7 @@ func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoSc
 }
 
 func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*LaunchConfiguration, error) {
-	req, err := lc.client.NewRequest(ctx, http.MethodGet, lc.itemPath(profileID), nil)
+	req, err := lc.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, lc.itemPath(profileID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -798,7 +797,7 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 	if _, ok := SliceContains(actionTypeSupportedWebhooks, ActionType); !ok {
 		return nil, errors.New("UNSUPPORTED action type")
 	}
-	req, err := wh.client.NewRequest(ctx, http.MethodGet, wh.resourcePath(clusterID), nil)
+	req, err := wh.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, wh.resourcePath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -826,7 +825,7 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 }
 
 func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
-	req, err := t.client.NewRequest(ctx, http.MethodGet, t.resourcePath(taskID), nil)
+	req, err := t.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, t.resourcePath(taskID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -849,7 +848,7 @@ func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
 }
 
 func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*AutoScalingSchdeule, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, s.itemPath(clusterID, scheduleID), nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, s.itemPath(clusterID, scheduleID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -873,7 +872,7 @@ func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*Auto
 
 //  Delete
 func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error {
-	req, err := asg.client.NewRequest(ctx, http.MethodDelete, asg.itemPath(clusterID), nil)
+	req, err := asg.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, asg.itemPath(clusterID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -889,7 +888,7 @@ func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error
 }
 
 func (lc *launchConfiguration) Delete(ctx context.Context, profileID string) error {
-	req, err := lc.client.NewRequest(ctx, http.MethodDelete, lc.itemPath(profileID), nil)
+	req, err := lc.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, lc.itemPath(profileID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -905,7 +904,7 @@ func (lc *launchConfiguration) Delete(ctx context.Context, profileID string) err
 }
 
 func (p *policy) Delete(ctx context.Context, clusterID, PolicyID string) error {
-	req, err := p.client.NewRequest(ctx, http.MethodDelete, p.itemPath(clusterID, PolicyID), nil)
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, p.itemPath(clusterID, PolicyID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -922,7 +921,7 @@ func (p *policy) Delete(ctx context.Context, clusterID, PolicyID string) error {
 }
 
 func (n *node) Delete(ctx context.Context, clusterID string, asnd *AutoScalingNodesDelete) error {
-	req, err := n.client.NewRequest(ctx, http.MethodDelete, n.resourcePath(clusterID), &asnd)
+	req, err := n.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, n.resourcePath(clusterID), &asnd)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -939,7 +938,7 @@ func (n *node) Delete(ctx context.Context, clusterID string, asnd *AutoScalingNo
 }
 
 func (s *schedule) Delete(ctx context.Context, clusterID, scheduleID string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, s.itemPath(clusterID, scheduleID), nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, s.itemPath(clusterID, scheduleID), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -961,7 +960,7 @@ func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupC
 		return nil, errors.New("Not enough quotas to create new auto scaling group")
 	}
 
-	req, err := asg.client.NewRequest(ctx, http.MethodPost, asg.resourcePath(), &ascr)
+	req, err := asg.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, asg.resourcePath(), &ascr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -983,7 +982,7 @@ func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupC
 }
 
 func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfiguration) (*LaunchConfiguration, error) {
-	req, err := lc.client.NewRequest(ctx, http.MethodPost, lc.resourcePath(), &lcr)
+	req, err := lc.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, lc.resourcePath(), &lcr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1005,7 +1004,7 @@ func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfigurat
 }
 
 func (p *policy) Create(ctx context.Context, clusterID string, pcr *PolicyCreateRequest) (*TaskResponses, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodPost, p.resourcePath(clusterID), &pcr)
+	req, err := p.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, p.resourcePath(clusterID), &pcr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1027,7 +1026,7 @@ func (p *policy) Create(ctx context.Context, clusterID string, pcr *PolicyCreate
 }
 
 func (s *schedule) Create(ctx context.Context, clusterID string, asscr *AutoScalingSchdeuleCreateRequest) (*TaskResponses, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.resourcePath(clusterID), &asscr)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, s.resourcePath(clusterID), &asscr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1054,7 +1053,7 @@ func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur 
 		return nil, errors.New("Not enough quotas to update new auto scaling group")
 	}
 
-	req, err := asg.client.NewRequest(ctx, http.MethodPut, asg.itemPath(clusterID), &asur)
+	req, err := asg.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, asg.itemPath(clusterID), &asur)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1076,7 +1075,7 @@ func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur 
 }
 
 func (p *policy) Update(ctx context.Context, clusterID, PolicyID string, pur *PolicyUpdateRequest) (*TaskResponses, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodPut, p.itemPath(clusterID, PolicyID), &pur)
+	req, err := p.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, p.itemPath(clusterID, PolicyID), &pur)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1099,7 +1098,7 @@ func (p *policy) Update(ctx context.Context, clusterID, PolicyID string, pur *Po
 
 // Common
 func (c *common) AutoScalingUsingResource(ctx context.Context) (*usingResource, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, c.usingResourcePath(), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, c.usingResourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -1130,7 +1129,7 @@ func isValidQuotas(ctx context.Context, client *Client, ProfileID string, maxSiz
 		"profile_id": ProfileID,
 	}
 
-	req, err := client.NewRequest(ctx, http.MethodPost, getQuotasResourcePath(), &payload)
+	req, err := client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, getQuotasResourcePath(), &payload)
 	if err != nil {
 		log.Fatal(err)
 		return false, err
@@ -1167,7 +1166,7 @@ func getSuggestion(ctx context.Context, client *Client, ProfileID string, desire
 		"profile_id":       ProfileID,
 	}
 
-	req, err := client.NewRequest(ctx, http.MethodPost, getSuggestionResourcePath(), &payload)
+	req, err := client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, getSuggestionResourcePath(), &payload)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err

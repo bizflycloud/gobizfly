@@ -27,7 +27,7 @@ import (
 )
 
 const (
-	volumeBasePath = "/iaas-cloud/api/volumes"
+	volumeBasePath = "/volumes"
 )
 
 var _ VolumeService = (*volume)(nil)
@@ -74,7 +74,7 @@ type Volume struct {
 	VolumeType       string             `json:"type"`
 	Description      string             `json:"description"`
 	SnapshotID       string             `json:"snapshot_id"`
-	Bootable         string             `json:"bootable"`
+	Bootable         bool               `json:"bootable"`
 	AvailabilityZone string             `json:"availability_zone"`
 	Status           string             `json:"status"`
 	UserID           string             `json:"user_id"`
@@ -92,7 +92,7 @@ type volume struct {
 
 // List lists all volumes of users.
 func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath, nil)
+	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error)
 
 // Create creates a new volume.
 func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodPost, volumeBasePath, &vcr)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, volumeBasePath, &vcr)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume,
 
 // Get gets information of a volume.
 func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodGet, volumeBasePath+"/"+id, nil)
+	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +156,7 @@ func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
 
 // Delete deletes a volume.
 func (v *volume) Delete(ctx context.Context, id string) error {
-	req, err := v.client.NewRequest(ctx, http.MethodDelete, volumeBasePath+"/"+id, nil)
+	req, err := v.client.NewRequest(ctx, http.MethodDelete, serverServiceName, volumeBasePath+"/"+id, nil)
 
 	if err != nil {
 		return err
@@ -200,7 +200,7 @@ func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Tas
 		Type:    "extend",
 		NewSize: newsize}
 
-	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func (v *volume) Attach(ctx context.Context, id string, serverID string) (*Volum
 		Type:     "attach",
 		ServerID: serverID}
 
-	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +250,7 @@ func (v *volume) Detach(ctx context.Context, id string, serverID string) (*Volum
 		Type:     "detach",
 		ServerID: serverID}
 
-	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Ta
 		Type:       "restore",
 		SnapshotID: snapshotID}
 
-	req, err := v.client.NewRequest(ctx, http.MethodPost, v.itemActionPath(id), payload)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}

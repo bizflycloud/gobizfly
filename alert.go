@@ -53,11 +53,10 @@ func (as *alertService) Histories() *histories {
 }
 
 const (
-	alertBasePath         = "/api/alert"
-	alarmsResourcePath    = "alarms"
-	receiversResourcePath = "receivers"
-	historiesResourcePath = "histories"
-	getVerificationPath   = "resend"
+	alarmsResourcePath    = "/alarms"
+	receiversResourcePath = "/receivers"
+	historiesResourcePath = "/histories"
+	getVerificationPath   = "/resend"
 )
 
 // Comparison is represents comparison payload in alarms
@@ -267,32 +266,32 @@ type Histories struct {
 }
 
 func (a *alarms) resourcePath() string {
-	return strings.Join([]string{alertBasePath, alarmsResourcePath}, "/")
+	return strings.Join([]string{alarmsResourcePath}, "/")
 }
 
 func (a *alarms) itemPath(id string) string {
-	return strings.Join([]string{alertBasePath, alarmsResourcePath, id}, "/")
+	return strings.Join([]string{alarmsResourcePath, id}, "/")
 }
 
 func (r *receivers) resourcePath() string {
-	return strings.Join([]string{alertBasePath, receiversResourcePath}, "/")
+	return strings.Join([]string{receiversResourcePath}, "/")
 }
 
 func (r *receivers) itemPath(id string) string {
-	return strings.Join([]string{alertBasePath, receiversResourcePath, id}, "/")
+	return strings.Join([]string{receiversResourcePath, id}, "/")
 }
 
 func (r *receivers) verificationPath() string {
-	return strings.Join([]string{alertBasePath, getVerificationPath}, "/")
+	return strings.Join([]string{getVerificationPath}, "/")
 }
 
 func (h *histories) resourcePath() string {
-	return strings.Join([]string{alertBasePath, historiesResourcePath}, "/")
+	return strings.Join([]string{historiesResourcePath}, "/")
 }
 
 // List is function using list alarms
 func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodGet, a.resourcePath(), nil)
+	req, err := a.client.NewRequest(ctx, http.MethodGet, alertServiceName, a.resourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -325,7 +324,7 @@ func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 
 // List is function using list receivers
 func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, r.resourcePath(), nil)
+	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.resourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -358,7 +357,7 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 
 // List is function using list histories
 func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, error) {
-	req, err := h.client.NewRequest(ctx, http.MethodGet, h.resourcePath(), nil)
+	req, err := h.client.NewRequest(ctx, http.MethodGet, alertServiceName, h.resourcePath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -391,7 +390,7 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 }
 
 func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*ResponseRequest, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodPost, a.resourcePath(), &acr)
+	req, err := a.client.NewRequest(ctx, http.MethodPost, alertServiceName, a.resourcePath(), &acr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -412,7 +411,7 @@ func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*Response
 }
 
 func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*ResponseRequest, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodPost, r.resourcePath(), &rcr)
+	req, err := r.client.NewRequest(ctx, http.MethodPost, alertServiceName, r.resourcePath(), &rcr)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -433,7 +432,7 @@ func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*Re
 }
 
 func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodGet, a.itemPath(id), nil)
+	req, err := a.client.NewRequest(ctx, http.MethodGet, alertServiceName, a.itemPath(id), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -472,7 +471,7 @@ func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 }
 
 func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, r.itemPath(id), nil)
+	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.itemPath(id), nil)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -493,7 +492,7 @@ func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
 }
 
 func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest) (*ResponseRequest, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodPatch, a.itemPath(id), &aur)
+	req, err := a.client.NewRequest(ctx, http.MethodPatch, alertServiceName, a.itemPath(id), &aur)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -515,7 +514,7 @@ func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest)
 }
 
 func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRequest) (*ResponseRequest, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodPut, r.itemPath(id), &rur)
+	req, err := r.client.NewRequest(ctx, http.MethodPut, alertServiceName, r.itemPath(id), &rur)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -537,7 +536,7 @@ func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRe
 }
 
 func (a *alarms) Delete(ctx context.Context, id string) error {
-	req, err := a.client.NewRequest(ctx, http.MethodDelete, a.itemPath(id), nil)
+	req, err := a.client.NewRequest(ctx, http.MethodDelete, alertServiceName, a.itemPath(id), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -553,7 +552,7 @@ func (a *alarms) Delete(ctx context.Context, id string) error {
 }
 
 func (r *receivers) Delete(ctx context.Context, id string) error {
-	req, err := r.client.NewRequest(ctx, http.MethodDelete, r.itemPath(id), nil)
+	req, err := r.client.NewRequest(ctx, http.MethodDelete, alertServiceName, r.itemPath(id), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err
@@ -570,7 +569,7 @@ func (r *receivers) Delete(ctx context.Context, id string) error {
 
 // ResendVerificationLink is use get a link verification
 func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType string) error {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, r.verificationPath(), nil)
+	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.verificationPath(), nil)
 	if err != nil {
 		log.Fatal(err)
 		return err

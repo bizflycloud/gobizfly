@@ -20,6 +20,7 @@ package gobizfly
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -31,7 +32,7 @@ func TestSnapshotList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(snapshotPath, func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(snapshotPath), func(writer http.ResponseWriter, request *http.Request) {
 		require.Equal(t, http.MethodGet, request.Method)
 		resp := `
 [
@@ -90,7 +91,7 @@ func TestSnapshotList(t *testing.T) {
          "source_volid":null,
          "consistencygroup_id":null,
          "name":"timtro_rootdisk",
-         "bootable":"true",
+         "bootable":true,
          "created_at":"2018-05-04T01:51:38.000000",
          "volume_type":"HDD",
          "attached_type":"rootdisk",
@@ -154,7 +155,7 @@ func TestSnapshotList(t *testing.T) {
          "source_volid":null,
          "consistencygroup_id":null,
          "name":"prtgadmin2_rootdisk",
-         "bootable":"true",
+         "bootable":true,
          "created_at":"2020-04-27T06:59:57.000000",
          "volume_type":"SSD",
          "attached_type":"rootdisk",
@@ -177,7 +178,7 @@ func TestSnapshotGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(strings.Join([]string{snapshotPath, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
+	mux.HandleFunc(strings.Join([]string{testlib.CloudServerURL(snapshotPath), "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
 		func(writer http.ResponseWriter, request *http.Request) {
 			require.Equal(t, http.MethodGet, request.Method)
 			resp := `
@@ -258,7 +259,7 @@ func TestSnapshotGet(t *testing.T) {
       "source_volid":null,
       "consistencygroup_id":null,
       "name":"ducpx-devgolang_rootdisk",
-      "bootable":"true",
+      "bootable":true,
       "created_at":"2020-05-06T08:10:29.000000",
       "volume_type":"BASIC_HDD",
       "attached_type":"rootdisk",
@@ -278,7 +279,7 @@ func TestSnapshotGet(t *testing.T) {
 func TestSnapshotCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(snapshotPath, func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(snapshotPath), func(writer http.ResponseWriter, request *http.Request) {
 		require.Equal(t, http.MethodPost, request.Method)
 		var snapshot *SnapshotCreateRequest
 		require.NoError(t, json.NewDecoder(request.Body).Decode(&snapshot))
@@ -342,7 +343,7 @@ func TestSnapshotCreate(t *testing.T) {
       "source_volid":null,
       "consistencygroup_id":null,
       "name":"timtro_rootdisk",
-      "bootable":"true",
+      "bootable":true,
       "created_at":"2018-05-04T01:51:38.000000",
       "volume_type":"HDD",
       "attached_type":"rootdisk",
@@ -371,7 +372,7 @@ func TestSnapshotCreate(t *testing.T) {
 func TestSnapshotDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{snapshotPath, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
+	mux.HandleFunc(strings.Join([]string{testlib.CloudServerURL(snapshotPath), "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"}, "/"),
 		func(writer http.ResponseWriter, request *http.Request) {
 			require.Equal(t, http.MethodDelete, request.Method)
 			writer.WriteHeader(http.StatusNoContent)

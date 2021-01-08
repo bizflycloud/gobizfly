@@ -27,9 +27,10 @@ import (
 )
 
 const (
-	serverBasePath = "/iaas-cloud/api/servers"
-	flavorPath     = "/iaas-cloud/api/flavors"
-	osImagePath    = "/iaas-cloud/api/images"
+	serverBasePath = "/servers"
+	flavorPath     = "/flavors"
+	osImagePath    = "/images"
+	taskPath       = "/tasks"
 )
 
 var _ ServerService = (*server)(nil)
@@ -41,7 +42,35 @@ type ServerSecurityGroup struct {
 
 // AttachedVolume contains attached volumes of a server.
 type AttachedVolume struct {
-	ID string `json:"id"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Size         int    `json:"size"`
+	AttachedType string `json:"attached_type"`
+	Type         string `json:"type"`
+	Category     string `json:"category"`
+}
+
+// IP represents the IP address, version and mac address of a port
+type IP struct {
+	Version    int    `json:"version"`
+	Address    string `json:"addr"`
+	Type       string `json:"OS-EXT-IPS:type"`
+	MacAddress string `json:"0S-EXT-IPS-MAC:mac_addr"`
+}
+
+// IPAddresses contains LAN & WAN Ip address of a Cloud Server
+type IPAddress struct {
+	LanAddresses   []IP `json:"LAN"`
+	WanV4Addresses []IP `json:"WAN_V4"`
+	WanV6Addresses []IP `json:"WAN_V6"`
+}
+
+// Flavor contains flavor information.
+type Flavor struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Ram  int    `json:"ram"`
+	VCPU int    `json:"vcpu"`
 }
 
 // Server contains server information.
@@ -56,13 +85,15 @@ type Server struct {
 	Status           string                 `json:"status"`
 	IPv6             bool                   `json:"ipv6"`
 	SecurityGroup    []ServerSecurityGroup  `json:"security_group"`
-	Addresses        map[string]interface{} `json:"addresses"`
+	Addresses        map[string]interface{} `json:"addresses"` // Deprecated: This field will be removed in the near future
 	Metadata         map[string]string      `json:"metadata"`
-	Flavor           map[string]interface{} `json:"flavor"`
+	Flavor           Flavor                 `json:"flavor"`
 	Progress         int                    `json:"progress"`
 	AttachedVolumes  []AttachedVolume       `json:"os-extended-volumes:volumes_attached"`
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
 	Category         string                 `json:"category"`
+	IPAddresses      IPAddress              `json:"ip_addresses"`
+	RegionName       string                 `json:"region_name"`
 }
 
 type server struct {
@@ -72,7 +103,7 @@ type server struct {
 // ServerService is an interface to interact with BizFly Cloud API.
 type ServerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
-	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error)
+	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
 	Delete(ctx context.Context, id string) error
 	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
@@ -84,6 +115,8 @@ type ServerService interface {
 	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
 	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
 	ListOSImages(ctx context.Context) ([]osImageResponse, error)
+	GetTask(ctx context.Context, id string) (*ServerTaskResponse, error)
+	ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -112,6 +145,11 @@ type ServerTask struct {
 	TaskID string `json:"task_id"`
 }
 
+// ServerCreateResponse contains response tasks when create server
+type ServerCreateResponse struct {
+	Task []string `json:"task_id"`
+}
+
 // ServerDisk contains server's disk information.
 type ServerDisk struct {
 	Size int    `json:"size"`
@@ -135,6 +173,7 @@ type ServerCreateRequest struct {
 	Type             string        `json:"type"`
 	AvailabilityZone string        `json:"availability_zone"`
 	OS               *ServerOS     `json:"os"`
+	Quantity         int           `json:"quantity,omitempty"`
 }
 
 // itemActionPath return http path of server action
@@ -145,7 +184,7 @@ func (s *server) itemActionPath(id string) string {
 // List lists all servers.
 func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error) {
 
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverBasePath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +204,9 @@ func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 }
 
 // Create creates a new server.
-func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerTask, error) {
+func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error) {
 	payload := []*ServerCreateRequest{scr}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, serverBasePath, payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, serverBasePath, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +216,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 	}
 
 	defer resp.Body.Close()
-	var task *ServerTask
+	var task *ServerCreateResponse
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
 		return nil, err
 	}
@@ -186,7 +225,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerT
 
 // Get gets a server.
 func (s *server) Get(ctx context.Context, id string) (*Server, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverBasePath+"/"+id, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -205,7 +244,7 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 
 // Delete deletes a server.
 func (s *server) Delete(ctx context.Context, id string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverBasePath+"/"+id, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, nil)
 	if err != nil {
 		return err
 	}
@@ -222,7 +261,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 	var payload = &ServerAction{
 		Action:     "resize",
 		FlavorName: newFlavor}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +282,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 // Start starts a server.
 func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "start"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -263,7 +302,7 @@ func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 // Stop stops a server
 func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "stop"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +322,7 @@ func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 // SoftReboot soft reboots a server.
 func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "soft_reboot"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +342,7 @@ func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageRespo
 // HardReboot hard reboots a server.
 func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "hard_reboot"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +364,7 @@ func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*Serve
 	var payload = &ServerAction{
 		Action:  "rebuild",
 		ImageID: imageID}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -348,7 +387,7 @@ func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse,
 	payload := &ServerAction{
 		Action:      "get_vnc",
 		ConsoleType: "novnc"}
-	req, err := s.client.NewRequest(ctx, http.MethodPost, s.itemActionPath(id), payload)
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -374,7 +413,7 @@ type serverFlavorResponse struct {
 
 // ListFlavors lists server flavors
 func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, flavorPath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, flavorPath, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +441,7 @@ type osImageResponse struct {
 
 // ListOSImage list server os images
 func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, osImagePath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, osImagePath, nil)
 
 	if err != nil {
 		return nil, err
@@ -422,4 +461,54 @@ func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
 		return nil, err
 	}
 	return respPayload.OSImages, nil
+}
+
+type ServerTaskResult struct {
+	Action   string `json:"action"`
+	Progress int    `json:"progress"`
+	Success  bool   `json:"success"`
+	Server
+}
+
+type ServerTaskResponse struct {
+	Ready  bool             `json:"ready"`
+	Result ServerTaskResult `json:"result"`
+}
+
+// GetTask get tasks result from Server API
+func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, taskPath+"/"+id, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	var str *ServerTaskResponse
+	if err := json.NewDecoder(resp.Body).Decode(&str); err != nil {
+		return nil, err
+	}
+	return str, nil
+}
+
+func (s server) ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error) {
+	payload := &ServerAction{
+		Action:  "change_type",
+		NewType: newCategory}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var svt *ServerTask
+	if err := json.NewDecoder(resp.Body).Decode(&svt); err != nil {
+		return nil, err
+	}
+	return svt, nil
 }

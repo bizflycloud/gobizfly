@@ -19,6 +19,7 @@ package gobizfly
 
 import (
 	"fmt"
+	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"testing"
 
@@ -41,7 +42,7 @@ func TestToken(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			setup()
 			defer teardown()
-			mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(testlib.AuthURL(tokenPath), func(w http.ResponseWriter, r *http.Request) {
 				require.Equal(t, http.MethodPost, r.Method)
 				resp := fmt.Sprintf(`
 {
@@ -49,6 +50,27 @@ func TestToken(t *testing.T) {
     "expires_at": "2019-11-22T15:39:54.000000Z"
 }
 `, tc.expectedToken)
+				_, _ = fmt.Fprint(w, resp)
+			})
+
+			mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+				require.Equal(t, http.MethodGet, r.Method)
+				resp := `
+{
+  "services": [
+    {
+      "canonical_name": "cloud_server", 
+      "code": "CS", 
+      "description": "Cloud Server", 
+      "enabled": true, 
+      "icon": "https://manage.bizflycloud.vn/iaas-cloud/api", 
+      "id": 2, 
+      "name": "Cloud Server", 
+      "region": "HN", 
+      "service_url": "https://manage.bizflycloud.vn/iaas-cloud/api"
+    }
+  ]
+}`
 				_, _ = fmt.Fprint(w, resp)
 			})
 
@@ -63,7 +85,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(tokenPath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.AuthURL(tokenPath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
 {
@@ -75,7 +97,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 	})
 
 	var l loadbalancer
-	mux.HandleFunc(l.resourcePath(), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		token := r.Header.Get("X-Auth-Token")
 		if token != "xxx" {
@@ -87,6 +109,27 @@ func TestRetryWhenTokenExpired(t *testing.T) {
     "loadbalancers": []
 }
 `
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+  "services": [
+    {
+      "canonical_name": "cloud_server", 
+      "code": "CS", 
+      "description": "Cloud Server", 
+      "enabled": true, 
+      "icon": "https://manage.bizflycloud.vn/iaas-cloud/api", 
+      "id": 2, 
+      "name": "Cloud Server", 
+      "region": "HN", 
+      "service_url": "https://manage.bizflycloud.vn/iaas-cloud/api"
+    }
+  ]
+}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 
