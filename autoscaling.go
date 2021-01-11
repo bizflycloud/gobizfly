@@ -30,25 +30,32 @@ import (
 )
 
 const (
-	statusError                      = "Error"
-	statusActive                     = "Active"
-	autoscalingGroupResourcePath     = "groups"
-	launchConfigurationsResourcePath = "launch_configs"
-	webhooksResourcePath             = "webhooks"
-	eventsResourcePath               = "events"
-	policiesResourcePath             = "policies"
+	statusActive = "Active"
+	statusError  = "Error"
+)
+
+const (
+	autoscalingGroupResourcePath     = "/groups"
+	eventsResourcePath               = "/events"
+	launchConfigurationsResourcePath = "/launch_configs"
 	nodesResourcePath                = "nodes"
+	policiesResourcePath             = "policies"
+	quotasResourcePath               = "/quotas"
 	schedulesResourcePath            = "cron_triggers"
-	tasksResourcePath                = "task"
-	usingResourcePath                = "using_resource"
-	quotasResourcePath               = "quotas"
-	suggestionResourcePath           = "suggestion"
+	suggestionResourcePath           = "/suggestion"
+	tasksResourcePath                = "/task"
+	usingResourcePath                = "/using_resource"
+	webhooksResourcePath             = "webhooks"
 )
 
 var (
 	actionTypeSupportedWebhooks = []string{
 		"CLUSTER SCALE IN",
 		"CLUSTER SCALE OUT",
+	}
+	networkPlan = []string{
+		"free_datatransfer",
+		"free_bandwidth",
 	}
 )
 
@@ -58,17 +65,28 @@ type autoscalingService struct {
 	client *Client
 }
 
-// AutoScalingService is interface wrap others resource's interfaces
+/*
+AutoScalingService is interface wrap others resource's interfaces. Includes:
+1. AutoScalingGroups: Provides function interact with an autoscaling group such as:
+    Create, Update, Delete
+2. Events: Provides function to list events of an autoscaling group
+3. LaunchConfigurations: Provides function to interact with launch configurations
+4. Nodes: Provides function to interact with members of autoscaling group
+5. Policies: Provides function to interact with autoscaling policies of autoscaling group
+6. Schedules: Provides function to interact with schedule for auto scaling
+7. Tasks: Provides function to get information of task
+8. Webhooks: Provides fucntion to list webhook triggers scale of autoscaling group
+*/
 type AutoScalingService interface {
 	AutoScalingGroups() *autoScalingGroup
+	Common() *common
 	Events() *event
 	LaunchConfigurations() *launchConfiguration
 	Nodes() *node
 	Policies() *policy
 	Schedules() *schedule
-	Webhooks() *webhook
 	Tasks() *task
-	Common() *common
+	Webhooks() *webhook
 }
 
 func (as *autoscalingService) AutoScalingGroups() *autoScalingGroup {
@@ -290,6 +308,7 @@ type AutoScalingGroupUpdateRequest struct {
 	MinSize                        int                            `json:"min_size"`
 	Name                           string                         `json:"name"`
 	ProfileID                      string                         `json:"profile_id"`
+	ProfileOnly                    bool                           `json:"profile_only"`
 }
 
 // AutoScalingGroup - is represents an auto scaling group
@@ -330,6 +349,12 @@ type AutoScalingOperatingSystem struct {
 	OSName     string `json:"os_name,omitempty"`
 }
 
+// AutoScalingNetworks - is represents for relationship between network and firewalls
+type AutoScalingNetworks struct {
+	ID             string    `json:"id"`
+	SecurityGroups *[]string `json:"security_groups,omitempty"`
+}
+
 // LaunchConfiguration - is represents a launch configurations
 type LaunchConfiguration struct {
 	AvailabilityZone string                     `json:"availability_zone"`
@@ -339,6 +364,8 @@ type LaunchConfiguration struct {
 	ID               *string                    `json:"id,omitempty"`
 	Metadata         map[string]interface{}     `json:"metadata"`
 	Name             string                     `json:"name"`
+	NetworkPlan      string                     `json:"network_plan,omitempty"`
+	Networks         *[]AutoScalingNetworks     `json:"networks,omitempty"`
 	OperatingSystem  AutoScalingOperatingSystem `json:"os"`
 	ProfileType      string                     `json:"profile_type,omitempty"`
 	RootDisk         AutoScalingDataDisk        `json:"rootdisk"`
@@ -451,7 +478,7 @@ type AutoScalingSchdeule struct {
 
 // Auto Scaling Group path
 func (asg *autoScalingGroup) resourcePath() string {
-	return strings.Join([]string{autoscalingGroupResourcePath}, "/")
+	return autoscalingGroupResourcePath
 }
 
 func (asg *autoScalingGroup) itemPath(id string) string {
@@ -460,7 +487,7 @@ func (asg *autoScalingGroup) itemPath(id string) string {
 
 // Launch Configurations path
 func (lc *launchConfiguration) resourcePath() string {
-	return strings.Join([]string{launchConfigurationsResourcePath}, "/")
+	return launchConfigurationsResourcePath
 }
 
 func (lc *launchConfiguration) itemPath(id string) string {
@@ -474,7 +501,7 @@ func (wh *webhook) resourcePath(clusterID string) string {
 
 // Events path
 func (e *event) resourcePath(clusterID string, page, total int) string {
-	return strings.Join([]string{eventsResourcePath}, "/")
+	return eventsResourcePath
 }
 
 // Policy path
@@ -507,15 +534,15 @@ func (t *task) resourcePath(taskID string) string {
 
 // Using Resource path
 func (c *common) usingResourcePath() string {
-	return strings.Join([]string{usingResourcePath}, "/")
+	return usingResourcePath
 }
 
 func getQuotasResourcePath() string {
-	return strings.Join([]string{quotasResourcePath}, "/")
+	return quotasResourcePath
 }
 
 func getSuggestionResourcePath() string {
-	return strings.Join([]string{suggestionResourcePath}, "/")
+	return suggestionResourcePath
 }
 
 // List
@@ -959,7 +986,6 @@ func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupC
 	if valid, _ := isValidQuotas(ctx, asg.client, ascr.ProfileID, ascr.MaxSize); !valid {
 		return nil, errors.New("Not enough quotas to create new auto scaling group")
 	}
-
 	req, err := asg.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, asg.resourcePath(), &ascr)
 	if err != nil {
 		log.Fatal(err)
@@ -982,6 +1008,10 @@ func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupC
 }
 
 func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfiguration) (*LaunchConfiguration, error) {
+	if _, ok := SliceContains(networkPlan, lcr.NetworkPlan); !ok {
+		return nil, errors.New("UNSUPPORTED network plan")
+	}
+
 	req, err := lc.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, lc.resourcePath(), &lcr)
 	if err != nil {
 		log.Fatal(err)
