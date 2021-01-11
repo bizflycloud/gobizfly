@@ -20,10 +20,11 @@ package gobizfly
 import (
 	"context"
 	"fmt"
-	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"github.com/bizflycloud/gobizfly/testlib"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -162,6 +163,14 @@ func Test_launchConfiguration_List(t *testing.T) {
               "id": "243f772f-5fb1-4fee-bdf1-70413de1e2d0",
               "flavor": "nix.2c_2g",
               "type": "premium",
+              "network_plan": "free_datatransfer",
+              "networks": [{
+                "id": "wan",
+                "security_groups": [
+                  "7102e422-2c81-4943-86bf-d90b8e7520d4",
+                  "46b3f48a-9f3c-43a6-9927-3c790fbb166b"
+                ]
+              }],
               "security_groups": [
                 "7102e422-2c81-4943-86bf-d90b8e7520d4",
                 "46b3f48a-9f3c-43a6-9927-3c790fbb166b"
@@ -189,6 +198,7 @@ func Test_launchConfiguration_List(t *testing.T) {
 	assert.Equal(t, "nix.2c_2g", launchConfig.Flavor)
 	assert.Equal(t, "HDD", launchConfig.RootDisk.Type)
 	assert.Equal(t, "snapshot", launchConfig.OperatingSystem.CreateFrom)
+	assert.Equal(t, "free_datatransfer", launchConfig.NetworkPlan)
 }
 
 func Test_webhook_List(t *testing.T) {

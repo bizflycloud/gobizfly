@@ -8,7 +8,7 @@ func LoadBalancerURL(path string) string {
 	return "/api/loadbalancers" + path
 }
 
-func AlertURL(path string) string {
+func CloudWatcherURL(path string) string {
 	return "/api/alert" + path
 }
 

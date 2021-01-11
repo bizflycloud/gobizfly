@@ -22,40 +22,53 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
 
-var _ AlertService = (*alertService)(nil)
+var _ CloudWatcherService = (*cloudwatcherService)(nil)
 
-type alertService struct {
+type cloudwatcherService struct {
 	client *Client
 }
 
-// AlertService is interface wrap others resource's interfaces
-type AlertService interface {
+// CloudWatcherService is interface wrap others resource's interfaces
+type CloudWatcherService interface {
+	Agents() *agents
 	Alarms() *alarms
-	Receivers() *receivers
 	Histories() *histories
+	Receivers() *receivers
+	Secrets() *secrets
 }
 
-func (as *alertService) Alarms() *alarms {
-	return &alarms{client: as.client}
+func (cws *cloudwatcherService) Agents() *agents {
+	return &agents{client: cws.client}
 }
 
-func (as *alertService) Receivers() *receivers {
-	return &receivers{client: as.client}
+func (cws *cloudwatcherService) Alarms() *alarms {
+	return &alarms{client: cws.client}
 }
 
-func (as *alertService) Histories() *histories {
-	return &histories{client: as.client}
+func (cws *cloudwatcherService) Receivers() *receivers {
+	return &receivers{client: cws.client}
+}
+
+func (cws *cloudwatcherService) Histories() *histories {
+	return &histories{client: cws.client}
+}
+
+func (cws *cloudwatcherService) Secrets() *secrets {
+	return &secrets{client: cws.client}
 }
 
 const (
+	agentsResourcePath    = "/agents"
 	alarmsResourcePath    = "/alarms"
-	receiversResourcePath = "/receivers"
-	historiesResourcePath = "/histories"
 	getVerificationPath   = "/resend"
+	historiesResourcePath = "/histories"
+	receiversResourcePath = "/receivers"
+	secretsResourcePath   = "/secrets"
 )
 
 // Comparison is represents comparison payload in alarms
@@ -107,6 +120,10 @@ type AlarmReceiversUse struct {
 	WebhookURL           string `json:"webhook_url,omitempty"`
 }
 
+type agents struct {
+	client *Client
+}
+
 type alarms struct {
 	client *Client
 }
@@ -116,6 +133,10 @@ type receivers struct {
 }
 
 type histories struct {
+	client *Client
+}
+
+type secrets struct {
 	client *Client
 }
 
@@ -148,6 +169,11 @@ type ReceiverCreateRequest struct {
 	WebhookURL     string              `json:"webhook_url,omitempty"`
 }
 
+// SecretsCreateRequest contains receiver information.
+type SecretsCreateRequest struct {
+	Name string `json:"name,omitempty"`
+}
+
 // AlarmUpdateRequest represents update alarm request payload.
 type AlarmUpdateRequest struct {
 	AlertInterval    int                          `json:"alert_interval,omitempty"`
@@ -173,6 +199,18 @@ type ResponseRequest struct {
 	Deleted bool   `json:"_deleted,omitempty"`
 	ID      string `json:"_id,omitempty"`
 	Status  string `json:"_status,omitempty"`
+}
+
+// Agents contains agent information.
+type Agents struct {
+	Created   string `json:"_created"`
+	Hostname  string `json:"hostname"`
+	ID        string `json:"_id"`
+	Name      string `json:"name"`
+	Online    bool   `json:"online"`
+	ProjectID string `json:"project_id"`
+	Runtime   string `json:"runtime"`
+	UserID    string `json:"user_id"`
 }
 
 // Alarms contains alarm information.
@@ -264,6 +302,108 @@ type Histories struct {
 	Created     string            `json:"_created,omitempty"`
 }
 
+// SecretCreateRequest represents create new secret request payload.
+type SecretCreateRequest struct {
+	Name string `json:"name,omitempty"`
+}
+
+// Secrets contains secrets information.
+type Secrets struct {
+	Created   string `json:"_created,omitempty"`
+	ID        string `json:"_id"`
+	Name      string `json:"name"`
+	ProjectID string `json:"project_id,omitempty"`
+	Secret    string `json:"secret,omitempty"`
+	UserID    string `json:"user_id,omitempty"`
+}
+
+// ===========================================================================
+// Start block interaction for agents
+// ===========================================================================
+func (a *agents) resourcePath() string {
+	return strings.Join([]string{agentsResourcePath}, "/")
+}
+
+func (a *agents) itemPath(id string) string {
+	return strings.Join([]string{agentsResourcePath, id}, "/")
+}
+
+// List agents
+func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.resourcePath(), nil)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	if filters != nil {
+		q := req.URL.Query()
+		q.Add("where", *filters)
+		req.URL.RawQuery = q.Encode()
+	}
+
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Agents []*Agents `json:"_items"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return data.Agents, nil
+}
+
+// Get an agent
+func (a *agents) Get(ctx context.Context, id string) (*Agents, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	agent := &Agents{}
+	if err := json.NewDecoder(resp.Body).Decode(agent); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return agent, nil
+}
+
+// Delete an agent
+func (a *agents) Delete(ctx context.Context, id string) error {
+	req, err := a.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, a.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+// ===========================================================================
+// Start block interaction for alarms
+// ===========================================================================
 func (a *alarms) resourcePath() string {
 	return strings.Join([]string{alarmsResourcePath}, "/")
 }
@@ -272,6 +412,144 @@ func (a *alarms) itemPath(id string) string {
 	return strings.Join([]string{alarmsResourcePath, id}, "/")
 }
 
+// List alarms
+func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.resourcePath(), nil)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	if filters != nil {
+		q := req.URL.Query()
+		q.Add("where", *filters)
+		req.URL.RawQuery = q.Encode()
+	}
+
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Alarms []*Alarms `json:"_items"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return data.Alarms, nil
+}
+
+// Create an alarm
+func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*ResponseRequest, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, a.resourcePath(), &acr)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData = &ResponseRequest{}
+	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return respData, nil
+}
+
+// Get an alarm
+func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	alarm := &Alarms{}
+	if err := json.NewDecoder(resp.Body).Decode(alarm); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	// hardcode in here
+	for _, loadbalancer := range alarm.LoadBalancers {
+		if loadbalancer.TargetType == "frontend" {
+			frontend, err := a.client.Listener.Get(ctx, loadbalancer.TargetID)
+			if err != nil {
+				log.Fatal(err)
+				loadbalancer.TargetName = ""
+			}
+			loadbalancer.TargetName = frontend.Name
+		} else {
+			backend, err := a.client.Pool.Get(ctx, loadbalancer.TargetID)
+			if err != nil {
+				log.Fatal(err)
+				loadbalancer.TargetName = ""
+			}
+			loadbalancer.TargetName = backend.Name
+		}
+	}
+	return alarm, nil
+}
+
+// Update an alarm
+func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest) (*ResponseRequest, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodPatch, cloudwatcherServiceName, a.itemPath(id), &aur)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respData := &ResponseRequest{}
+	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return respData, nil
+}
+
+// Delete an alarm
+func (a *alarms) Delete(ctx context.Context, id string) error {
+	req, err := a.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, a.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+// ===========================================================================
+// Start block interaction for receivers
+// ===========================================================================
 func (r *receivers) resourcePath() string {
 	return strings.Join([]string{receiversResourcePath}, "/")
 }
@@ -284,44 +562,11 @@ func (r *receivers) verificationPath() string {
 	return strings.Join([]string{getVerificationPath}, "/")
 }
 
-func (h *histories) resourcePath() string {
-	return strings.Join([]string{historiesResourcePath}, "/")
-}
-
-// List is function using list alarms
-func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodGet, alertServiceName, a.resourcePath(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	if filters != nil {
-		q := req.URL.Query()
-		q.Add("where", *filters)
-		req.URL.RawQuery = q.Encode()
-	}
-
-	resp, err := a.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var data struct {
-		Alarms []*Alarms `json:"_items"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-
-	return data.Alarms, nil
-}
-
-// List is function using list receivers
+// List receivers
 func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.resourcePath(), nil)
+	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.resourcePath(), nil)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 
@@ -333,6 +578,7 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -342,16 +588,132 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 
 	return data.Receivers, nil
 }
 
-// List is function using list histories
-func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, error) {
-	req, err := h.client.NewRequest(ctx, http.MethodGet, alertServiceName, h.resourcePath(), nil)
+// Create a receiver
+func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*ResponseRequest, error) {
+	req, err := r.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, r.resourcePath(), &rcr)
 	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := r.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData = &ResponseRequest{}
+	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return respData, nil
+}
+
+// Get a receiver
+func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
+	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := r.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	receiver := &Receivers{}
+	if err := json.NewDecoder(resp.Body).Decode(receiver); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	return receiver, nil
+}
+
+// Update receiver
+func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRequest) (*ResponseRequest, error) {
+	req, err := r.client.NewRequest(ctx, http.MethodPut, cloudwatcherServiceName, r.itemPath(id), &rur)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := r.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respData := &ResponseRequest{}
+	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return respData, nil
+}
+
+// Delete receiver
+func (r *receivers) Delete(ctx context.Context, id string) error {
+	req, err := r.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, r.itemPath(id), nil)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	resp, err := r.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+// ResendVerificationLink is use get a link verification
+func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType string) error {
+	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.verificationPath(), nil)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	q := req.URL.Query()
+	q.Add("rec_id", id)
+	q.Add("rec_type", rType)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := r.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+// ===========================================================================
+// Start block interaction for histories
+// ===========================================================================
+func (h *histories) resourcePath() string {
+	return strings.Join([]string{historiesResourcePath}, "/")
+}
+
+// List histories
+func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, error) {
+	req, err := h.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, h.resourcePath(), nil)
+	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 
@@ -364,6 +726,7 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 
 	resp, err := h.client.Do(ctx, req)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -373,180 +736,111 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 
 	return data.Histories, nil
 }
 
-func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*ResponseRequest, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodPost, alertServiceName, a.resourcePath(), &acr)
+// ===========================================================================
+// Start block interaction for secrets
+// ===========================================================================
+func (s *secrets) resourcePath() string {
+	return strings.Join([]string{secretsResourcePath}, "/")
+}
+
+func (s *secrets) itemPath(id string) string {
+	return strings.Join([]string{secretsResourcePath, id}, "/")
+}
+
+// List secrets
+func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, s.resourcePath(), nil)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
-	resp, err := a.client.Do(ctx, req)
+
+	if filters != nil {
+		q := req.URL.Query()
+		q.Add("where", *filters)
+		req.URL.RawQuery = q.Encode()
+	}
+
+	resp, err := s.client.Do(ctx, req)
 	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Secrets []*Secrets `json:"_items"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	return data.Secrets, nil
+}
+
+// Create a secret
+func (s *secrets) Create(ctx context.Context, scr *SecretsCreateRequest) (*ResponseRequest, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, s.resourcePath(), &scr)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	return respData, nil
 }
 
-func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*ResponseRequest, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodPost, alertServiceName, r.resourcePath(), &rcr)
+// Get a secret
+func (s *secrets) Get(ctx context.Context, id string) (*Secrets, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, s.itemPath(id), nil)
 	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
-	resp, err := r.client.Do(ctx, req)
+	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	var respData = &ResponseRequest{}
-	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		return nil, err
-	}
-	return respData, nil
-}
-
-func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodGet, alertServiceName, a.itemPath(id), nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := a.client.Do(ctx, req)
-	if err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	alarm := &Alarms{}
-	if err := json.NewDecoder(resp.Body).Decode(alarm); err != nil {
+	secret := &Secrets{}
+	if err := json.NewDecoder(resp.Body).Decode(secret); err != nil {
+		log.Fatal(err)
 		return nil, err
 	}
-	// hardcode in here
-	for _, loadbalancer := range alarm.LoadBalancers {
-		if loadbalancer.TargetType == "frontend" {
-			frontend, err := a.client.Listener.Get(ctx, loadbalancer.TargetID)
-			if err != nil {
-				loadbalancer.TargetName = ""
-			}
-			loadbalancer.TargetName = frontend.Name
-		} else {
-			backend, err := a.client.Pool.Get(ctx, loadbalancer.TargetID)
-			if err != nil {
-				loadbalancer.TargetName = ""
-			}
-			loadbalancer.TargetName = backend.Name
-		}
-	}
-	return alarm, nil
+	return secret, nil
 }
 
-func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.itemPath(id), nil)
+// Delete secret
+func (s *secrets) Delete(ctx context.Context, id string) error {
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, s.itemPath(id), nil)
 	if err != nil {
-		return nil, err
-	}
-	resp, err := r.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	receiver := &Receivers{}
-	if err := json.NewDecoder(resp.Body).Decode(receiver); err != nil {
-		return nil, err
-	}
-	return receiver, nil
-}
-
-func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest) (*ResponseRequest, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodPatch, alertServiceName, a.itemPath(id), &aur)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := a.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	respData := &ResponseRequest{}
-	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		return nil, err
-	}
-
-	return respData, nil
-}
-
-func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRequest) (*ResponseRequest, error) {
-	req, err := r.client.NewRequest(ctx, http.MethodPut, alertServiceName, r.itemPath(id), &rur)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := r.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	respData := &ResponseRequest{}
-	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		return nil, err
-	}
-
-	return respData, nil
-}
-
-func (a *alarms) Delete(ctx context.Context, id string) error {
-	req, err := a.client.NewRequest(ctx, http.MethodDelete, alertServiceName, a.itemPath(id), nil)
-	if err != nil {
+		log.Fatal(err)
 		return err
 	}
-	resp, err := a.client.Do(ctx, req)
+	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		return err
-	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-
-	return resp.Body.Close()
-}
-
-func (r *receivers) Delete(ctx context.Context, id string) error {
-	req, err := r.client.NewRequest(ctx, http.MethodDelete, alertServiceName, r.itemPath(id), nil)
-	if err != nil {
-		return err
-	}
-	resp, err := r.client.Do(ctx, req)
-	if err != nil {
-		return err
-	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-
-	return resp.Body.Close()
-}
-
-// ResendVerificationLink is use get a link verification
-func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType string) error {
-	req, err := r.client.NewRequest(ctx, http.MethodGet, alertServiceName, r.verificationPath(), nil)
-	if err != nil {
-		return err
-	}
-
-	q := req.URL.Query()
-	q.Add("rec_id", id)
-	q.Add("rec_type", rType)
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := r.client.Do(ctx, req)
-	if err != nil {
+		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
