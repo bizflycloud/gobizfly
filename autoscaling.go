@@ -370,7 +370,7 @@ type LaunchConfiguration struct {
 	ProfileType      string                     `json:"profile_type,omitempty"`
 	RootDisk         AutoScalingDataDisk        `json:"rootdisk"`
 	SecurityGroups   *[]string                  `json:"security_groups,omitempty"`
-	SSHKey           string                     `json:"key_name"`
+	SSHKey           string                     `json:"key_name,omitempty"`
 	Status           string                     `json:"status,omitempty"`
 	Type             string                     `json:"type,omitempty"`
 	UserData         string                     `json:"user_data,omitempty"`
