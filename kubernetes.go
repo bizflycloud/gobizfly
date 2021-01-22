@@ -316,4 +316,3 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Contex
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
 }
-

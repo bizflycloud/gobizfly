@@ -40,14 +40,9 @@ const (
 	autoScalingServiceName  = "auto_scaling"
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
-<<<<<<< HEAD
 	kubernetesServiceName   = "kubernetes_engine"
 	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
-=======
-	kubernetsServiceName    = "kubernetes_engine"
-	containerRegistryName   = "container-registry"
->>>>>>> feat: support container registry
 )
 
 var (
@@ -61,7 +56,6 @@ var (
 
 // Client represents BizFly API client.
 type Client struct {
-<<<<<<< HEAD
 	AutoScaling       AutoScalingService
 	CloudWatcher      CloudWatcherService
 	Token             TokenService
@@ -73,18 +67,6 @@ type Client struct {
 	KubernetesEngine  KubernetesEngineService
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
-=======
-	AutoScaling      AutoScalingService
-	CloudWatcher     CloudWatcherService
-	Token            TokenService
-	LoadBalancer     LoadBalancerService
-	Listener         ListenerService
-	Pool             PoolService
-	Member           MemberService
-	HealthMonitor    HealthMonitorService
-	KubernetesEngine KubernetesEngineService
-	Container        ContainerRegistryService
->>>>>>> feat: support container registry
 
 	Snapshot SnapshotService
 
@@ -198,12 +180,8 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
-<<<<<<< HEAD
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.CDN = &cdnService{client: c}
-=======
-	c.Container = &containerRegistry{client: c}
->>>>>>> feat: support container registry
 	return c, nil
 }
 
