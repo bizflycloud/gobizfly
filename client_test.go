@@ -80,12 +80,15 @@ func setup() {
 			ServiceUrl:    serverTest.URL + "/api/container-registry",
 			Region:        testRegion,
 		},
+<<<<<<< HEAD
 		{
 			Name:          "CDN",
 			CanonicalName: cdnName,
 			ServiceUrl:    serverTest.URL + "/api/cdn",
 			Region:        testRegion,
 		},
+=======
+>>>>>>> feat: support container registry
 	}
 	client.services = services
 	if err != nil {
