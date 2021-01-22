@@ -19,9 +19,10 @@ package gobizfly
 
 import (
 	"fmt"
-	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
 	"testing"
+
+	"github.com/bizflycloud/gobizfly/testlib"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,7 +32,7 @@ func Test_alarms_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var a alarms
-	mux.HandleFunc(testlib.AlertURL(a.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudWatcherURL(a.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
@@ -110,7 +111,7 @@ func Test_alarms_List(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	alarms, err := client.Alert.Alarms().List(ctx, nil)
+	alarms, err := client.CloudWatcher.Alarms().List(ctx, nil)
 	require.NoError(t, err)
 	alarm := alarms[0]
 	// receivers
@@ -176,7 +177,7 @@ func Test_receivers_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var r receivers
-	mux.HandleFunc(testlib.AlertURL(r.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudWatcherURL(r.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
@@ -232,7 +233,7 @@ func Test_receivers_List(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	receivers, err := client.Alert.Receivers().List(ctx, nil)
+	receivers, err := client.CloudWatcher.Receivers().List(ctx, nil)
 	require.NoError(t, err)
 	receiver := receivers[0]
 	// receiver
@@ -257,7 +258,7 @@ func Test_histories_List(t *testing.T) {
 	setup()
 	defer teardown()
 	var h histories
-	mux.HandleFunc(testlib.AlertURL(h.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudWatcherURL(h.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
 		    "_items": [{
@@ -327,7 +328,7 @@ func Test_histories_List(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	histories, err := client.Alert.Histories().List(ctx, nil)
+	histories, err := client.CloudWatcher.Histories().List(ctx, nil)
 	require.NoError(t, err)
 	history := histories[0]
 	assert.Equal(t, "DOWN", history.State)
