@@ -23,3 +23,7 @@ func AuthURL(path string) string {
 func K8sURL(path string) string {
 	return "/api/kubernetes-engine" + path
 }
+
+func RegistryURL(path string) string {
+	return "/api/container-registry" + path
+}

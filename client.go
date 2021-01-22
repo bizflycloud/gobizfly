@@ -41,6 +41,7 @@ const (
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
 	kubernetsServiceName    = "kubernetes_engine"
+	containerRegistryName   = "container-registry"
 )
 
 var (
@@ -63,6 +64,7 @@ type Client struct {
 	Member           MemberService
 	HealthMonitor    HealthMonitorService
 	KubernetesEngine KubernetesEngineService
+	Container        ContainerRegistryService
 
 	Snapshot SnapshotService
 
@@ -176,6 +178,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
+	c.Container = &containerRegistry{client: c}
 	return c, nil
 }
 
