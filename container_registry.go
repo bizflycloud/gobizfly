@@ -44,11 +44,7 @@ type ContainerRegistryService interface {
 	GetTags(ctx context.Context, repositoryName string) (*TagRepository, error)
 	EditRepo(ctx context.Context, repositoryName string, erpl *editRepositoryPayload) error
 	DeleteTag(ctx context.Context, tagName string, repositoryName string) error
-<<<<<<< HEAD
 	GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
-=======
-	GetImage(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
->>>>>>> feat: support container registry
 }
 
 type Repository struct {
@@ -137,18 +133,10 @@ func (c *containerRegistry) Create(ctx context.Context, crpl *createRepositoryPa
 		return err
 	}
 	resp, err := c.client.Do(ctx, req)
-<<<<<<< HEAD
 	if err != nil {
 		return err
 	}
 	return resp.Body.Close()
-=======
-	defer resp.Body.Close()
-	if err != nil {
-		return err
-	}
-	return nil
->>>>>>> feat: support container registry
 }
 
 func (c *containerRegistry) Delete(ctx context.Context, repositoryName string) error {
@@ -205,11 +193,7 @@ func (c *containerRegistry) DeleteTag(ctx context.Context, repositoryName string
 	return resp.Body.Close()
 }
 
-<<<<<<< HEAD
 func (c *containerRegistry) GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error) {
-=======
-func (c *containerRegistry) GetImage(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error) {
->>>>>>> feat: support container registry
 	var data *Image
 	u, _ := url.Parse(strings.Join([]string{registryPath, repositoryName, "tag", tagName}, "/"))
 	if vulnerabilities != "" {

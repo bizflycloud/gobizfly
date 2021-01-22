@@ -59,8 +59,8 @@ func TestDomainList(t *testing.T) {
     ]
 }
 `
-			_, _ = fmt.Fprintf(writer, resp)
-		})
+		_, _ = fmt.Fprintf(writer, resp)
+	})
 	resp, err := client.CDN.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, resp.Domains, 1)
