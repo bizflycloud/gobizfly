@@ -133,11 +133,10 @@ func (c *containerRegistry) Create(ctx context.Context, crpl *createRepositoryPa
 		return err
 	}
 	resp, err := c.client.Do(ctx, req)
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
-	return nil
+	return resp.Body.Close()
 }
 
 func (c *containerRegistry) Delete(ctx context.Context, repositoryName string) error {
