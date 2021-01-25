@@ -31,7 +31,7 @@ func TestReposList(t *testing.T) {
 }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	repos, err := client.Container.List(ctx, &ListOptions{})
+	repos, err := client.ContainerRegistry.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, repos, 1)
 	assert.Equal(t, "string", repos[0].Name)
@@ -48,7 +48,7 @@ func TestRepoCreate(t *testing.T) {
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, false, payload.Public)
 	})
-	err := client.Container.Create(ctx, &createRepositoryPayload{
+	err := client.ContainerRegistry.Create(ctx, &createRepositoryPayload{
 		Name:   "abc",
 		Public: false,
 	})
@@ -63,7 +63,7 @@ func TestRepoDelete(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.Container.Delete(ctx, "ji84wqtzr77ogo6b"))
+	require.NoError(t, client.ContainerRegistry.Delete(ctx, "ji84wqtzr77ogo6b"))
 }
 
 func TestGetRepoTags(t *testing.T) {
@@ -96,7 +96,7 @@ func TestGetRepoTags(t *testing.T) {
 }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	resp, err := client.Container.GetTags(ctx, "ji84wqtzr77ogo6b")
+	resp, err := client.ContainerRegistry.GetTags(ctx, "ji84wqtzr77ogo6b")
 	require.NoError(t, err)
 	assert.Equal(t, "string", resp.Repository.Name)
 	assert.Equal(t, 0, resp.Tags[0].Fixes)
@@ -112,7 +112,7 @@ func TestEditRepo(t *testing.T) {
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, false, payload.Public)
 		})
-	err := client.Container.EditRepo(ctx, "ji84wqtzr77ogo6b", &editRepositoryPayload{
+	err := client.ContainerRegistry.EditRepo(ctx, "ji84wqtzr77ogo6b", &editRepositoryPayload{
 		Public: false,
 	})
 	require.NoError(t, err)
@@ -125,7 +125,7 @@ func TestDeleteImageTag(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
-	err := client.Container.DeleteTag(ctx, "ji84wqtzr77ogo6b", "tag")
+	err := client.ContainerRegistry.DeleteTag(ctx, "ji84wqtzr77ogo6b", "tag")
 	require.NoError(t, err)
 }
 
@@ -168,7 +168,7 @@ func TestGetImage(t *testing.T) {
 }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	resp, err := client.Container.GetImage(ctx, "ji84wqtzr77ogo6b", "tag", "tag")
+	resp, err := client.ContainerRegistry.GetTag(ctx, "ji84wqtzr77ogo6b", "tag", "tag")
 	require.NoError(t, err)
 	assert.Len(t, resp.Vulnerabilities, 1)
 	assert.Equal(t, "string", resp.Vulnerabilities[0].Package)

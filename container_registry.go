@@ -44,7 +44,7 @@ type ContainerRegistryService interface {
 	GetTags(ctx context.Context, repositoryName string) (*TagRepository, error)
 	EditRepo(ctx context.Context, repositoryName string, erpl *editRepositoryPayload) error
 	DeleteTag(ctx context.Context, tagName string, repositoryName string) error
-	GetImage(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
+	GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
 }
 
 type Repository struct {
@@ -193,7 +193,7 @@ func (c *containerRegistry) DeleteTag(ctx context.Context, repositoryName string
 	return resp.Body.Close()
 }
 
-func (c *containerRegistry) GetImage(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error) {
+func (c *containerRegistry) GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error) {
 	var data *Image
 	u, _ := url.Parse(strings.Join([]string{registryPath, repositoryName, "tag", tagName}, "/"))
 	if vulnerabilities != "" {
