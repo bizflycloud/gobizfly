@@ -74,6 +74,12 @@ func setup() {
 			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
 			Region:        testRegion,
 		},
+		{
+			Name:          "Container Registry",
+			CanonicalName: containerRegistryName,
+			ServiceUrl:    serverTest.URL + "/api/container-registry",
+			Region:        testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {
