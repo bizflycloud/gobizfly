@@ -178,11 +178,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
-<<<<<<< HEAD
 	c.ContainerRegistry = &containerRegistry{client: c}
-=======
-	c.Container = &containerRegistry{client: c}
->>>>>>> feat: support container registry
 	return c, nil
 }
 
