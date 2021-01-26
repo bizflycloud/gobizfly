@@ -244,7 +244,7 @@ func TestDeleteDomain(t *testing.T) {
 	require.NoError(t, client.CDN.Delete(ctx, "a0afe23e-437b-43e8-906e-055bdac9ed3c"))
 }
 
-func TestDeleteCahce(t *testing.T) {
+func TestDeleteCache(t *testing.T) {
 	setup()
 	defer teardown()
 	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "a0afe23e-437b-43e8-906e-055bdac9ed3c"}, "/"),
