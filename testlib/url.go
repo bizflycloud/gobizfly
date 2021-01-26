@@ -27,3 +27,7 @@ func K8sURL(path string) string {
 func RegistryURL(path string) string {
 	return "/api/container-registry" + path
 }
+
+func CDNURL(path string) string {
+	return "/api/cdn" + path
+}
