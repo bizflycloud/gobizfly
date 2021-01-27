@@ -70,7 +70,7 @@ func setup() {
 		},
 		{
 			Name:          "Kubernetes",
-			CanonicalName: kubernetsServiceName,
+			CanonicalName: kubernetesServiceName,
 			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
 			Region:        testRegion,
 		},

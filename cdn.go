@@ -23,11 +23,14 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 )
 
 const (
 	domainPath = "/domains"
+	userPath   = "/users"
 )
 
 type cdnService struct {
@@ -43,21 +46,6 @@ type CDNService interface {
 	Update(ctx context.Context, domainID string, udrq *UpdateDomainReq) (*UpdateDomainResp, error)
 	Delete(ctx context.Context, domainID string) error
 	DeleteCache(ctx context.Context, domainID string, files *Files) error
-}
-
-type User struct {
-	ID        int    `json:"id"`
-	Email     string `json:"email"`
-	TenantID  string `json:"tenant_id"`
-	CreatedAt string `json:"created_at"`
-	Name      string `json:"name"`
-	StartedAt string `json:"started_at"`
-	Status    string `json:"status"`
-}
-
-type UsageUser struct {
-	User  User `json:"user"`
-	Usage int  `json:"usage"`
 }
 
 type Domain struct {
@@ -85,14 +73,11 @@ type DomainsResp struct {
 	Total   int      `json:"total"`
 }
 
-type BandwidthPrice struct {
-	Price int `json:"price"`
-}
-
 type OriginAddr struct {
 	Type string `json:"type"`
 	Host string `json:"host"`
 }
+
 type ExtendedDomain struct {
 	Domain
 	Last24hUsage int          `json:"last_24h_usage"`
@@ -146,7 +131,16 @@ func (c *cdnService) itemPath(id string) string {
 }
 
 func (c *cdnService) List(ctx context.Context, opts *ListOptions) (*DomainsResp, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, cdnName, c.resourcePath(), nil)
+	u, _ := url.Parse(strings.Join([]string{userPath, domainPath}, ""))
+	query := url.Values{}
+	if opts.Page != 0 {
+		query.Add("page", strconv.Itoa(opts.Page))
+	}
+	if opts.Page != 0 {
+		query.Add("limit", strconv.Itoa(opts.Limit))
+	}
+	u.RawQuery = query.Encode()
+	req, err := c.client.NewRequest(ctx, http.MethodGet, cdnName, u.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +157,7 @@ func (c *cdnService) List(ctx context.Context, opts *ListOptions) (*DomainsResp,
 }
 
 func (c *cdnService) Get(ctx context.Context, domainID string) (*ExtendedDomain, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, cdnName, strings.Join([]string{domainPath, domainID}, "/"), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, cdnName, c.itemPath(domainID), nil)
 	var data struct {
 		Domain *ExtendedDomain `json:"domain"`
 	}

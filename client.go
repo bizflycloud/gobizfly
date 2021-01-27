@@ -40,7 +40,7 @@ const (
 	autoScalingServiceName  = "auto_scaling"
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
-	kubernetsServiceName    = "kubernetes_engine"
+	kubernetesServiceName   = "kubernetes_engine"
 	containerRegistryName   = "container-registry"
 	cdnName                 = "cdn"
 )
@@ -267,7 +267,10 @@ func (c *Client) SetKeystoneToken(s string) {
 }
 
 // ListOptions specifies the optional parameters for List method.
-type ListOptions struct{}
+type ListOptions struct {
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+}
 
 func errorFromStatus(code int, msg string) error {
 	switch code {
