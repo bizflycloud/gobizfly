@@ -31,10 +31,9 @@ import (
 func TestDomainList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CDNURL(strings.Join([]string{userPath, domainPath}, "")),
-		func(writer http.ResponseWriter, r *http.Request) {
-			require.Equal(t, http.MethodGet, r.Method)
-			resp := `
+	mux.HandleFunc(testlib.CDNURL(domainPath), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
 {
     "total": 1,
     "pages": 1,
@@ -60,8 +59,8 @@ func TestDomainList(t *testing.T) {
     ]
 }
 `
-			_, _ = fmt.Fprintf(writer, resp)
-		})
+		_, _ = fmt.Fprintf(writer, resp)
+	})
 	resp, err := client.CDN.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, resp.Domains, 1)
