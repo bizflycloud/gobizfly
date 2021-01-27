@@ -41,7 +41,11 @@ const (
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
 	kubernetesServiceName   = "kubernetes_engine"
+<<<<<<< HEAD
 	containerRegistryName   = "container_registry"
+=======
+	containerRegistryName   = "container-registry"
+>>>>>>> fix: typo, conflicts
 	cdnName                 = "cdn"
 )
 
