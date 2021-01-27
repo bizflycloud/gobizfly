@@ -41,7 +41,7 @@ const (
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
 	kubernetesServiceName   = "kubernetes_engine"
-	containerRegistryName   = "container-registry"
+	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
 )
 
