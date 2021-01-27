@@ -40,8 +40,9 @@ const (
 	autoScalingServiceName  = "auto_scaling"
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
-	kubernetsServiceName    = "kubernetes_engine"
-	containerRegistryName   = "container-registry"
+	kubernetesServiceName   = "kubernetes_engine"
+	containerRegistryName   = "container_registry"
+	cdnName                 = "cdn"
 )
 
 var (
@@ -65,6 +66,7 @@ type Client struct {
 	HealthMonitor     HealthMonitorService
 	KubernetesEngine  KubernetesEngineService
 	ContainerRegistry ContainerRegistryService
+	CDN               CDNService
 
 	Snapshot SnapshotService
 
@@ -179,6 +181,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	c.ContainerRegistry = &containerRegistry{client: c}
+	c.CDN = &cdnService{client: c}
 	return c, nil
 }
 
@@ -264,7 +267,10 @@ func (c *Client) SetKeystoneToken(s string) {
 }
 
 // ListOptions specifies the optional parameters for List method.
-type ListOptions struct{}
+type ListOptions struct {
+	Page  int `json:"page,omitempty"`
+	Limit int `json:"limit,omitempty"`
+}
 
 func errorFromStatus(code int, msg string) error {
 	switch code {

@@ -70,7 +70,7 @@ func setup() {
 		},
 		{
 			Name:          "Kubernetes",
-			CanonicalName: kubernetsServiceName,
+			CanonicalName: kubernetesServiceName,
 			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
 			Region:        testRegion,
 		},
@@ -78,6 +78,12 @@ func setup() {
 			Name:          "Container Registry",
 			CanonicalName: containerRegistryName,
 			ServiceUrl:    serverTest.URL + "/api/container-registry",
+			Region:        testRegion,
+		},
+		{
+			Name:          "CDN",
+			CanonicalName: cdnName,
+			ServiceUrl:    serverTest.URL + "/api/cdn",
 			Region:        testRegion,
 		},
 	}
