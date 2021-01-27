@@ -31,7 +31,7 @@ import (
 func TestDomainList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CDNURL(domainPath), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CDNURL(strings.Join([]string{userPath, domainPath}, "")), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
