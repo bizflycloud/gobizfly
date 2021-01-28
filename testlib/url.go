@@ -31,3 +31,7 @@ func RegistryURL(path string) string {
 func CDNURL(path string) string {
 	return "/api/cdn" + path
 }
+
+func DNSURL(path string) string {
+	return "/api/dns" + path
+}
