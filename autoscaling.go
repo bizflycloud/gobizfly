@@ -277,7 +277,7 @@ type LoadBalancerPolicyInformation struct {
 	ServerGroupPort  int    `json:"server_group_port"`
 }
 
-// AutoScalingPolicies - information of policies using for autos scaling group
+// AutoScalingPolicies - information of policies using for auto scaling group
 type AutoScalingPolicies struct {
 	ScaleInPolicyInformations      []ScalePolicyInformation      `json:"scale_in_info,omitempty"`
 	ScaleOutPolicyInformations     []ScalePolicyInformation      `json:"scale_out_info,omitempty"`
@@ -936,7 +936,7 @@ func (s *schedule) Delete(ctx context.Context, clusterID, scheduleID string) err
 
 // Create
 func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupCreateRequest) (*AutoScalingGroup, error) {
-	if valid, _ := isValidQuotas(ctx, asg.client, ascr.ProfileID, ascr.MaxSize); !valid {
+	if valid, _ := isValidQuotas(ctx, asg.client, "", ascr.ProfileID, ascr.DesiredCapacity, ascr.MaxSize); !valid {
 		return nil, errors.New("Not enough quotas to create new auto scaling group")
 	}
 	req, err := asg.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, asg.resourcePath(), &ascr)
@@ -1020,7 +1020,7 @@ func (s *schedule) Create(ctx context.Context, clusterID string, asscr *AutoScal
 
 // Update
 func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur *AutoScalingGroupUpdateRequest) (*AutoScalingGroup, error) {
-	if valid, _ := isValidQuotas(ctx, asg.client, asur.ProfileID, asur.MaxSize); !valid {
+	if valid, _ := isValidQuotas(ctx, asg.client, clusterID, asur.ProfileID, asur.DesiredCapacity, asur.MaxSize); !valid {
 		return nil, errors.New("Not enough quotas to update new auto scaling group")
 	}
 
@@ -1081,14 +1081,19 @@ func (c *common) AutoScalingUsingResource(ctx context.Context) (*usingResource, 
 	return data, nil
 }
 
-func (c *common) AutoScalingIsValidQuotas(ctx context.Context, ProfileID string, maxSize int) (bool, error) {
-	return isValidQuotas(ctx, c.client, ProfileID, maxSize)
+func (c *common) AutoScalingIsValidQuotas(ctx context.Context, clusterID, ProfileID string, desiredCapacity, maxSize int) (bool, error) {
+	return isValidQuotas(ctx, c.client, clusterID, ProfileID, desiredCapacity, maxSize)
 }
 
-func isValidQuotas(ctx context.Context, client *Client, ProfileID string, maxSize int) (bool, error) {
+func isValidQuotas(ctx context.Context, client *Client, clusterID, ProfileID string, desiredCapacity, maxSize int) (bool, error) {
 	payload := map[string]interface{}{
-		"max_size":   maxSize,
-		"profile_id": ProfileID,
+		"desired_capacity": desiredCapacity,
+		"max_size":         maxSize,
+		"profile_id":       ProfileID,
+	}
+
+	if clusterID != "" {
+		payload["cluster_id"] = clusterID
 	}
 
 	req, err := client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, getQuotasResourcePath(), &payload)
