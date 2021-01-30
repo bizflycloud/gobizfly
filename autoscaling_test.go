@@ -479,7 +479,7 @@ func TestIsValidQuotas(t *testing.T) {
         }`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	valid, err := isValidQuotas(ctx, client, "ProfileID", 9)
+	valid, err := isValidQuotas(ctx, client, "", "ProfileID", 2, 9)
 	require.NoError(t, err)
 
 	assert.Equal(t, true, valid)
