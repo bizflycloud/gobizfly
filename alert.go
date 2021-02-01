@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -332,7 +331,6 @@ func (a *agents) itemPath(id string) string {
 func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -344,7 +342,6 @@ func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
 
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -354,7 +351,6 @@ func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -365,19 +361,16 @@ func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
 func (a *agents) Get(ctx context.Context, id string) (*Agents, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	agent := &Agents{}
 	if err := json.NewDecoder(resp.Body).Decode(agent); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -388,12 +381,10 @@ func (a *agents) Get(ctx context.Context, id string) (*Agents, error) {
 func (a *agents) Delete(ctx context.Context, id string) error {
 	req, err := a.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, a.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -416,7 +407,6 @@ func (a *alarms) itemPath(id string) string {
 func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -428,7 +418,6 @@ func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -438,7 +427,6 @@ func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -449,19 +437,16 @@ func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*ResponseRequest, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, a.resourcePath(), &acr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return respData, nil
@@ -471,19 +456,16 @@ func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*Response
 func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, a.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	alarm := &Alarms{}
 	if err := json.NewDecoder(resp.Body).Decode(alarm); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	// hardcode in here
@@ -491,14 +473,12 @@ func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 		if loadbalancer.TargetType == "frontend" {
 			frontend, err := a.client.Listener.Get(ctx, loadbalancer.TargetID)
 			if err != nil {
-				log.Fatal(err)
 				loadbalancer.TargetName = ""
 			}
 			loadbalancer.TargetName = frontend.Name
 		} else {
 			backend, err := a.client.Pool.Get(ctx, loadbalancer.TargetID)
 			if err != nil {
-				log.Fatal(err)
 				loadbalancer.TargetName = ""
 			}
 			loadbalancer.TargetName = backend.Name
@@ -511,19 +491,16 @@ func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest) (*ResponseRequest, error) {
 	req, err := a.client.NewRequest(ctx, http.MethodPatch, cloudwatcherServiceName, a.itemPath(id), &aur)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	respData := &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -534,12 +511,10 @@ func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest)
 func (a *alarms) Delete(ctx context.Context, id string) error {
 	req, err := a.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, a.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := a.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -566,7 +541,6 @@ func (r *receivers) verificationPath() string {
 func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, error) {
 	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -578,7 +552,6 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -588,7 +561,6 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -599,19 +571,16 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*ResponseRequest, error) {
 	req, err := r.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, r.resourcePath(), &rcr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return respData, nil
@@ -621,19 +590,16 @@ func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*Re
 func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
 	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	receiver := &Receivers{}
 	if err := json.NewDecoder(resp.Body).Decode(receiver); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return receiver, nil
@@ -643,19 +609,16 @@ func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
 func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRequest) (*ResponseRequest, error) {
 	req, err := r.client.NewRequest(ctx, http.MethodPut, cloudwatcherServiceName, r.itemPath(id), &rur)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	respData := &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -666,12 +629,10 @@ func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRe
 func (r *receivers) Delete(ctx context.Context, id string) error {
 	req, err := r.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, r.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -683,7 +644,6 @@ func (r *receivers) Delete(ctx context.Context, id string) error {
 func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType string) error {
 	req, err := r.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, r.verificationPath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
@@ -694,7 +654,6 @@ func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType
 
 	resp, err := r.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -713,7 +672,6 @@ func (h *histories) resourcePath() string {
 func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, error) {
 	req, err := h.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, h.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -726,7 +684,6 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 
 	resp, err := h.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -736,7 +693,6 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -758,7 +714,6 @@ func (s *secrets) itemPath(id string) string {
 func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, s.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -770,7 +725,6 @@ func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error)
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -780,7 +734,6 @@ func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error)
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -791,19 +744,16 @@ func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error)
 func (s *secrets) Create(ctx context.Context, scr *SecretsCreateRequest) (*ResponseRequest, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, cloudwatcherServiceName, s.resourcePath(), &scr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return respData, nil
@@ -813,19 +763,16 @@ func (s *secrets) Create(ctx context.Context, scr *SecretsCreateRequest) (*Respo
 func (s *secrets) Get(ctx context.Context, id string) (*Secrets, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, cloudwatcherServiceName, s.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
 
 	secret := &Secrets{}
 	if err := json.NewDecoder(resp.Body).Decode(secret); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return secret, nil
@@ -835,12 +782,10 @@ func (s *secrets) Get(ctx context.Context, id string) (*Secrets, error) {
 func (s *secrets) Delete(ctx context.Context, id string) error {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, cloudwatcherServiceName, s.itemPath(id), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)

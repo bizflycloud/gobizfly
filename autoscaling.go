@@ -23,7 +23,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -278,7 +277,7 @@ type LoadBalancerPolicyInformation struct {
 	ServerGroupPort  int    `json:"server_group_port"`
 }
 
-// AutoScalingPolicies - information of policies using for autos scaling group
+// AutoScalingPolicies - information of policies using for auto scaling group
 type AutoScalingPolicies struct {
 	ScaleInPolicyInformations      []ScalePolicyInformation      `json:"scale_in_info,omitempty"`
 	ScaleOutPolicyInformations     []ScalePolicyInformation      `json:"scale_out_info,omitempty"`
@@ -549,7 +548,6 @@ func getSuggestionResourcePath() string {
 func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScalingGroup, error) {
 	req, err := asg.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, asg.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -561,7 +559,6 @@ func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScaling
 
 	resp, err := asg.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -571,7 +568,6 @@ func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScaling
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -581,7 +577,6 @@ func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScaling
 func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchConfiguration, error) {
 	req, err := lc.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, lc.resourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -593,7 +588,6 @@ func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchCon
 
 	resp, err := lc.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -603,7 +597,6 @@ func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchCon
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -624,12 +617,10 @@ func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWe
 
 	req, err := wh.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, wh.resourcePath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := wh.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -637,7 +628,6 @@ func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWe
 	var data []*AutoScalingWebhook
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -651,7 +641,6 @@ func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]
 
 	req, err := e.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, e.resourcePath(clusterID, page, total), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -663,7 +652,6 @@ func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]
 
 	resp, err := e.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -673,7 +661,6 @@ func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -687,12 +674,10 @@ func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolici
 
 	req, err := p.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, p.resourcePath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := p.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -700,7 +685,6 @@ func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolici
 	var data = &AutoScalingPolicies{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -714,12 +698,10 @@ func (n *node) List(ctx context.Context, clusterID string) ([]*AutoScalingNode, 
 
 	req, err := n.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, n.resourcePath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := n.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -729,7 +711,6 @@ func (n *node) List(ctx context.Context, clusterID string) ([]*AutoScalingNode, 
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -743,12 +724,10 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, s.resourcePath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -758,7 +737,6 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -769,12 +747,10 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoScalingGroup, error) {
 	req, err := asg.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, asg.itemPath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := asg.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -782,7 +758,6 @@ func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoSc
 	data := &AutoScalingGroup{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -792,12 +767,10 @@ func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoSc
 func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*LaunchConfiguration, error) {
 	req, err := lc.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, lc.itemPath(profileID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := lc.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -805,7 +778,6 @@ func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*Laun
 	data := &LaunchConfiguration{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -826,12 +798,10 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 	}
 	req, err := wh.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, wh.resourcePath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := wh.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -839,7 +809,6 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 	var data []*AutoScalingWebhook
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -854,12 +823,10 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
 	req, err := t.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, t.resourcePath(taskID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := t.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -867,7 +834,6 @@ func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
 	var data = &ASTask{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -877,12 +843,10 @@ func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
 func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*AutoScalingSchdeule, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, s.itemPath(clusterID, scheduleID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	defer resp.Body.Close()
@@ -890,7 +854,6 @@ func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*Auto
 	var data = &AutoScalingSchdeule{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
@@ -901,12 +864,10 @@ func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*Auto
 func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error {
 	req, err := asg.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, asg.itemPath(clusterID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := asg.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -917,12 +878,10 @@ func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error
 func (lc *launchConfiguration) Delete(ctx context.Context, profileID string) error {
 	req, err := lc.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, lc.itemPath(profileID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	resp, err := lc.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -933,13 +892,11 @@ func (lc *launchConfiguration) Delete(ctx context.Context, profileID string) err
 func (p *policy) Delete(ctx context.Context, clusterID, PolicyID string) error {
 	req, err := p.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, p.itemPath(clusterID, PolicyID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
 	resp, err := p.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -950,13 +907,11 @@ func (p *policy) Delete(ctx context.Context, clusterID, PolicyID string) error {
 func (n *node) Delete(ctx context.Context, clusterID string, asnd *AutoScalingNodesDelete) error {
 	req, err := n.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, n.resourcePath(clusterID), &asnd)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
 	resp, err := n.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -967,13 +922,11 @@ func (n *node) Delete(ctx context.Context, clusterID string, asnd *AutoScalingNo
 func (s *schedule) Delete(ctx context.Context, clusterID, scheduleID string) error {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, s.itemPath(clusterID, scheduleID), nil)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return err
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
@@ -983,25 +936,22 @@ func (s *schedule) Delete(ctx context.Context, clusterID, scheduleID string) err
 
 // Create
 func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupCreateRequest) (*AutoScalingGroup, error) {
-	if valid, _ := isValidQuotas(ctx, asg.client, ascr.ProfileID, ascr.MaxSize); !valid {
+	if valid, _ := isValidQuotas(ctx, asg.client, "", ascr.ProfileID, ascr.DesiredCapacity, ascr.MaxSize); !valid {
 		return nil, errors.New("Not enough quotas to create new auto scaling group")
 	}
 	req, err := asg.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, asg.resourcePath(), &ascr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := asg.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &AutoScalingGroup{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1014,20 +964,17 @@ func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfigurat
 
 	req, err := lc.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, lc.resourcePath(), &lcr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := lc.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &LaunchConfiguration{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1036,20 +983,17 @@ func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfigurat
 func (p *policy) Create(ctx context.Context, clusterID string, pcr *PolicyCreateRequest) (*TaskResponses, error) {
 	req, err := p.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, p.resourcePath(clusterID), &pcr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := p.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &TaskResponses{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1058,20 +1002,17 @@ func (p *policy) Create(ctx context.Context, clusterID string, pcr *PolicyCreate
 func (s *schedule) Create(ctx context.Context, clusterID string, asscr *AutoScalingSchdeuleCreateRequest) (*TaskResponses, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, s.resourcePath(clusterID), &asscr)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &TaskResponses{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1079,26 +1020,23 @@ func (s *schedule) Create(ctx context.Context, clusterID string, asscr *AutoScal
 
 // Update
 func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur *AutoScalingGroupUpdateRequest) (*AutoScalingGroup, error) {
-	if valid, _ := isValidQuotas(ctx, asg.client, asur.ProfileID, asur.MaxSize); !valid {
+	if valid, _ := isValidQuotas(ctx, asg.client, clusterID, asur.ProfileID, asur.DesiredCapacity, asur.MaxSize); !valid {
 		return nil, errors.New("Not enough quotas to update new auto scaling group")
 	}
 
 	req, err := asg.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, asg.itemPath(clusterID), &asur)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := asg.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &AutoScalingGroup{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1107,20 +1045,17 @@ func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur 
 func (p *policy) Update(ctx context.Context, clusterID, PolicyID string, pur *PolicyUpdateRequest) (*TaskResponses, error) {
 	req, err := p.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, p.itemPath(clusterID, PolicyID), &pur)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := p.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &TaskResponses{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
@@ -1130,44 +1065,44 @@ func (p *policy) Update(ctx context.Context, clusterID, PolicyID string, pur *Po
 func (c *common) AutoScalingUsingResource(ctx context.Context) (*usingResource, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, c.usingResourcePath(), nil)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := &usingResource{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
 }
 
-func (c *common) AutoScalingIsValidQuotas(ctx context.Context, ProfileID string, maxSize int) (bool, error) {
-	return isValidQuotas(ctx, c.client, ProfileID, maxSize)
+func (c *common) AutoScalingIsValidQuotas(ctx context.Context, clusterID, ProfileID string, desiredCapacity, maxSize int) (bool, error) {
+	return isValidQuotas(ctx, c.client, clusterID, ProfileID, desiredCapacity, maxSize)
 }
 
-func isValidQuotas(ctx context.Context, client *Client, ProfileID string, maxSize int) (bool, error) {
+func isValidQuotas(ctx context.Context, client *Client, clusterID, ProfileID string, desiredCapacity, maxSize int) (bool, error) {
 	payload := map[string]interface{}{
-		"max_size":   maxSize,
-		"profile_id": ProfileID,
+		"desired_capacity": desiredCapacity,
+		"max_size":         maxSize,
+		"profile_id":       ProfileID,
+	}
+
+	if clusterID != "" {
+		payload["cluster_id"] = clusterID
 	}
 
 	req, err := client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, getQuotasResourcePath(), &payload)
 	if err != nil {
-		log.Fatal(err)
 		return false, err
 	}
 
 	resp, err := client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return false, err
 	}
 
@@ -1178,7 +1113,6 @@ func isValidQuotas(ctx context.Context, client *Client, ProfileID string, maxSiz
 	// data := &map[string]interface{}{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return false, err
 	}
 	return data.Quotas.Valid, nil
@@ -1198,20 +1132,17 @@ func getSuggestion(ctx context.Context, client *Client, ProfileID string, desire
 
 	req, err := client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, getSuggestionResourcePath(), &payload)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	resp, err := client.Do(ctx, req)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	data := map[string]interface{}{}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 	return data, nil
