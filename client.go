@@ -44,6 +44,7 @@ const (
 	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
 	dnsName                 = "dns"
+	userName                = "user"
 )
 
 var (
@@ -69,6 +70,7 @@ type Client struct {
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
 	DNS               DNSService
+	User              UserService
 
 	Snapshot SnapshotService
 
@@ -185,6 +187,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.CDN = &cdnService{client: c}
 	c.DNS = &dnsService{client: c}
+	c.User = &userService{client: c}
 	return c, nil
 }
 

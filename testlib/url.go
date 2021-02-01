@@ -35,3 +35,7 @@ func CDNURL(path string) string {
 func DNSURL(path string) string {
 	return "/api/dns" + path
 }
+
+func UserURL(path string) string {
+	return "/api/user" + path
+}

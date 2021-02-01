@@ -92,6 +92,12 @@ func setup() {
 			ServiceUrl:    serverTest.URL + "/api/dns",
 			Region:        testRegion,
 		},
+		{
+			Name:          "User",
+			CanonicalName: userName,
+			ServiceUrl:    serverTest.URL + "/api/user",
+			Region:        testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {
