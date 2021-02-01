@@ -106,6 +106,13 @@ type RoutingPolicyData struct {
 		TCPConnect struct {
 			TCPPort int `json:"tcp_port"`
 		} `json:"tcp_connect,omitempty"`
+		HTTPStatus struct {
+			HTTPPort int    `json:"http_port"`
+			URLPath  string `json:"url_path"`
+			VHost    string `json:"vhost"`
+			OkCodes  []int  `json:"ok_codes"`
+			Interval int    `json:"internal"`
+		} `json:"http_status,omitempty"`
 	} `json:"healthcheck,omitempty"`
 }
 
