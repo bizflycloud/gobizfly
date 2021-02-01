@@ -873,3 +873,468 @@ func TestServerChangeCategory(t *testing.T) {
 	assert.Equal(t, "f188d844-7e3f-11ea-a878-17c5949416eb", task.TaskID)
 
 }
+
+func TestServerAddVPC(t *testing.T) {
+	setup()
+	defer teardown()
+	var s *server
+	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")),
+		func(writer http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, http.MethodPost, r.Method)
+			resp := `{
+    "id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+    "name": "asdfasdfasdf",
+    "status": "ACTIVE",
+    "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+    "user_id": "7156c45b82cb4fabba997a90b032c0de",
+    "metadata": {
+        "network_plan": "free_datatransfer",
+        "category": "premium",
+        "os_type": "CentOS-7.0[64-bit-version]"
+    },
+    "hostId": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
+    "flavor": {
+        "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
+        "name": "2c_2g",
+        "ram": 2048,
+        "disk": 0,
+        "swap": "",
+        "OS-FLV-EXT-DATA:ephemeral": 0,
+        "OS-FLV-DISABLED:disabled": false,
+        "vcpus": 2,
+        "os-flavor-access:is_public": true,
+        "rxtx_factor": 1.0
+    },
+    "created": "2021-01-25T04:36:44Z",
+    "updated": "2021-01-25T04:37:18Z",
+    "addresses": {
+        "EXT_DIRECTNET_4": [
+            {
+                "version": 4,
+                "addr": "103.56.158.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:be:98:50"
+            }
+        ],
+        "Airflow": [
+            {
+                "version": 4,
+                "addr": "10.23.237.44",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:af:96:6a",
+                "network_name": "Airflow"
+            }
+        ],
+        "priv_vctest_devcs_tung491@vccloud.vn": [
+            {
+                "version": 4,
+                "addr": "10.26.53.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:dd:54:a4",
+                "network_name": "priv_vctest_devcs_tung491@vccloud.vn"
+            }
+        ],
+        "asdfasdf": [
+            {
+                "version": 4,
+                "addr": "10.108.18.48",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:75:63:bc",
+                "network_name": "asdfasdf"
+            }
+        ]
+    },
+    "accessIPv4": "",
+    "accessIPv6": "",
+    "OS-DCF:diskConfig": "MANUAL",
+    "progress": 0,
+    "OS-EXT-AZ:availability_zone": "HN1",
+    "config_drive": "",
+    "key_name": null,
+    "OS-SRV-USG:launched_at": "2021-01-25T04:37:17.000000",
+    "OS-SRV-USG:terminated_at": null,
+    "security_groups": [
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        }
+    ],
+    "OS-EXT-STS:task_state": null,
+    "OS-EXT-STS:vm_state": "active",
+    "OS-EXT-STS:power_state": 1,
+    "os-extended-volumes:volumes_attached": [
+        {
+            "id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+            "status": "in-use",
+            "size": 40,
+            "availability_zone": "HN1",
+            "created_at": "2021-01-25T04:35:30.000000",
+            "updated_at": "2021-01-25T04:36:49.000000",
+            "attachments": [
+                {
+                    "id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+                    "attachment_id": "a69f07c1-2455-478a-8d38-f0dcf27af00e",
+                    "volume_id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+                    "server_id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+                    "host_name": "thor-compute-016",
+                    "device": "/dev/vda",
+                    "attached_at": "2021-01-25T04:36:49.000000"
+                }
+            ],
+            "name": "asdfasdfasdf_rootdisk",
+            "description": null,
+            "volume_type": "PREMIUM_SSD",
+            "snapshot_id": null,
+            "source_volid": null,
+            "metadata": {
+                "category": "premium"
+            },
+            "user_id": "7156c45b82cb4fabba997a90b032c0de",
+            "bootable": "true",
+            "encrypted": false,
+            "replication_status": null,
+            "consistencygroup_id": null,
+            "multiattach": false,
+            "os-vol-tenant-attr:tenant_id": "ebbed256d9414b0598719c42dc17e837",
+            "volume_image_metadata": {
+                "signature_verified": "False",
+                "image_id": "9a0f31e3-c43d-4fc2-ae1c-cc6ebde571fa",
+                "image_name": "CentOS-7.0[64-bit-version]",
+                "checksum": "07d74cc43fd0a3b4531673f70a3b686f",
+                "container_format": "bare",
+                "disk_format": "raw",
+                "min_disk": "0",
+                "min_ram": "0",
+                "size": "4194304000"
+            },
+            "attached_type": "rootdisk",
+            "type": "SSD",
+            "category": "premium",
+            "snapshots": []
+        },
+        {
+            "id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+            "status": "in-use",
+            "size": 50,
+            "availability_zone": "HN1",
+            "created_at": "2021-01-25T04:37:34.000000",
+            "updated_at": "2021-01-25T04:37:40.000000",
+            "attachments": [
+                {
+                    "id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+                    "attachment_id": "02ec6bce-7500-46b7-b9b7-8498bca3f72e",
+                    "volume_id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+                    "server_id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+                    "host_name": "thor-compute-016",
+                    "device": "/dev/vdb",
+                    "attached_at": "2021-01-25T04:37:39.000000"
+                }
+            ],
+            "name": "asdfasdfasdf_datadisk",
+            "description": null,
+            "volume_type": "PREMIUM_SSD",
+            "snapshot_id": null,
+            "source_volid": null,
+            "metadata": {
+                "category": "premium"
+            },
+            "user_id": "7156c45b82cb4fabba997a90b032c0de",
+            "bootable": "false",
+            "encrypted": false,
+            "replication_status": null,
+            "consistencygroup_id": null,
+            "multiattach": false,
+            "os-vol-tenant-attr:tenant_id": "ebbed256d9414b0598719c42dc17e837",
+            "attached_type": "datadisk",
+            "type": "SSD",
+            "category": "premium",
+            "snapshots": []
+        }
+    ],
+    "locked": false,
+    "category": "premium",
+    "ip_addresses": {
+        "LAN": [
+            {
+                "version": 4,
+                "addr": "10.23.237.44",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:af:96:6a",
+                "network_name": "Airflow"
+            },
+            {
+                "version": 4,
+                "addr": "10.26.53.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:dd:54:a4",
+                "network_name": "priv_vctest_devcs_tung491@vccloud.vn"
+            },
+            {
+                "version": 4,
+                "addr": "10.108.18.48",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:75:63:bc",
+                "network_name": "asdfasdf"
+            }
+        ],
+        "WAN_V4": [
+            {
+                "version": 4,
+                "addr": "103.56.158.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:be:98:50"
+            }
+        ],
+        "WAN_V6": []
+    },
+    "zone_name": "HN1",
+    "region_name": "HaNoi",
+    "autoscale_service": {},
+    "ipv6": false,
+    "network_plan": "free_datatransfer",
+    "flavor_name": "2c_2g"
+}
+`
+			_, _ = fmt.Fprint(writer, resp)
+		})
+	server, err := client.Server.AddVPC(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
+	require.NoError(t, err)
+	assert.Len(t, server.IPAddresses.LanAddresses, 3)
+}
+
+func TestServerRemoveVPC(t *testing.T) {
+	setup()
+	defer teardown()
+	var s *server
+	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")),
+		func(writer http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, http.MethodPost, r.Method)
+			resp := `{
+    "id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+    "name": "asdfasdfasdf",
+    "status": "ACTIVE",
+    "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+    "user_id": "7156c45b82cb4fabba997a90b032c0de",
+    "metadata": {
+        "network_plan": "free_datatransfer",
+        "category": "premium",
+        "os_type": "CentOS-7.0[64-bit-version]"
+    },
+    "hostId": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
+    "flavor": {
+        "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
+        "name": "2c_2g",
+        "ram": 2048,
+        "disk": 0,
+        "swap": "",
+        "OS-FLV-EXT-DATA:ephemeral": 0,
+        "OS-FLV-DISABLED:disabled": false,
+        "vcpus": 2,
+        "os-flavor-access:is_public": true,
+        "rxtx_factor": 1.0
+    },
+    "created": "2021-01-25T04:36:44Z",
+    "updated": "2021-01-25T04:37:18Z",
+    "addresses": {
+        "EXT_DIRECTNET_4": [
+            {
+                "version": 4,
+                "addr": "103.56.158.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:be:98:50"
+            }
+        ],
+        "Airflow": [
+            {
+                "version": 4,
+                "addr": "10.23.237.44",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:af:96:6a",
+                "network_name": "Airflow"
+            }
+        ],
+        "priv_vctest_devcs_tung491@vccloud.vn": [
+            {
+                "version": 4,
+                "addr": "10.26.53.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:dd:54:a4",
+                "network_name": "priv_vctest_devcs_tung491@vccloud.vn"
+            }
+        ],
+        "asdfasdf": [
+            {
+                "version": 4,
+                "addr": "10.108.18.48",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:75:63:bc",
+                "network_name": "asdfasdf"
+            }
+        ]
+    },
+    "accessIPv4": "",
+    "accessIPv6": "",
+    "OS-DCF:diskConfig": "MANUAL",
+    "progress": 0,
+    "OS-EXT-AZ:availability_zone": "HN1",
+    "config_drive": "",
+    "key_name": null,
+    "OS-SRV-USG:launched_at": "2021-01-25T04:37:17.000000",
+    "OS-SRV-USG:terminated_at": null,
+    "security_groups": [
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        },
+        {
+            "name": "default"
+        }
+    ],
+    "OS-EXT-STS:task_state": null,
+    "OS-EXT-STS:vm_state": "active",
+    "OS-EXT-STS:power_state": 1,
+    "os-extended-volumes:volumes_attached": [
+        {
+            "id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+            "status": "in-use",
+            "size": 40,
+            "availability_zone": "HN1",
+            "created_at": "2021-01-25T04:35:30.000000",
+            "updated_at": "2021-01-25T04:36:49.000000",
+            "attachments": [
+                {
+                    "id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+                    "attachment_id": "a69f07c1-2455-478a-8d38-f0dcf27af00e",
+                    "volume_id": "b3a1486e-bc9a-4e41-908b-83a3079ba304",
+                    "server_id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+                    "host_name": "thor-compute-016",
+                    "device": "/dev/vda",
+                    "attached_at": "2021-01-25T04:36:49.000000"
+                }
+            ],
+            "name": "asdfasdfasdf_rootdisk",
+            "description": null,
+            "volume_type": "PREMIUM_SSD",
+            "snapshot_id": null,
+            "source_volid": null,
+            "metadata": {
+                "category": "premium"
+            },
+            "user_id": "7156c45b82cb4fabba997a90b032c0de",
+            "bootable": "true",
+            "encrypted": false,
+            "replication_status": null,
+            "consistencygroup_id": null,
+            "multiattach": false,
+            "os-vol-tenant-attr:tenant_id": "ebbed256d9414b0598719c42dc17e837",
+            "volume_image_metadata": {
+                "signature_verified": "False",
+                "image_id": "9a0f31e3-c43d-4fc2-ae1c-cc6ebde571fa",
+                "image_name": "CentOS-7.0[64-bit-version]",
+                "checksum": "07d74cc43fd0a3b4531673f70a3b686f",
+                "container_format": "bare",
+                "disk_format": "raw",
+                "min_disk": "0",
+                "min_ram": "0",
+                "size": "4194304000"
+            },
+            "attached_type": "rootdisk",
+            "type": "SSD",
+            "category": "premium",
+            "snapshots": []
+        },
+        {
+            "id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+            "status": "in-use",
+            "size": 50,
+            "availability_zone": "HN1",
+            "created_at": "2021-01-25T04:37:34.000000",
+            "updated_at": "2021-01-25T04:37:40.000000",
+            "attachments": [
+                {
+                    "id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+                    "attachment_id": "02ec6bce-7500-46b7-b9b7-8498bca3f72e",
+                    "volume_id": "7878d049-2838-43a7-a5fe-8d867ec33d6b",
+                    "server_id": "04c13e91-ede3-41b8-8824-7d3541f33b5a",
+                    "host_name": "thor-compute-016",
+                    "device": "/dev/vdb",
+                    "attached_at": "2021-01-25T04:37:39.000000"
+                }
+            ],
+            "name": "asdfasdfasdf_datadisk",
+            "description": null,
+            "volume_type": "PREMIUM_SSD",
+            "snapshot_id": null,
+            "source_volid": null,
+            "metadata": {
+                "category": "premium"
+            },
+            "user_id": "7156c45b82cb4fabba997a90b032c0de",
+            "bootable": "false",
+            "encrypted": false,
+            "replication_status": null,
+            "consistencygroup_id": null,
+            "multiattach": false,
+            "os-vol-tenant-attr:tenant_id": "ebbed256d9414b0598719c42dc17e837",
+            "attached_type": "datadisk",
+            "type": "SSD",
+            "category": "premium",
+            "snapshots": []
+        }
+    ],
+    "locked": false,
+    "category": "premium",
+    "ip_addresses": {
+        "LAN": [
+            {
+                "version": 4,
+                "addr": "10.23.237.44",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:af:96:6a",
+                "network_name": "Airflow"
+            },
+            {
+                "version": 4,
+                "addr": "10.26.53.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:dd:54:a4",
+                "network_name": "priv_vctest_devcs_tung491@vccloud.vn"
+            }
+        ],
+        "WAN_V4": [
+            {
+                "version": 4,
+                "addr": "103.56.158.174",
+                "OS-EXT-IPS:type": "fixed",
+                "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:be:98:50"
+            }
+        ],
+        "WAN_V6": []
+    },
+    "zone_name": "HN1",
+    "region_name": "HaNoi",
+    "autoscale_service": {},
+    "ipv6": false,
+    "network_plan": "free_datatransfer",
+    "flavor_name": "2c_2g"
+}
+`
+			_, _ = fmt.Fprint(writer, resp)
+		})
+	server, err := client.Server.RemoveVPC(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
+	require.NoError(t, err)
+	assert.Len(t, server.IPAddresses.LanAddresses, 2)
+}
