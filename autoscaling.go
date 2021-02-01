@@ -230,20 +230,55 @@ type DeleteionPolicyHooks struct {
 	Verify  *bool                   `json:"verify"`
 }
 
-// PolicyCreateRequest represents payload use create a  policy
-type PolicyCreateRequest struct {
-	CoolDown              int                  `json:"cooldown,omitempty"`
-	Event                 string               `json:"event,omitempty"`
-	MetricType            string               `json:"metric,omitempty"`
-	RangeTime             int                  `json:"range_time,omitempty"`
-	ScaleSize             int                  `json:"number,omitempty"`
-	Threshold             int                  `json:"threshold,omitempty"`
-	Type                  string               `json:"policy_type,omitempty"`
+// LoadBalancerScalingPolicy represents payload load balancers in LoadBalancersPolicyCreateRequest/Update
+type LoadBalancerScalingPolicy struct {
+	ID         string `json:"load_balancer_id"`
+	Name       string `json:"load_balancer_name,omitempty"`
+	TargetID   string `json:"target_id"`
+	TargetName string `json:"target_name,omitempty"`
+	TargetType string `json:"target_type"`
+}
+
+// LoadBalancersPolicyCreateRequest represents payload in create a load balancer policy
+type LoadBalancersPolicyCreateRequest struct {
+	CoolDown      int                       `json:"cooldown,omitempty"`
+	Event         string                    `json:"event,omitempty"`
+	LoadBalancers LoadBalancerScalingPolicy `json:"load_balancers,omitempty"`
+	MetricType    string                    `json:"metric,omitempty"`
+	RangeTime     int                       `json:"range_time,omitempty"`
+	ScaleSize     int                       `json:"number,omitempty"`
+	Threshold     int                       `json:"threshold,omitempty"`
+}
+
+// LoadBalancersPolicyUpdateRequest represents payload in create a load balancer policy
+type LoadBalancersPolicyUpdateRequest struct {
+	CoolDown      int                       `json:"cooldown,omitempty"`
+	Event         string                    `json:"event,omitempty"`
+	LoadBalancers LoadBalancerScalingPolicy `json:"load_balancers,omitempty"`
+	MetricType    string                    `json:"metric,omitempty"`
+	RangeTime     int                       `json:"range_time,omitempty"`
+	ScaleSize     int                       `json:"number,omitempty"`
+	Threshold     int                       `json:"threshold,omitempty"`
+}
+
+// HooksPolicyCreateRequest represents payload use create a deletion policy
+type HooksPolicyCreateRequest struct {
 	Criteria              string               `json:"criteria,omitempty"`
 	DestroyAfterDeletion  bool                 `json:"destroy_after_deletion,omitempty"`
 	GracePeriod           int                  `json:"grace_period,omitempty"`
-	ReduceDesiredCapacity bool                 `json:"reduce_desired_capacity,omitempty"`
 	Hooks                 DeleteionPolicyHooks `json:"hooks,omitempty"`
+	ReduceDesiredCapacity bool                 `json:"reduce_desired_capacity,omitempty"`
+	Type                  string               `json:"policy_type"`
+}
+
+// PolicyCreateRequest represents payload use create a  policy
+type PolicyCreateRequest struct {
+	CoolDown   int    `json:"cooldown,omitempty"`
+	Event      string `json:"event,omitempty"`
+	MetricType string `json:"metric,omitempty"`
+	RangeTime  int    `json:"range_time,omitempty"`
+	ScaleSize  int    `json:"number,omitempty"`
+	Threshold  int    `json:"threshold,omitempty"`
 }
 
 // PolicyUpdateRequest represents payload use update a  policy
@@ -860,6 +895,25 @@ func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*Auto
 	return data, nil
 }
 
+func (p *policy) Get(ctx context.Context, clusterID, PolicyID string) (*ScalePolicyInformation, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, p.itemPath(clusterID, PolicyID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &ScalePolicyInformation{}
+
+	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 //  Delete
 func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error {
 	req, err := asg.client.NewRequest(ctx, http.MethodDelete, autoScalingServiceName, asg.itemPath(clusterID), nil)
@@ -999,6 +1053,44 @@ func (p *policy) Create(ctx context.Context, clusterID string, pcr *PolicyCreate
 	return data, nil
 }
 
+func (p *policy) CreateHooks(ctx context.Context, clusterID string, hpcr *HooksPolicyCreateRequest) (*TaskResponses, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, p.resourcePath(clusterID), &hpcr)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &TaskResponses{}
+
+	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (p *policy) CreateLoadBalancers(ctx context.Context, clusterID string, lbpcr *LoadBalancersPolicyCreateRequest) (*TaskResponses, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, p.resourcePath(clusterID), &lbpcr)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &TaskResponses{}
+
+	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 func (s *schedule) Create(ctx context.Context, clusterID string, asscr *AutoScalingSchdeuleCreateRequest) (*TaskResponses, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, s.resourcePath(clusterID), &asscr)
 	if err != nil {
@@ -1035,6 +1127,25 @@ func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur 
 	}
 
 	data := &AutoScalingGroup{}
+
+	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (p *policy) UpdateLoadBalancers(ctx context.Context, clusterID, PolicyID string, lbpur *LoadBalancersPolicyUpdateRequest) (*TaskResponses, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, p.itemPath(clusterID, PolicyID), &lbpur)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	data := &TaskResponses{}
 
 	if err := json.NewDecoder(resp.Body).Decode(data); err != nil {
 		return nil, err
