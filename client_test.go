@@ -63,6 +63,12 @@ func setup() {
 			Region:        testRegion,
 		},
 		{
+			Name:          "Accounts",
+			CanonicalName: accountName,
+			ServiceUrl:    serverTest.URL + "/api/account",
+			Region:        testRegion,
+		},
+		{
 			Name:          "Auth",
 			CanonicalName: authServiceName,
 			ServiceUrl:    serverTest.URL + "/api",

@@ -20,6 +20,10 @@ func AuthURL(path string) string {
 	return "/api" + path
 }
 
+func AccountURL(path string) string {
+	return "/api/account" + path
+}
+
 func K8sURL(path string) string {
 	return "/api/kubernetes-engine" + path
 }
@@ -38,4 +42,8 @@ func UserURL(path string) string {
 
 func DNSURL(path string) string {
 	return "/api/dns" + path
+}
+
+func VPCURL(path string) string {
+	return "/api/vpc-networks" + path
 }
