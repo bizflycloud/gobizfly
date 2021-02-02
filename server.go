@@ -117,6 +117,8 @@ type ServerService interface {
 	ListOSImages(ctx context.Context) ([]osImageResponse, error)
 	GetTask(ctx context.Context, id string) (*ServerTaskResponse, error)
 	ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error)
+	AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
+	RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -132,12 +134,13 @@ type ServerMessageResponse struct {
 
 // ServerAction represents server action request payload.
 type ServerAction struct {
-	Action      string   `json:"action"`
-	ImageID     string   `json:"image,omitempty"`
-	FlavorName  string   `json:"flavor_name,omitempty"`
-	ConsoleType string   `json:"type,omitempty"`
-	FirewallIDs []string `json:"firewall_ids,omitempty"`
-	NewType     string   `json:"new_type,omitempty"`
+	Action        string   `json:"action"`
+	ImageID       string   `json:"image,omitempty"`
+	FlavorName    string   `json:"flavor_name,omitempty"`
+	ConsoleType   string   `json:"type,omitempty"`
+	FirewallIDs   []string `json:"firewall_ids,omitempty"`
+	NewType       string   `json:"new_type,omitempty"`
+	VPCNetworkIDs []string `json:"vpc_network_ids,omitempty"`
 }
 
 // ServerTask contains task information.
@@ -359,6 +362,8 @@ func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageRespo
 	return smr, nil
 }
 
+// AddVPC add VPC to the server
+
 // Rebuild rebuilds a server.
 func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error) {
 	var payload = &ServerAction{
@@ -511,4 +516,46 @@ func (s server) ChangeCategory(ctx context.Context, id string, newCategory strin
 		return nil, err
 	}
 	return svt, nil
+}
+
+func (s server) AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
+	payload := &ServerAction{
+		Action:        "add_vpc",
+		VPCNetworkIDs: vpcs,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var server *Server
+	if err := json.NewDecoder(resp.Body).Decode(&server); err != nil {
+		return nil, err
+	}
+	return server, nil
+}
+
+func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
+	payload := &ServerAction{
+		Action:        "remove_vpc",
+		VPCNetworkIDs: vpcs,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var server *Server
+	if err := json.NewDecoder(resp.Body).Decode(&server); err != nil {
+		return nil, err
+	}
+	return server, nil
 }
