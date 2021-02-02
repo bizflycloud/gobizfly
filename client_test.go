@@ -92,12 +92,6 @@ func setup() {
 			ServiceUrl:    serverTest.URL + "/api/dns",
 			Region:        testRegion,
 		},
-		{
-			Name:          "VPC",
-			CanonicalName: vpcName,
-			ServiceUrl:    serverTest.URL + "/api/vpc-networks",
-			Region:        testRegion,
-		},
 	}
 	client.services = services
 	if err != nil {

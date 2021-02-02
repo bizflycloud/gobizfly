@@ -113,7 +113,7 @@ func (v vpcService) itemPath(id string) string {
 }
 
 func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodGet, vpcName, v.resourcePath(), nil)
+	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
 }
 
 func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodGet, vpcName, v.itemPath(vpcID), nil)
+	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.itemPath(vpcID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 }
 
 func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *updateVPCPayload) (*VPC, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodPut, vpcName, v.itemPath(vpcID), uvpl)
+	req, err := v.client.NewRequest(ctx, http.MethodPut, serverServiceName, v.itemPath(vpcID), uvpl)
 	if err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *updateVPCPay
 }
 
 func (v vpcService) Create(ctx context.Context, cvpl *createVPCPayload) (*VPC, error) {
-	req, err := v.client.NewRequest(ctx, http.MethodPost, vpcName, v.resourcePath(), cvpl)
+	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.resourcePath(), cvpl)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *createVPCPayload) (*VPC, e
 }
 
 func (v vpcService) Delete(ctx context.Context, vpcID string) error {
-	req, err := v.client.NewRequest(ctx, http.MethodDelete, vpcName, v.itemPath(vpcID), nil)
+	req, err := v.client.NewRequest(ctx, http.MethodDelete, serverServiceName, v.itemPath(vpcID), nil)
 	if err != nil {
 		return err
 	}

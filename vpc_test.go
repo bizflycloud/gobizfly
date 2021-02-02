@@ -30,7 +30,7 @@ import (
 func TestVPCList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.VPCURL(vpcPath), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(vpcPath), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		resp := `[
     {
@@ -294,7 +294,7 @@ func TestVPCList(t *testing.T) {
 func TestVPCCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.VPCURL(vpcPath), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(vpcPath), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var payload *createVPCPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
@@ -390,7 +390,7 @@ func TestVPCGet(t *testing.T) {
 	setup()
 	defer teardown()
 	var v vpcService
-	mux.HandleFunc(testlib.VPCURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
+	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
 			resp := `
@@ -482,7 +482,7 @@ func TestVPCUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 	var v vpcService
-	mux.HandleFunc(testlib.VPCURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
+	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
 			var payload *updateVPCPayload
@@ -579,7 +579,7 @@ func TestVPCDelete(t *testing.T) {
 	setup()
 	defer teardown()
 	var v vpcService
-	mux.HandleFunc(testlib.VPCURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
+	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
