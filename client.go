@@ -44,7 +44,6 @@ const (
 	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
 	dnsName                 = "dns"
-	d
 )
 
 var (
