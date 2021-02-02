@@ -37,8 +37,8 @@ type vpcService struct {
 type VPCService interface {
 	List(ctx context.Context) ([]*VPC, error)
 	Get(ctx context.Context, vpcID string) (*VPC, error)
-	Update(ctx context.Context, vpcID string, uvpl *updateVPCPayload) (*VPC, error)
-	Create(ctx context.Context, cvpl *createVPCPayload) (*VPC, error)
+	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error)
+	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error)
 	Delete(ctx context.Context, vpcID string) error
 }
 
@@ -90,14 +90,14 @@ type Subnet struct {
 	ProjectID       string              `json:"project_id"`
 }
 
-type createVPCPayload struct {
+type CreateVPCPayload struct {
 	Name        string `json:"name"`
 	CIDR        string `json:"cidr,omitempty"`
 	Description string `json:"description,omitempty"`
 	IsDefault   bool   `json:"is_default,omitempty"`
 }
 
-type updateVPCPayload struct {
+type UpdateVPCPayload struct {
 	Name        string `json:"name,omitempty"`
 	Description string `json:"description,omitempty"`
 	CIDR        string `json:"cidr,omitempty"`
@@ -148,7 +148,7 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 	return data.Network, nil
 }
 
-func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *updateVPCPayload) (*VPC, error) {
+func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPut, serverServiceName, v.itemPath(vpcID), uvpl)
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *updateVPCPay
 	return data.Network, nil
 }
 
-func (v vpcService) Create(ctx context.Context, cvpl *createVPCPayload) (*VPC, error) {
+func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.resourcePath(), cvpl)
 	if err != nil {
 		return nil, err
