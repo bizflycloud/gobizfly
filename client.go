@@ -43,6 +43,7 @@ const (
 	kubernetesServiceName   = "kubernetes_engine"
 	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
+	dnsName                 = "dns"
 )
 
 var (
@@ -67,6 +68,7 @@ type Client struct {
 	KubernetesEngine  KubernetesEngineService
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
+	DNS               DNSService
 
 	Snapshot SnapshotService
 
@@ -182,6 +184,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.CDN = &cdnService{client: c}
+	c.DNS = &dnsService{client: c}
 	return c, nil
 }
 
