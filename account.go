@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	regionsPath = "/regions"
+	regionsPath   = "/regions"
+	usersInfoPath = "/users/info"
 )
 
 type accountService struct {
@@ -20,6 +21,7 @@ var _ AccountService = (*accountService)(nil)
 type AccountService interface {
 	ListRegion(ctx context.Context) (*Regions, error)
 	GetRegion(ctx context.Context, regionName string) (*Region, error)
+	GetUserInfo(ctx context.Context) (*User, error)
 }
 
 type Region struct {
@@ -45,8 +47,67 @@ type Regions struct {
 	HCM Region `json:"HCM"`
 }
 
-func (a accountService) resourcePath() string {
+type User struct {
+	Service           string             `json:"service"`
+	URLType           string             `json:"url_type"`
+	Origin            string             `json:"origin"`
+	ClientType        string             `json:"client_type"`
+	BillingBalance    int                `json:"billing_balance"`
+	Balances          map[string]float32 `json:"balances"`
+	PaymentMethod     string             `json:"payment_method"`
+	BillingAccID      string             `json:"billing_acc_id"`
+	Debit             bool               `json:"debit"`
+	Email             string             `json:"email"`
+	Phone             string             `json:"phone"`
+	FullName          string             `json:"full_name"`
+	VerifiedEmail     bool               `json:"verified_email"`
+	VerifiedPhone     bool               `json:"verified_phone"`
+	LoginAlert        bool               `json:"login_alert"`
+	VerifiedPayment   bool               `json:"verified_payment"`
+	LastRegion        string             `json:"last_region"`
+	LastProject       string             `json:"last_project"`
+	Type              string             `json:"type"`
+	OTP               bool               `json:"otp"`
+	Services          []Service          `json:"services"`
+	Whitelist         []string           `json:"whitelist"`
+	Expires           string             `json:"expires"`
+	TenantID          string             `json:"tenant_id"`
+	TenantName        string             `json:"tenant_name"`
+	KsUserID          string             `json:"ks_user_id"`
+	IAM               IAM                `json:"iam"`
+	Domains           []string           `json:"domains"`
+	PaymentType       string             `json:"payment_type"`
+	DOB               string             `json:"dob"`
+	Gender            string             `json:"_gender"`
+	Trial             Trial              `json:"trial"`
+	HasExpiredInvoice bool               `json:"has_expired_invoice"`
+	NegativeBalance   bool               `json:"negative_balance"`
+	Promotion         []string           `json:"promotion"`
+}
+
+type IAM struct {
+	Expire          string `json:"expire"`
+	TenantID        string `json:"tenant_id"`
+	TenantName      string `json:"tenant_name"`
+	VerifiedPhone   bool   `json:"verified_phone"`
+	VerifiedEmail   bool   `json:"verified_email"`
+	VerifiedPayment bool   `json:"verified_payment"`
+}
+
+type Trial struct {
+	StartedAt    string `json:"started_at"`
+	ExpiredAt    string `json:"expired_at"`
+	Active       bool   `json:"active"`
+	Enable       bool   `json:"enable"`
+	ServiceLevel int    `json:"service_level"`
+}
+
+func (a accountService) resourceRegionPath() string {
 	return regionsPath
+}
+
+func (a accountService) resourceUserInfo() string {
+	return usersInfoPath
 }
 
 func (a accountService) itemPath(name string) string {
@@ -54,7 +115,7 @@ func (a accountService) itemPath(name string) string {
 }
 
 func (a accountService) ListRegion(ctx context.Context) (*Regions, error) {
-	req, err := a.client.NewRequest(ctx, http.MethodGet, accountName, a.resourcePath(), nil)
+	req, err := a.client.NewRequest(ctx, http.MethodGet, accountName, a.resourceRegionPath(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +146,21 @@ func (a accountService) GetRegion(ctx context.Context, regionName string) (*Regi
 		return nil, err
 	}
 	return region, nil
+}
+
+func (a accountService) GetUserInfo(ctx context.Context) (*User, error) {
+	req, err := a.client.NewRequest(ctx, http.MethodGet, accountName, a.resourceUserInfo(), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := a.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var user *User
+	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }

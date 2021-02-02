@@ -70,7 +70,6 @@ type Client struct {
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
 	DNS               DNSService
-	User              UserService
 	Account           AccountService
 	VPC               VPCService
 
@@ -189,7 +188,6 @@ func NewClient(options ...Option) (*Client, error) {
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.CDN = &cdnService{client: c}
 	c.DNS = &dnsService{client: c}
-	c.User = &userService{client: c}
 	c.Account = &accountService{client: c}
 	c.VPC = &vpcService{client: c}
 	return c, nil
