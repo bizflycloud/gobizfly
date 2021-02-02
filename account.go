@@ -25,16 +25,16 @@ type AccountService interface {
 }
 
 type Region struct {
-	Active     bool          `json:"active"`
-	Icon       string        `json:"icon"`
-	Name       string        `json:"name"`
-	Order      int           `json:"order"`
-	RegionName string        `json:"region_name"`
-	ShortName  string        `json:"short_name"`
-	Zones      []AccountZone `json:"zones"`
+	Active     bool               `json:"active"`
+	Icon       string             `json:"icon"`
+	Name       string             `json:"name"`
+	Order      int                `json:"order"`
+	RegionName string             `json:"region_name"`
+	ShortName  string             `json:"short_name"`
+	Zones      []AvailabilityZone `json:"zones"`
 }
 
-type AccountZone struct {
+type AvailabilityZone struct {
 	Active    bool   `json:"active"`
 	Icon      string `json:"icon"`
 	Name      string `json:"name"`
