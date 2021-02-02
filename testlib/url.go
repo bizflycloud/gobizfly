@@ -39,3 +39,7 @@ func CDNURL(path string) string {
 func DNSURL(path string) string {
 	return "/api/dns" + path
 }
+
+func VPCURL(path string) string {
+	return "/api/vpc-networks" + path
+}
