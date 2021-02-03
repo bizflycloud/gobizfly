@@ -34,29 +34,29 @@ func TestVPCList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		resp := `[
     {
-        "id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
-        "name": "asdfasdf",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+        "id": "41f40298-8d05-4889-9672-f03cfccd719f",
+        "name": "vxsCFZ",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
         "admin_state_up": true,
         "mtu": 1500,
         "status": "ACTIVE",
         "subnets": [
             {
-                "id": "cf24149a-8ba9-4445-84a9-99b27258cf23",
-                "name": "asdfasdf",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
+                "id": "d05bbc5d-8933-4dcf-af98-f0d20179f471",
+                "name": "vxsCFZ",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "41f40298-8d05-4889-9672-f03cfccd719f",
                 "ip_version": 4,
                 "subnetpool_id": null,
                 "enable_dhcp": true,
                 "ipv6_ra_mode": null,
                 "ipv6_address_mode": null,
                 "gateway_ip": null,
-                "cidr": "10.108.16.0/20",
+                "cidr": "10.21.148.0/24",
                 "allocation_pools": [
                     {
-                        "start": "10.108.16.1",
-                        "end": "10.108.31.254"
+                        "start": "10.21.148.1",
+                        "end": "10.21.148.254"
                     }
                 ],
                 "host_routes": [],
@@ -67,73 +67,10 @@ func TestVPCList(t *testing.T) {
                 "description": "",
                 "service_types": [],
                 "tags": [],
-                "created_at": "2021-01-28T02:50:50Z",
-                "updated_at": "2021-01-28T02:50:50Z",
+                "created_at": "2021-02-03T06:59:41Z",
+                "updated_at": "2021-02-03T06:59:41Z",
                 "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
-            }
-        ],
-        "shared": false,
-        "availability_zone_hints": [
-            "HN1",
-            "HN2"
-        ],
-        "availability_zones": [
-            "HN1"
-        ],
-        "ipv4_address_scope": null,
-        "ipv6_address_scope": null,
-        "router:external": false,
-        "description": "asdf",
-        "port_security_enabled": true,
-        "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-        "tags": [
-            "default-vpc-network"
-        ],
-        "created_at": "2021-01-28T02:50:49Z",
-        "updated_at": "2021-01-28T02:56:35Z",
-        "revision_number": 5,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
-        "is_default": true
-    },
-    {
-        "id": "54d26e73-89ea-4e46-ab82-c14d4692d8b2",
-        "name": "Airflow",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-        "admin_state_up": true,
-        "mtu": 1500,
-        "status": "ACTIVE",
-        "subnets": [
-            {
-                "id": "b4af9e10-e1cf-4ba1-bf11-98ce46440607",
-                "name": "Airflow",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "54d26e73-89ea-4e46-ab82-c14d4692d8b2",
-                "ip_version": 4,
-                "subnetpool_id": null,
-                "enable_dhcp": true,
-                "ipv6_ra_mode": null,
-                "ipv6_address_mode": null,
-                "gateway_ip": null,
-                "cidr": "10.23.237.0/24",
-                "allocation_pools": [
-                    {
-                        "start": "10.23.237.1",
-                        "end": "10.23.237.254"
-                    }
-                ],
-                "host_routes": [],
-                "dns_nameservers": [
-                    "103.92.35.110",
-                    "208.67.222.222"
-                ],
-                "description": "",
-                "service_types": [],
-                "tags": [],
-                "created_at": "2021-01-20T09:07:29Z",
-                "updated_at": "2021-01-20T09:07:29Z",
-                "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
             }
         ],
         "shared": false,
@@ -151,97 +88,36 @@ func TestVPCList(t *testing.T) {
         "port_security_enabled": true,
         "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
         "tags": [],
-        "created_at": "2021-01-20T09:07:24Z",
-        "updated_at": "2021-01-28T02:23:41Z",
-        "revision_number": 5,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
-        "is_default": false
-    },
-    {
-        "id": "7262bf39-14b1-4f06-aae6-2e62944bb124",
-        "name": "test_vpc",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-        "admin_state_up": true,
-        "mtu": 1500,
-        "status": "ACTIVE",
-        "subnets": [
-            {
-                "id": "1bedd484-0ef0-4097-aaee-a07163b0cfd5",
-                "name": "test_vpc",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "7262bf39-14b1-4f06-aae6-2e62944bb124",
-                "ip_version": 4,
-                "subnetpool_id": null,
-                "enable_dhcp": true,
-                "ipv6_ra_mode": null,
-                "ipv6_address_mode": null,
-                "gateway_ip": null,
-                "cidr": "10.108.16.0/20",
-                "allocation_pools": [
-                    {
-                        "start": "10.108.16.1",
-                        "end": "10.108.31.254"
-                    }
-                ],
-                "host_routes": [],
-                "dns_nameservers": [
-                    "103.92.35.110",
-                    "208.67.222.222"
-                ],
-                "description": "",
-                "service_types": [],
-                "tags": [],
-                "created_at": "2021-01-28T02:32:12Z",
-                "updated_at": "2021-01-28T02:32:12Z",
-                "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
-            }
-        ],
-        "shared": false,
-        "availability_zone_hints": [
-            "HN1",
-            "HN2"
-        ],
-        "availability_zones": [
-            "HN2"
-        ],
-        "ipv4_address_scope": null,
-        "ipv6_address_scope": null,
-        "router:external": false,
-        "description": "asdf",
-        "port_security_enabled": true,
-        "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-        "tags": [],
-        "created_at": "2021-01-28T02:32:11Z",
-        "updated_at": "2021-01-28T02:32:12Z",
+        "created_at": "2021-02-03T06:59:35Z",
+        "updated_at": "2021-02-03T06:59:41Z",
         "revision_number": 2,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
         "is_default": false
     },
     {
-        "id": "79423750-628d-481b-b3bd-c34065c40585",
-        "name": "priv_vctest_devcs_tung491@vccloud.vn",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+        "id": "b5b52090-3ca0-4954-8300-a0ea998f5ab7",
+        "name": "Airflow",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
         "admin_state_up": true,
         "mtu": 1500,
         "status": "ACTIVE",
         "subnets": [
             {
-                "id": "c908f63c-ede7-4eb7-90f3-f8b3d2c976ec",
-                "name": "priv_subnet_vctest_devcs_tung491@vccloud.vn",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "79423750-628d-481b-b3bd-c34065c40585",
+                "id": "a62ae59e-8efa-4d46-9d37-a87bef6de3f0",
+                "name": "Airflow",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "b5b52090-3ca0-4954-8300-a0ea998f5ab7",
                 "ip_version": 4,
                 "subnetpool_id": null,
                 "enable_dhcp": true,
                 "ipv6_ra_mode": null,
                 "ipv6_address_mode": null,
                 "gateway_ip": null,
-                "cidr": "10.26.53.0/24",
+                "cidr": "10.26.86.0/24",
                 "allocation_pools": [
                     {
-                        "start": "10.26.53.1",
-                        "end": "10.26.53.254"
+                        "start": "10.26.86.1",
+                        "end": "10.26.86.254"
                     }
                 ],
                 "host_routes": [],
@@ -252,10 +128,10 @@ func TestVPCList(t *testing.T) {
                 "description": "",
                 "service_types": [],
                 "tags": [],
-                "created_at": "2021-01-09T03:10:46Z",
-                "updated_at": "2021-01-09T03:10:46Z",
+                "created_at": "2021-01-20T14:28:24Z",
+                "updated_at": "2021-01-20T14:28:24Z",
                 "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
             }
         ],
         "shared": false,
@@ -272,14 +148,134 @@ func TestVPCList(t *testing.T) {
         "description": "",
         "port_security_enabled": true,
         "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-        "tags": [
-            "default-vpc-network"
+        "tags": [],
+        "created_at": "2021-01-20T14:28:19Z",
+        "updated_at": "2021-01-20T14:28:24Z",
+        "revision_number": 2,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
+        "is_default": false
+    },
+    {
+        "id": "bc65f5ae-59a5-4405-80a5-a23aa08194bb",
+        "name": "priv_svtt.tungds@vccloud.vn",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+        "admin_state_up": true,
+        "mtu": 1500,
+        "status": "ACTIVE",
+        "subnets": [
+            {
+                "id": "75532b4a-6f84-414f-aa64-bf635d449589",
+                "name": "priv_subnet_svtt.tungds@vccloud.vn",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "bc65f5ae-59a5-4405-80a5-a23aa08194bb",
+                "ip_version": 4,
+                "subnetpool_id": null,
+                "enable_dhcp": true,
+                "ipv6_ra_mode": null,
+                "ipv6_address_mode": null,
+                "gateway_ip": null,
+                "cidr": "10.26.118.0/24",
+                "allocation_pools": [
+                    {
+                        "start": "10.26.118.1",
+                        "end": "10.26.118.254"
+                    }
+                ],
+                "host_routes": [],
+                "dns_nameservers": [
+                    "123.31.11.89",
+                    "208.67.222.222"
+                ],
+                "description": "",
+                "service_types": [],
+                "tags": [],
+                "created_at": "2020-10-05T03:08:04Z",
+                "updated_at": "2020-10-05T03:08:04Z",
+                "revision_number": 0,
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
+            }
         ],
-        "created_at": "2021-01-09T03:10:38Z",
-        "updated_at": "2021-01-29T02:34:09Z",
-        "revision_number": 8,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
-        "is_default": true
+        "shared": false,
+        "availability_zone_hints": [
+            "HN1",
+            "HN2"
+        ],
+        "availability_zones": [
+            "HN1"
+        ],
+        "ipv4_address_scope": null,
+        "ipv6_address_scope": null,
+        "router:external": false,
+        "description": "",
+        "port_security_enabled": true,
+        "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
+        "tags": [],
+        "created_at": "2020-10-05T03:07:58Z",
+        "updated_at": "2021-02-03T06:53:07Z",
+        "revision_number": 6,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
+        "is_default": false
+    },
+    {
+        "id": "d9b58855-f44e-4958-9e18-624efe0ebc07",
+        "name": "kdsfasfd",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+        "admin_state_up": true,
+        "mtu": 1500,
+        "status": "ACTIVE",
+        "subnets": [
+            {
+                "id": "bfb5cbf3-c26e-406e-a3a4-94735bf5ff8d",
+                "name": "kdsfasfd",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "d9b58855-f44e-4958-9e18-624efe0ebc07",
+                "ip_version": 4,
+                "subnetpool_id": null,
+                "enable_dhcp": true,
+                "ipv6_ra_mode": null,
+                "ipv6_address_mode": null,
+                "gateway_ip": null,
+                "cidr": "10.26.200.0/24",
+                "allocation_pools": [
+                    {
+                        "start": "10.26.200.1",
+                        "end": "10.26.200.254"
+                    }
+                ],
+                "host_routes": [],
+                "dns_nameservers": [
+                    "103.92.35.110",
+                    "208.67.222.222"
+                ],
+                "description": "",
+                "service_types": [],
+                "tags": [],
+                "created_at": "2021-02-02T04:33:06Z",
+                "updated_at": "2021-02-02T04:33:06Z",
+                "revision_number": 0,
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
+            }
+        ],
+        "shared": false,
+        "availability_zone_hints": [
+            "HN1",
+            "HN2"
+        ],
+        "availability_zones": [
+            "HN1"
+        ],
+        "ipv4_address_scope": null,
+        "ipv6_address_scope": null,
+        "router:external": false,
+        "description": "",
+        "port_security_enabled": true,
+        "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
+        "tags": [],
+        "created_at": "2021-02-02T04:33:01Z",
+        "updated_at": "2021-02-02T04:33:06Z",
+        "revision_number": 2,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
+        "is_default": false
     }
 ]
 `
@@ -344,35 +340,35 @@ func TestVPCGet(t *testing.T) {
 	setup()
 	defer teardown()
 	var v vpcService
-	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
+	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("41f40298-8d05-4889-9672-f03cfccd719f")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
 			resp := `
 {
     "network": {
-        "id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
-        "name": "asdfasdf",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+        "id": "41f40298-8d05-4889-9672-f03cfccd719f",
+        "name": "test1",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
         "admin_state_up": true,
         "mtu": 1500,
         "status": "ACTIVE",
         "subnets": [
             {
-                "id": "cf24149a-8ba9-4445-84a9-99b27258cf23",
-                "name": "asdfasdf",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
+                "id": "d05bbc5d-8933-4dcf-af98-f0d20179f471",
+                "name": "vxsCFZ",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "41f40298-8d05-4889-9672-f03cfccd719f",
                 "ip_version": 4,
                 "subnetpool_id": null,
                 "enable_dhcp": true,
                 "ipv6_ra_mode": null,
                 "ipv6_address_mode": null,
                 "gateway_ip": null,
-                "cidr": "10.108.16.0/20",
+                "cidr": "10.21.148.0/24",
                 "allocation_pools": [
                     {
-                        "start": "10.108.16.1",
-                        "end": "10.108.31.254"
+                        "start": "10.21.148.1",
+                        "end": "10.21.148.254"
                     }
                 ],
                 "host_routes": [],
@@ -383,10 +379,10 @@ func TestVPCGet(t *testing.T) {
                 "description": "",
                 "service_types": [],
                 "tags": [],
-                "created_at": "2021-01-28T02:50:50Z",
-                "updated_at": "2021-01-28T02:50:50Z",
+                "created_at": "2021-02-03T06:59:41Z",
+                "updated_at": "2021-02-03T06:59:41Z",
                 "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
             }
         ],
         "shared": false,
@@ -400,36 +396,34 @@ func TestVPCGet(t *testing.T) {
         "ipv4_address_scope": null,
         "ipv6_address_scope": null,
         "router:external": false,
-        "description": "asdf",
+        "description": "",
         "port_security_enabled": true,
         "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-        "tags": [
-            "default-vpc-network"
-        ],
-        "created_at": "2021-01-28T02:50:49Z",
-        "updated_at": "2021-01-28T02:56:35Z",
-        "revision_number": 5,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
+        "tags": [],
+        "created_at": "2021-02-03T06:59:35Z",
+        "updated_at": "2021-02-03T07:28:06Z",
+        "revision_number": 4,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
         "ip_availability": [
             {
-                "subnet_id": "cf24149a-8ba9-4445-84a9-99b27258cf23",
+                "subnet_id": "d05bbc5d-8933-4dcf-af98-f0d20179f471",
                 "ip_version": 4,
-                "cidr": "10.108.16.0/20",
-                "subnet_name": "asdfasdf",
+                "cidr": "10.21.148.0/24",
+                "subnet_name": "vxsCFZ",
                 "used_ips": 2,
-                "total_ips": 4094
+                "total_ips": 254
             }
         ],
         "ports": [],
-        "is_default": true
+        "is_default": false
     }
 }
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.VPC.Get(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50")
+	vpc, err := client.VPC.Get(ctx, "41f40298-8d05-4889-9672-f03cfccd719f")
 	require.NoError(t, err)
-	assert.Equal(t, "2021-01-28T02:50:49Z", vpc.CreatedAt)
+	assert.Equal(t, "2021-02-03T06:59:35Z", vpc.CreatedAt)
 }
 
 func TestVPCUpdate(t *testing.T) {

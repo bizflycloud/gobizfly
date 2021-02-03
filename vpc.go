@@ -35,9 +35,9 @@ type vpcService struct {
 }
 
 type VPCService interface {
-	List(ctx context.Context) ([]*VPC, error)
-	Get(ctx context.Context, vpcID string) (*VPC, error)
-	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error)
+	List(ctx context.Context) ([]*ExtendedVPC, error)
+	Get(ctx context.Context, vpcID string) (*ExtendedVPC, error)
+	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*ExtendedVPC, error)
 	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error)
 	Delete(ctx context.Context, vpcID string) error
 }
@@ -49,7 +49,7 @@ type VPC struct {
 	AdminStateUp          bool     `json:"admin_state_up"`
 	MTU                   int      `json:"mtu"`
 	Status                string   `json:"status"`
-	Subnets               []Subnet `json:"subnets"`
+	Subnets               []string `json:"subnets"`
 	Shared                bool     `json:"shared"`
 	AvailabilityZoneHints []string `json:"availability_zone_hints"`
 	AvailabilityZones     []string `json:"availability_zones"`
@@ -64,6 +64,11 @@ type VPC struct {
 	UpdatedAt             string   `json:"updated_at"`
 	RevisionNumber        int      `json:"revision_number"`
 	IsDefault             bool     `json:"is_default"`
+}
+
+type ExtendedVPC struct {
+	VPC
+	Subnets []Subnet `json:"subnets"`
 }
 
 type Subnet struct {
@@ -112,12 +117,12 @@ func (v vpcService) itemPath(id string) string {
 	return strings.Join([]string{vpcPath, id}, "/")
 }
 
-func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
+func (v vpcService) List(ctx context.Context) ([]*ExtendedVPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
-	var data []*VPC
+	var data []*ExtendedVPC
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -129,13 +134,13 @@ func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
 	return data, nil
 }
 
-func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
+func (v vpcService) Get(ctx context.Context, vpcID string) (*ExtendedVPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.itemPath(vpcID), nil)
 	if err != nil {
 		return nil, err
 	}
 	var data *struct {
-		Network *VPC `json:"network"`
+		Network *ExtendedVPC `json:"network"`
 	}
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
@@ -148,13 +153,13 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 	return data.Network, nil
 }
 
-func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error) {
+func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*ExtendedVPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPut, serverServiceName, v.itemPath(vpcID), uvpl)
 	if err != nil {
 		return nil, err
 	}
 	var data *struct {
-		Network *VPC `json:"network"`
+		Network *ExtendedVPC `json:"network"`
 	}
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
