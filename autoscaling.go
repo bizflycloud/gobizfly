@@ -386,27 +386,27 @@ type AutoScalingOperatingSystem struct {
 // AutoScalingNetworks - is represents for relationship between network and firewalls
 type AutoScalingNetworks struct {
 	ID             string    `json:"id"`
-	SecurityGroups *[]string `json:"security_groups,omitempty"`
+	SecurityGroups []*string `json:"security_groups,omitempty"`
 }
 
 // LaunchConfiguration - is represents a launch configurations
 type LaunchConfiguration struct {
 	AvailabilityZone string                     `json:"availability_zone"`
 	Created          string                     `json:"created_at,omitempty"`
-	DataDisks        *[]AutoScalingDataDisk     `json:"datadisks,omitempty"`
+	DataDisks        []*AutoScalingDataDisk     `json:"datadisks,omitempty"`
 	Flavor           string                     `json:"flavor"`
-	ID               *string                    `json:"id,omitempty"`
+	ID               string                     `json:"id,omitempty"`
 	Metadata         map[string]interface{}     `json:"metadata"`
 	Name             string                     `json:"name"`
 	NetworkPlan      string                     `json:"network_plan,omitempty"`
-	Networks         *[]AutoScalingNetworks     `json:"networks,omitempty"`
+	Networks         []*AutoScalingNetworks     `json:"networks,omitempty"`
 	OperatingSystem  AutoScalingOperatingSystem `json:"os"`
 	ProfileType      string                     `json:"profile_type,omitempty"`
-	RootDisk         AutoScalingDataDisk        `json:"rootdisk"`
-	SecurityGroups   *[]string                  `json:"security_groups,omitempty"`
+	RootDisk         *AutoScalingDataDisk       `json:"rootdisk"`
+	SecurityGroups   []*string                  `json:"security_groups,omitempty"`
 	SSHKey           string                     `json:"key_name,omitempty"`
 	Status           string                     `json:"status,omitempty"`
-	Type             string                     `json:"type"`
+	Type             string                     `json:"type,omitempty"`
 	UserData         string                     `json:"user_data,omitempty"`
 }
 
