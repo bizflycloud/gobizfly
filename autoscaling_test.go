@@ -193,7 +193,7 @@ func Test_launchConfiguration_List(t *testing.T) {
 	require.NoError(t, err)
 	launchConfig := launchConfigs[0]
 
-	assert.Equal(t, "243f772f-5fb1-4fee-bdf1-70413de1e2d0", *launchConfig.ID)
+	assert.Equal(t, "243f772f-5fb1-4fee-bdf1-70413de1e2d0", launchConfig.ID)
 	assert.Equal(t, "LaunchConfiguration", launchConfig.Name)
 	assert.Equal(t, "nix.2c_2g", launchConfig.Flavor)
 	assert.Equal(t, "HDD", launchConfig.RootDisk.Type)
