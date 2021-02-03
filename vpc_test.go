@@ -430,7 +430,7 @@ func TestVPCUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 	var v vpcService
-	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
+	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("41f40298-8d05-4889-9672-f03cfccd719f")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
 			var payload *UpdateVPCPayload
@@ -438,44 +438,14 @@ func TestVPCUpdate(t *testing.T) {
 			assert.Equal(t, "test_update", payload.Name)
 			resp := `{
     "network": {
-        "id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
-        "name": "test_update",
-        "tenant_id": "ebbed256d9414b0598719c42dc17e837",
+        "id": "41f40298-8d05-4889-9672-f03cfccd719f",
+        "name": "testaa",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
         "admin_state_up": true,
         "mtu": 1500,
         "status": "ACTIVE",
         "subnets": [
-            {
-                "id": "cf24149a-8ba9-4445-84a9-99b27258cf23",
-                "name": "asdfasdf",
-                "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-                "network_id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
-                "ip_version": 4,
-                "subnetpool_id": null,
-                "enable_dhcp": true,
-                "ipv6_ra_mode": null,
-                "ipv6_address_mode": null,
-                "gateway_ip": null,
-                "cidr": "10.108.16.0/20",
-                "allocation_pools": [
-                    {
-                        "start": "10.108.16.1",
-                        "end": "10.108.31.254"
-                    }
-                ],
-                "host_routes": [],
-                "dns_nameservers": [
-                    "103.92.35.110",
-                    "208.67.222.222"
-                ],
-                "description": "",
-                "service_types": [],
-                "tags": [],
-                "created_at": "2021-01-28T02:50:50Z",
-                "updated_at": "2021-01-28T02:50:50Z",
-                "revision_number": 0,
-                "project_id": "ebbed256d9414b0598719c42dc17e837"
-            }
+            "d05bbc5d-8933-4dcf-af98-f0d20179f471"
         ],
         "shared": false,
         "availability_zone_hints": [
@@ -488,34 +458,24 @@ func TestVPCUpdate(t *testing.T) {
         "ipv4_address_scope": null,
         "ipv6_address_scope": null,
         "router:external": false,
-        "description": "asdf",
+        "description": "test descriptionsss",
         "port_security_enabled": true,
         "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-        "tags": [
-            "default-vpc-network"
-        ],
-        "created_at": "2021-01-28T02:50:49Z",
-        "updated_at": "2021-01-28T02:56:35Z",
-        "revision_number": 5,
-        "project_id": "ebbed256d9414b0598719c42dc17e837",
-        "ip_availability": [
-            {
-                "subnet_id": "cf24149a-8ba9-4445-84a9-99b27258cf23",
-                "ip_version": 4,
-                "cidr": "10.108.16.0/20",
-                "subnet_name": "asdfasdf",
-                "used_ips": 2,
-                "total_ips": 4094
-            }
-        ],
-        "ports": [],
+        "tags": [],
+        "created_at": "2021-02-03T06:59:35Z",
+        "updated_at": "2021-02-03T08:41:46Z",
+        "revision_number": 11,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
+        "provider:network_type": "gre",
+        "provider:physical_network": null,
+        "provider:segmentation_id": 2393,
         "is_default": false
     }
 }
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.VPC.Update(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50", &UpdateVPCPayload{
+	vpc, err := client.VPC.Update(ctx, "41f40298-8d05-4889-9672-f03cfccd719f", &UpdateVPCPayload{
 		Name:      "test_update",
 		IsDefault: false,
 	})

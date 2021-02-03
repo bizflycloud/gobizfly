@@ -37,7 +37,7 @@ type vpcService struct {
 type VPCService interface {
 	List(ctx context.Context) ([]*ExtendedVPC, error)
 	Get(ctx context.Context, vpcID string) (*ExtendedVPC, error)
-	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*ExtendedVPC, error)
+	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error)
 	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error)
 	Delete(ctx context.Context, vpcID string) error
 }
@@ -153,13 +153,13 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*ExtendedVPC, error)
 	return data.Network, nil
 }
 
-func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*ExtendedVPC, error) {
+func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPut, serverServiceName, v.itemPath(vpcID), uvpl)
 	if err != nil {
 		return nil, err
 	}
 	var data *struct {
-		Network *ExtendedVPC `json:"network"`
+		Network *VPC `json:"network"`
 	}
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
