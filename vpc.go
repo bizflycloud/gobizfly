@@ -172,9 +172,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, e
 	if err != nil {
 		return nil, err
 	}
-	var data *struct {
-		Network *VPC `json:"network"`
-	}
+	var data *VPC
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -183,7 +181,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, e
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Network, nil
+	return data, nil
 }
 
 func (v vpcService) Delete(ctx context.Context, vpcID string) error {
