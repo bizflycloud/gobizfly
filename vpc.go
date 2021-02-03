@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	vpcPath = "vpc-networks"
+	vpcPath = "/vpc-networks"
 )
 
 var _ VPCService = (*vpcService)(nil)
