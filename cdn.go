@@ -30,7 +30,7 @@ import (
 
 const (
 	domainPath = "/domains"
-	userPath   = "/users"
+	usersPath  = "/users"
 )
 
 type cdnService struct {
@@ -131,7 +131,7 @@ func (c *cdnService) itemPath(id string) string {
 }
 
 func (c *cdnService) List(ctx context.Context, opts *ListOptions) (*DomainsResp, error) {
-	u, _ := url.Parse(strings.Join([]string{userPath, domainPath}, ""))
+	u, _ := url.Parse(strings.Join([]string{usersPath, domainPath}, ""))
 	query := url.Values{}
 	if opts.Page != 0 {
 		query.Add("page", strconv.Itoa(opts.Page))

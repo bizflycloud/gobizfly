@@ -35,6 +35,7 @@ const (
 	ua                      = "bizfly-client-go/" + version
 	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
 	mediaType               = "application/json; charset=utf-8"
+	accountName             = "account"
 	loadBalancerServiceName = "load_balancer"
 	serverServiceName       = "cloud_server"
 	autoScalingServiceName  = "auto_scaling"
@@ -69,6 +70,7 @@ type Client struct {
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
 	DNS               DNSService
+	Account           AccountService
 	VPC               VPCService
 
 	Snapshot SnapshotService
@@ -186,6 +188,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.CDN = &cdnService{client: c}
 	c.DNS = &dnsService{client: c}
+	c.Account = &accountService{client: c}
 	c.VPC = &vpcService{client: c}
 	return c, nil
 }

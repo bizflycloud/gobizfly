@@ -406,7 +406,7 @@ type LaunchConfiguration struct {
 	SecurityGroups   *[]string                  `json:"security_groups,omitempty"`
 	SSHKey           string                     `json:"key_name,omitempty"`
 	Status           string                     `json:"status,omitempty"`
-	Type             string                     `json:"type,omitempty"`
+	Type             string                     `json:"type"`
 	UserData         string                     `json:"user_data,omitempty"`
 }
 
@@ -636,6 +636,9 @@ func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchCon
 	}
 
 	for _, LaunchConfiguration := range data.LaunchConfigurations {
+		// Force ProfileType = Type
+		LaunchConfiguration.ProfileType = LaunchConfiguration.Type
+
 		if LaunchConfiguration.OperatingSystem.Error != "" {
 			LaunchConfiguration.Status = statusError
 		} else {
@@ -815,6 +818,9 @@ func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*Laun
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
+
+	// Force ProfileType = Type
+	data.ProfileType = data.Type
 
 	if data.OperatingSystem.Error != "" {
 		data.Status = statusError
