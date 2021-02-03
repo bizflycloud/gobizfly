@@ -296,7 +296,7 @@ func TestVPCCreate(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(testlib.CloudServerURL(vpcPath), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		var payload *createVPCPayload
+		var payload *CreateVPCPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "test", payload.Name)
 		resp := `{
@@ -378,7 +378,7 @@ func TestVPCCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	vpc, err := client.VPC.Create(ctx, &createVPCPayload{
+	vpc, err := client.VPC.Create(ctx, &CreateVPCPayload{
 		Name: "test",
 	})
 	require.NoError(t, err)
@@ -485,7 +485,7 @@ func TestVPCUpdate(t *testing.T) {
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
-			var payload *updateVPCPayload
+			var payload *UpdateVPCPayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "test_update", payload.Name)
 			resp := `{
@@ -567,7 +567,7 @@ func TestVPCUpdate(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.VPC.Update(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50", &updateVPCPayload{
+	vpc, err := client.VPC.Update(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50", &UpdateVPCPayload{
 		Name:      "test_update",
 		IsDefault: false,
 	})
