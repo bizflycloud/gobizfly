@@ -439,13 +439,43 @@ func TestVPCUpdate(t *testing.T) {
 			resp := `{
     "network": {
         "id": "41f40298-8d05-4889-9672-f03cfccd719f",
-        "name": "testaa",
+        "name": "test1",
         "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
         "admin_state_up": true,
         "mtu": 1500,
         "status": "ACTIVE",
         "subnets": [
-            "d05bbc5d-8933-4dcf-af98-f0d20179f471"
+            {
+                "id": "d05bbc5d-8933-4dcf-af98-f0d20179f471",
+                "name": "vxsCFZ",
+                "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+                "network_id": "41f40298-8d05-4889-9672-f03cfccd719f",
+                "ip_version": 4,
+                "subnetpool_id": null,
+                "enable_dhcp": true,
+                "ipv6_ra_mode": null,
+                "ipv6_address_mode": null,
+                "gateway_ip": null,
+                "cidr": "10.21.148.0/24",
+                "allocation_pools": [
+                    {
+                        "start": "10.21.148.1",
+                        "end": "10.21.148.254"
+                    }
+                ],
+                "host_routes": [],
+                "dns_nameservers": [
+                    "103.92.35.110",
+                    "208.67.222.222"
+                ],
+                "description": "",
+                "service_types": [],
+                "tags": [],
+                "created_at": "2021-02-03T06:59:41Z",
+                "updated_at": "2021-02-03T06:59:41Z",
+                "revision_number": 0,
+                "project_id": "bc8d2790fc9a46949818b942c0a824de"
+            }
         ],
         "shared": false,
         "availability_zone_hints": [
@@ -458,17 +488,25 @@ func TestVPCUpdate(t *testing.T) {
         "ipv4_address_scope": null,
         "ipv6_address_scope": null,
         "router:external": false,
-        "description": "test descriptionsss",
+        "description": "",
         "port_security_enabled": true,
         "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
         "tags": [],
         "created_at": "2021-02-03T06:59:35Z",
-        "updated_at": "2021-02-03T08:41:46Z",
-        "revision_number": 11,
+        "updated_at": "2021-02-03T07:28:06Z",
+        "revision_number": 4,
         "project_id": "bc8d2790fc9a46949818b942c0a824de",
-        "provider:network_type": "gre",
-        "provider:physical_network": null,
-        "provider:segmentation_id": 2393,
+        "ip_availability": [
+            {
+                "subnet_id": "d05bbc5d-8933-4dcf-af98-f0d20179f471",
+                "ip_version": 4,
+                "cidr": "10.21.148.0/24",
+                "subnet_name": "vxsCFZ",
+                "used_ips": 2,
+                "total_ips": 254
+            }
+        ],
+        "ports": [],
         "is_default": false
     }
 }
