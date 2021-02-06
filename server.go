@@ -27,11 +27,12 @@ import (
 )
 
 const (
-	serverBasePath  = "/servers"
-	flavorPath      = "/flavors"
-	osImagePath     = "/images"
-	taskPath        = "/tasks"
-	customImagePath = "/user/images"
+	serverBasePath   = "/servers"
+	flavorPath       = "/flavors"
+	osImagePath      = "/images"
+	taskPath         = "/tasks"
+	customImagesPath = "/user/images"
+	customImagePath  = "/user/image"
 )
 
 var _ ServerService = (*server)(nil)
@@ -608,7 +609,7 @@ func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Serve
 }
 
 func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, customImagePath, nil)
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, customImagesPath, nil)
 	if err != nil {
 		return nil, err
 	}

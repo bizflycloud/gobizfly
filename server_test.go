@@ -1343,7 +1343,7 @@ func TestServerRemoveVPC(t *testing.T) {
 func TestCustomImageList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL(customImagePath), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(customImagesPath), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
     "images": [
@@ -1391,7 +1391,7 @@ func TestCustomImageList(t *testing.T) {
 func TestCustomImageCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagePath, "upload"}, "/")), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagesPath, "upload"}, "/")), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload *CreateCustomImagePayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
@@ -1439,7 +1439,7 @@ func TestCustomImageCreate(t *testing.T) {
 func TestCustomImageDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagePath, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532"}, "/")),
+	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagesPath, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532"}, "/")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
