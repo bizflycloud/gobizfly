@@ -27,10 +27,12 @@ import (
 )
 
 const (
-	serverBasePath = "/servers"
-	flavorPath     = "/flavors"
-	osImagePath    = "/images"
-	taskPath       = "/tasks"
+	serverBasePath   = "/servers"
+	flavorPath       = "/flavors"
+	osImagePath      = "/images"
+	taskPath         = "/tasks"
+	customImagesPath = "/user/images"
+	customImagePath  = "/user/image"
 )
 
 var _ ServerService = (*server)(nil)
@@ -96,6 +98,45 @@ type Server struct {
 	RegionName       string                 `json:"region_name"`
 }
 
+type CreateCustomImagePayload struct {
+	Name        string `json:"name"`
+	DiskFormat  string `json:"disk_format"`
+	Description string `json:"description,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
+}
+
+type Location struct {
+	URL      string            `json:"url"`
+	Metadata map[string]string `json:"metadata,"`
+}
+
+type CustomImage struct {
+	Name            string     `json:"name"`
+	Description     string     `json:"description"`
+	DiskFormat      string     `json:"disk_format"`
+	ContainerFormat string     `json:"container_format"`
+	Visibility      string     `json:"visibility"`
+	Size            int        `json:"size"`
+	VirtualSize     int        `json:"virtual_size"`
+	Status          string     `json:"status"`
+	Checksum        string     `json:"checksum"`
+	Protected       bool       `json:"protected"`
+	MinRam          int        `json:"min_ram"`
+	MinDisk         int        `json:"min_disk"`
+	Owner           string     `json:"owner"`
+	OSHidden        bool       `json:"os_hidden"`
+	OSHashAlgo      string     `json:"os_hash_algo"`
+	OSHashValue     string     `json:"os_hash_value"`
+	ID              string     `json:"id"`
+	CreatedAt       string     `json:"created_at"`
+	UpdatedAt       string     `json:"updated_at"`
+	Locations       []Location `json:"locations"`
+	DirectURL       string     `json:"direct_url"`
+	Tags            []string   `json:"tags"`
+	File            string     `json:"file"`
+	Schema          string     `json:"schema"`
+}
+
 type server struct {
 	client *Client
 }
@@ -119,6 +160,9 @@ type ServerService interface {
 	ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error)
 	AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
 	RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
+	ListCustomImages(ctx context.Context) ([]*CustomImage, error)
+	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CustomImage, error)
+	DeleteCustomImage(ctx context.Context, imageID string) error
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -182,6 +226,10 @@ type ServerCreateRequest struct {
 // itemActionPath return http path of server action
 func (s *server) itemActionPath(id string) string {
 	return strings.Join([]string{serverBasePath, id, "action"}, "/")
+}
+
+func (s *server) itemCustomImagePath(id string) string {
+	return strings.Join([]string{customImagePath, id}, "/")
 }
 
 // List lists all servers.
@@ -558,4 +606,55 @@ func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Serve
 		return nil, err
 	}
 	return server, nil
+}
+
+func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, customImagesPath, nil)
+	if err != nil {
+		return nil, err
+	}
+	var data struct {
+		Images []*CustomImage `json:"images"`
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Images, nil
+}
+
+func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CustomImage, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{customImagePath, "upload"}, "/"), cipl)
+	if err != nil {
+		return nil, err
+	}
+	var data struct {
+		Image *CustomImage `json:"image"`
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Image, nil
+}
+
+func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, s.itemCustomImagePath(imageID), nil)
+
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"github.com/bizflycloud/gobizfly/testlib"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -1337,4 +1338,111 @@ func TestServerRemoveVPC(t *testing.T) {
 	server, err := client.Server.RemoveVPC(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
 	require.NoError(t, err)
 	assert.Len(t, server.IPAddresses.LanAddresses, 2)
+}
+
+func TestCustomImageList(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(customImagesPath), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `{
+    "images": [
+        {
+            "description": "",
+            "name": "Cloud-server.postman_collection.json",
+            "disk_format": "raw",
+            "container_format": "bare",
+            "visibility": "private",
+            "size": 40838,
+            "virtual_size": null,
+            "status": "active",
+            "checksum": "d9d256a9a06ae5eb18579987a74ec8fb",
+            "protected": false,
+            "min_ram": 0,
+            "min_disk": 0,
+            "owner": "bc8d2790fc9a46949818b942c0a824de",
+            "os_hidden": false,
+            "os_hash_algo": "sha512",
+            "os_hash_value": "a7572c56048cd67c20f23d908bd04d29a86ea53bbebe3e011e8d4a3a216ff7faa07810e480ea05409543ba0a0345f5b31ac136aa0f05788d34dbb210ae586049",
+            "id": "13e73169-d92c-4ec0-b839-1a22a093cbc4",
+            "created_at": "2021-02-05T02:03:00Z",
+            "updated_at": "2021-02-05T02:03:13Z",
+            "locations": [
+                {
+                    "url": "rbd://46b21e69-6559-4eed-aba9-540ab496a77d/glances/13e73169-d92c-4ec0-b839-1a22a093cbc4/snap",
+                    "metadata": {}
+                }
+            ],
+            "direct_url": "rbd://46b21e69-6559-4eed-aba9-540ab496a77d/glances/13e73169-d92c-4ec0-b839-1a22a093cbc4/snap",
+            "tags": [],
+            "file": "https://hn-1.bizflycloud.vn:9292/v2/images/13e73169-d92c-4ec0-b839-1a22a093cbc4/file",
+            "schema": "/v2/schemas/image"
+        }
+    ]
+}
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	images, err := client.Server.ListCustomImages(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, "/v2/schemas/image", images[0].Schema)
+}
+
+func TestCustomImageCreate(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagesPath, "upload"}, "/")), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var payload *CreateCustomImagePayload
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		resp := `{
+    "image": {
+        "description": "",
+        "name": "Cloud-server.postman_collection.jsonafasds",
+        "disk_format": "raw",
+        "container_format": "bare",
+        "visibility": "private",
+        "size": null,
+        "virtual_size": null,
+        "status": "queued",
+        "checksum": null,
+        "protected": false,
+        "min_ram": 0,
+        "min_disk": 0,
+        "owner": "bc8d2790fc9a46949818b942c0a824de",
+        "os_hidden": false,
+        "os_hash_algo": null,
+        "os_hash_value": null,
+        "id": "0b5ae9ed-7cfb-454b-a5cc-df0bba693532",
+        "created_at": "2021-02-05T02:05:11Z",
+        "updated_at": "2021-02-05T02:05:11Z",
+        "locations": [],
+        "tags": [],
+        "file": "/v2/images/0b5ae9ed-7cfb-454b-a5cc-df0bba693532/file",
+        "schema": "/v2/schemas/image"
+    },
+    "success": true,
+    "token": "gAAAAABgHKajmGPDwMPFTqpoZLQ34D7shjMQI-_zTsANuXpcybC7786K-wE1FPegZa71cst1GZNp2NXejugv8jBZLOhUqaHuR_HtZWLQWy4RIXwY-w5m-YSWzHJb4aCK1gmPP9ZoN7i3oylr7THieBjA3t_BsRj-jvgWCtjStoevYPOQ-zwz7JY",
+    "upload_uri": "https://hn-1.bizflycloud.vn:9292/v2/images/0b5ae9ed-7cfb-454b-a5cc-df0bba693532/file"
+}
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	image, err := client.Server.CreateCustomImage(ctx, &CreateCustomImagePayload{
+		Name:       "Cloud-server.postman_collection.jsonafasds",
+		DiskFormat: "raw",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "bare", image.ContainerFormat)
+}
+
+func TestCustomImageDelete(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagesPath, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532"}, "/")),
+		func(writer http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodDelete, r.Method)
+		})
+	err := client.Server.DeleteCustomImage(ctx, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532")
+	require.NoError(t, err)
 }
