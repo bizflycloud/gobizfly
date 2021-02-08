@@ -137,6 +137,13 @@ type CustomImage struct {
 	Schema          string     `json:"schema"`
 }
 
+type CreateCustomImageResp struct {
+	Image     CustomImage `json:"image"`
+	Success   bool        `json:"success"`
+	Token     string      `json:"token,omitempty"`
+	UploadURI string      `json:"upload_uri,omitempty"`
+}
+
 type server struct {
 	client *Client
 }
@@ -161,7 +168,7 @@ type ServerService interface {
 	AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
 	RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
 	ListCustomImages(ctx context.Context) ([]*CustomImage, error)
-	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CustomImage, error)
+	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error)
 	DeleteCustomImage(ctx context.Context, imageID string) error
 }
 
@@ -627,14 +634,12 @@ func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
 	return data.Images, nil
 }
 
-func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CustomImage, error) {
+func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{customImagePath, "upload"}, "/"), cipl)
 	if err != nil {
 		return nil, err
 	}
-	var data struct {
-		Image *CustomImage `json:"image"`
-	}
+	var data *CreateCustomImageResp
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -643,7 +648,7 @@ func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImageP
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Image, nil
+	return data, nil
 }
 
 func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
