@@ -174,12 +174,8 @@ func TestClusterCreate(t *testing.T) {
 	})
 
 	cluster, err := client.KubernetesEngine.Create(ctx, &ClusterCreateRequest{
-		Name: "my-kubernetes-cluster-1",
-		Version: ControllerVersion{
-			Name:       "v1.18.6-5f7d3a91",
-			ID:         "5f7d3a91d857155ad4993a32",
-			K8SVersion: "v1.18.6",
-		},
+		Name:        "my-kubernetes-cluster-1",
+		Version:     "v1.18.6-5f7d3a91",
 		AutoUpgrade: false,
 		EnableCloud: true,
 		Tags:        []string{"string"},
