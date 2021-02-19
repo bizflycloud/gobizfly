@@ -119,12 +119,12 @@ type ExtendedWorkerPools struct {
 }
 
 type ClusterCreateRequest struct {
-	Name        string            `json:"name"`
-	Version     ControllerVersion `json:"version"`
-	AutoUpgrade bool              `json:"auto_upgrade"`
-	EnableCloud bool              `json:"enable_cloud"`
-	Tags        []string          `json:"tags"`
-	WorkerPools []WorkerPool      `json:"worker_pools"`
+	Name        string       `json:"name"`
+	Version     string       `json:"version"`
+	AutoUpgrade bool         `json:"auto_upgrade"`
+	EnableCloud bool         `json:"enable_cloud"`
+	Tags        []string     `json:"tags"`
+	WorkerPools []WorkerPool `json:"worker_pools"`
 }
 
 type AddWorkerPoolsRequest struct {
