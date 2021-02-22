@@ -32,7 +32,7 @@ func TestClusterList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(testlib.K8sURL(clusterPath), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.K8sURL(clusterPath+"/"), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -143,31 +143,54 @@ func TestClusterCreate(t *testing.T) {
 
 		resp := `
 {
-  "name": "my-kubernetes-cluster-1",
-  "version": {"id": "5f7d3a91d857155ad4993a32", "name": "v1.18.6-5f7d3a91", "description": null, "kubernetes_version": "v1.18.6"},
-  "auto_upgrade": false,
-  "enable_cloud": true,
-  "tags": [
-    "string"
-  ],
-  "worker_pools": [
-    {
-      "name": "my-first-pool",
-      "version": "v1.18.0",
-      "flavor": "8c_8g",
-      "profile_type": "premium",
-      "volume_type": "SSD",
-      "volume_size": 40,
-      "availability_zone": "HN2",
-      "desired_size": 1,
-      "enable_autoscaling": true,
-      "min_size": 1,
-      "max_size": 3,
-      "tags": [
-        "string"
-      ]
-    }
-  ]
+  "cluster": {
+    "uid": "nkieuavgndkdxwsqc",
+    "name": "my-kubernetes-cluster-1",
+    "version": {
+      "id": "5f6425f3d0d3befd40e7a31f",
+      "name": "v1.18.6-bke-5f6425f3",
+      "description": "Kubernetes v1.18.6 on BizFly Cloud",
+      "kubernetes_version": "v1.18.6"
+    },
+    "private_network_id": "727caa8c-1ed1-4302-b659-5a92864dcdef",
+    "auto_upgrade": true,
+    "tags": [
+      "string"
+    ],
+    "provision_status": "PROVISIONING",
+    "cluster_status": "PROVISIONING",
+    "created_at": "2021-02-22T12:53:09.361Z",
+    "created_by": "thanhpm@vccloud.vn",
+    "worker_pools_count": 3,
+    "worker_pools": [
+      {
+        "id": "5eaf853b449fea8e4d0852e5",
+        "name": "my-first-pool",
+        "version": "v1.18.0",
+        "flavor": "6c_6g",
+        "flavor_detail": {
+          "name": "6c_6g",
+          "vcpus": 6,
+          "ram": 6114
+        },
+        "profile_type": "premium",
+        "volume_type": "SSD",
+        "volume_size": 40,
+        "availability_zone": "HN2",
+        "desired_size": 1,
+        "enable_autoscaling": true,
+        "min_size": 1,
+        "max_size": 3,
+        "tags": [
+          "string"
+        ],
+        "provision_status": "PROVISIONING",
+        "launch_config_id": "2b1a00f1-28cd-4daf-b886-c0f07b401ed4",
+        "autoscaling_group_id": "31e8465b-7275-4055-aeba-e3984453a223",
+        "created_at": "2021-02-22T12:53:09.362Z"
+      }
+    ]
+  }
 }
 `
 		_, _ = fmt.Fprint(w, resp)
@@ -176,7 +199,7 @@ func TestClusterCreate(t *testing.T) {
 	cluster, err := client.KubernetesEngine.Create(ctx, &ClusterCreateRequest{
 		Name:        "my-kubernetes-cluster-1",
 		Version:     "v1.18.6-5f7d3a91",
-		AutoUpgrade: false,
+		AutoUpgrade: true,
 		EnableCloud: true,
 		Tags:        []string{"string"},
 		WorkerPools: []WorkerPool{
@@ -197,7 +220,7 @@ func TestClusterCreate(t *testing.T) {
 		},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, false, cluster.AutoUpgrade)
+	assert.Equal(t, true, cluster.AutoUpgrade)
 }
 
 func TestClusterDelete(t *testing.T) {

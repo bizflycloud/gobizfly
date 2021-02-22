@@ -52,17 +52,17 @@ type KubernetesEngineService interface {
 
 type WorkerPool struct {
 	Name              string   `json:"name"`
-	Version           string   `json:"version"`
+	Version           string   `json:"version,omitempty"`
 	Flavor            string   `json:"flavor"`
 	ProfileType       string   `json:"profile_type"`
-	VolumeType        string   `json:"volume_type,omitempty"`
+	VolumeType        string   `json:"volume_type"`
 	VolumeSize        int      `json:"volume_size"`
 	AvailabilityZone  string   `json:"availability_zone"`
 	DesiredSize       int      `json:"desired_size"`
-	EnableAutoScaling bool     `json:"enable_autoscaling"`
+	EnableAutoScaling bool     `json:"enable_autoscaling,omitempty"`
 	MinSize           int      `json:"min_size"`
 	MaxSize           int      `json:"max_size"`
-	Tags              []string `json:"tags"`
+	Tags              []string `json:"tags,omitempty"`
 }
 
 type ControllerVersion struct {
@@ -80,6 +80,7 @@ type Cluster struct {
 	UID              string            `json:"uid"`
 	Name             string            `json:"name"`
 	Version          ControllerVersion `json:"version"`
+	PrivateNetworkID string            `json:"private_network_id"`
 	AutoUpgrade      bool              `json:"auto_upgrade"`
 	Tags             []string          `json:"tags"`
 	ProvisionStatus  string            `json:"provision_status"`
@@ -119,12 +120,13 @@ type ExtendedWorkerPools struct {
 }
 
 type ClusterCreateRequest struct {
-	Name        string       `json:"name"`
-	Version     string       `json:"version"`
-	AutoUpgrade bool         `json:"auto_upgrade"`
-	EnableCloud bool         `json:"enable_cloud"`
-	Tags        []string     `json:"tags"`
-	WorkerPools []WorkerPool `json:"worker_pools"`
+	Name             string       `json:"name"`
+	Version          string       `json:"version"`
+	AutoUpgrade      bool         `json:"auto_upgrade,omitempty"`
+	PrivateNetworkID string       `json:"private_network_id"`
+	EnableCloud      bool         `json:"enable_cloud,omitempty"`
+	Tags             []string     `json:"tags,omitempty"`
+	WorkerPools      []WorkerPool `json:"worker_pools"`
 }
 
 type AddWorkerPoolsRequest struct {
@@ -153,7 +155,7 @@ type UpdateWorkerPoolRequest struct {
 }
 
 func (c *kubernetesEngineService) resourcePath() string {
-	return clusterPath
+	return clusterPath + "/"
 }
 
 func (c *kubernetesEngineService) itemPath(id string) string {
@@ -180,7 +182,9 @@ func (c *kubernetesEngineService) List(ctx context.Context, opts *ListOptions) (
 }
 
 func (c *kubernetesEngineService) Create(ctx context.Context, clcr *ClusterCreateRequest) (*ExtendedCluster, error) {
-	var cluster *ExtendedCluster
+	var data struct {
+		Cluster *ExtendedCluster `json:"cluster"`
+	}
 	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.resourcePath(), &clcr)
 	if err != nil {
 		return nil, err
@@ -190,10 +194,10 @@ func (c *kubernetesEngineService) Create(ctx context.Context, clcr *ClusterCreat
 		return nil, err
 	}
 	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&cluster); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return cluster, nil
+	return data.Cluster, nil
 }
 
 func (c *kubernetesEngineService) Get(ctx context.Context, id string) (*FullCluster, error) {
@@ -202,7 +206,6 @@ func (c *kubernetesEngineService) Get(ctx context.Context, id string) (*FullClus
 	if err != nil {
 		return nil, err
 	}
-
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
