@@ -80,7 +80,7 @@ type Cluster struct {
 	UID              string            `json:"uid"`
 	Name             string            `json:"name"`
 	Version          ControllerVersion `json:"version"`
-	PrivateNetworkID string            `json:"private_network_id"`
+	VPCNetworkID     string            `json:"private_network_id"`
 	AutoUpgrade      bool              `json:"auto_upgrade"`
 	Tags             []string          `json:"tags"`
 	ProvisionStatus  string            `json:"provision_status"`
@@ -120,13 +120,13 @@ type ExtendedWorkerPools struct {
 }
 
 type ClusterCreateRequest struct {
-	Name             string       `json:"name"`
-	Version          string       `json:"version"`
-	AutoUpgrade      bool         `json:"auto_upgrade,omitempty"`
-	PrivateNetworkID string       `json:"private_network_id"`
-	EnableCloud      bool         `json:"enable_cloud,omitempty"`
-	Tags             []string     `json:"tags,omitempty"`
-	WorkerPools      []WorkerPool `json:"worker_pools"`
+	Name         string       `json:"name"`
+	Version      string       `json:"version"`
+	AutoUpgrade  bool         `json:"auto_upgrade,omitempty"`
+	VPCNetworkID string       `json:"private_network_id"`
+	EnableCloud  bool         `json:"enable_cloud,omitempty"`
+	Tags         []string     `json:"tags,omitempty"`
+	WorkerPools  []WorkerPool `json:"worker_pools"`
 }
 
 type AddWorkerPoolsRequest struct {
