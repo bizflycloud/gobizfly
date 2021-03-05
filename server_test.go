@@ -1446,3 +1446,51 @@ func TestCustomImageDelete(t *testing.T) {
 	err := client.Server.DeleteCustomImage(ctx, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532")
 	require.NoError(t, err)
 }
+
+func TestCustomImageDownload(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(strings.Join([]string{customImagePath, "809cd001-07e3-4e00-a5c5-2d8fa0516d90"}, "/")),
+		func(writer http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
+			resp := `{
+    "image": {
+        "description": "",
+        "name": "large-file",
+        "disk_format": "raw",
+        "container_format": "bare",
+        "visibility": "private",
+        "size": 5561008296,
+        "virtual_size": null,
+        "status": "active",
+        "checksum": "f4c392cfbbecc6656b547b1b55afcd16",
+        "protected": false,
+        "min_ram": 0,
+        "min_disk": 0,
+        "owner": "bc8d2790fc9a46949818b942c0a824de",
+        "os_hidden": false,
+        "os_hash_algo": "sha512",
+        "os_hash_value": "dc44107ab48eaa6d4ae60c6e82acdf0098f129805e61b8cc00c2df7e3568e3407ba2b999bd387c2b0ac18fe9faf82b21b5a109eb27bc932d3d85803a521e4ef0",
+        "id": "809cd001-07e3-4e00-a5c5-2d8fa0516d90",
+        "created_at": "2021-02-08T14:20:05Z",
+        "updated_at": "2021-02-08T14:31:16Z",
+        "locations": [
+            {
+                "url": "rbd://46b21e69-6559-4eed-aba9-540ab496a77d/glances/809cd001-07e3-4e00-a5c5-2d8fa0516d90/snap",
+                "metadata": {}
+            }
+        ],
+        "direct_url": "rbd://46b21e69-6559-4eed-aba9-540ab496a77d/glances/809cd001-07e3-4e00-a5c5-2d8fa0516d90/snap",
+        "tags": [],
+        "file": "https://hn-1.bizflycloud.vn:9292/v2/images/809cd001-07e3-4e00-a5c5-2d8fa0516d90/file",
+        "schema": "/v2/schemas/image"
+    },
+    "token": "gAAAAABgQY1kuIcMMK17B1nWBMd5dHTcitsChmDv1WU4xIGgHph09_Do4wDjY8V5XTyTYWgeYVaN5cNJG2In3oyvSm6uYlugYk6nxC-XiD81rp-8zxvSPTDd2jlaKfrrFgd2HJH5rfpV5iQlMMps52vGpxFrxFa-2ppK8BQbye63nKK_e4LwahE"
+}
+`
+			_, _ = fmt.Fprint(writer, resp)
+		})
+	image, err := client.Server.GetCustomImage(ctx, "809cd001-07e3-4e00-a5c5-2d8fa0516d90")
+	require.NoError(t, err)
+	assert.Equal(t, image.Token, "gAAAAABgQY1kuIcMMK17B1nWBMd5dHTcitsChmDv1WU4xIGgHph09_Do4wDjY8V5XTyTYWgeYVaN5cNJG2In3oyvSm6uYlugYk6nxC-XiD81rp-8zxvSPTDd2jlaKfrrFgd2HJH5rfpV5iQlMMps52vGpxFrxFa-2ppK8BQbye63nKK_e4LwahE")
+}

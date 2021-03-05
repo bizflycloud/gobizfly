@@ -144,6 +144,11 @@ type CreateCustomImageResp struct {
 	UploadURI string      `json:"upload_uri,omitempty"`
 }
 
+type CustomImageGetResp struct {
+	Image CustomImage `json:"image"`
+	Token string      `json:"token"`
+}
+
 type server struct {
 	client *Client
 }
@@ -170,6 +175,7 @@ type ServerService interface {
 	ListCustomImages(ctx context.Context) ([]*CustomImage, error)
 	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error)
 	DeleteCustomImage(ctx context.Context, imageID string) error
+	GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error)
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -662,4 +668,21 @@ func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
 		return err
 	}
 	return resp.Body.Close()
+}
+
+func (s *server) GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, strings.Join([]string{customImagePath, imageID}, "/"), nil)
+	if err != nil {
+		return nil, err
+	}
+	var data *CustomImageGetResp
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
 }
