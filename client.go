@@ -90,6 +90,7 @@ type Client struct {
 	authType      string
 	username      string
 	password      string
+	projectName   string
 	appCredID     string
 	appCredSecret string
 	// TODO: this will be removed in near future
