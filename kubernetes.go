@@ -336,7 +336,7 @@ func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID 
 	}
 	defer resp.Body.Close()
 	fileName := fmt.Sprintf("%s.kubeconfig", clusterUID)
-	file, err := os.Create(filepath.Join(outputPath, fileName))
+	file, _ := os.Create(filepath.Join(outputPath, fileName))
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
 		log.Fatal(err)
