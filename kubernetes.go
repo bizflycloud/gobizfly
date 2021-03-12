@@ -25,8 +25,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -52,7 +50,7 @@ type KubernetesEngineService interface {
 	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
-	GetKubeConfig(ctx context.Context, clusterUID string, outputPath string) error
+	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 }
 
 type WorkerPool struct {
@@ -325,21 +323,20 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Contex
 	return resp.Body.Close()
 }
 
-func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string, outputPath string) error {
+func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string) (string, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(clusterUID), kubeConfig}, "/"), nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
-		return nil
+		return "", nil
 	}
 	defer resp.Body.Close()
-	fileName := fmt.Sprintf("%s.kubeconfig", clusterUID)
-	file, _ := os.Create(filepath.Join(outputPath, fileName))
-	_, err = io.Copy(file, resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return nil
+	bodyString := string(bodyBytes)
+	return bodyString, nil
 }
