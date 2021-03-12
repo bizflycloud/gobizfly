@@ -23,12 +23,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strings"
 )
 
 const (
 	clusterPath = "/_"
+	kubeConfig  = "kubeconfig"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -48,6 +50,7 @@ type KubernetesEngineService interface {
 	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
+	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 }
 
 type WorkerPool struct {
@@ -318,4 +321,22 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(ctx context.Contex
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string) (string, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(clusterUID), kubeConfig}, "/"), nil)
+	if err != nil {
+		return "", err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return "", nil
+	}
+	defer resp.Body.Close()
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	bodyString := string(bodyBytes)
+	return bodyString, nil
 }
