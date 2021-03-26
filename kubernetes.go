@@ -151,10 +151,10 @@ type WorkerPoolWithNodes struct {
 }
 
 type UpdateWorkerPoolRequest struct {
-	DesiredSize       int  `json:"desired_size" yaml:"desired_size"`
-	EnableAutoScaling bool `json:"enable_autoscaling" yaml:"enable_autoscaling"`
-	MinSize           int  `json:"min_size" yaml:"min_size"`
-	MaxSize           int  `json:"max_size" yaml:"max_size"`
+	DesiredSize       int  `json:"desired_size,omitempty" yaml:"desired_size,omitempty"`
+	EnableAutoScaling bool `json:"enable_autoscaling,omitempty" yaml:"enable_autoscaling,omitempty"`
+	MinSize           int  `json:"min_size,omitempty" yaml:"min_size,omitempty"`
+	MaxSize           int  `json:"max_size,omitempty" yaml:"max_size,omitempty"`
 }
 
 func (c *kubernetesEngineService) resourcePath() string {
