@@ -1,14 +1,17 @@
+// This file is part of gobizfly
+
 package gobizfly
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bizflycloud/gobizfly/testlib"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/bizflycloud/gobizfly/testlib"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestReposList(t *testing.T) {
