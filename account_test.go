@@ -1,12 +1,15 @@
+// This file is part of gobizfly
+
 package gobizfly
 
 import (
 	"fmt"
+	"net/http"
+	"testing"
+
 	"github.com/bizflycloud/gobizfly/testlib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"net/http"
-	"testing"
 )
 
 func TestRegionList(t *testing.T) {
