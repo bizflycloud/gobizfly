@@ -75,6 +75,7 @@ type Server struct {
 	Addresses        map[string]interface{} `json:"addresses"` // Deprecated: This field will be removed in the near future
 	Metadata         map[string]string      `json:"metadata"`
 	Flavor           Flavor                 `json:"flavor"`
+	FlavorName       string                 `json:"flavor_name"`
 	Progress         int                    `json:"progress"`
 	AttachedVolumes  []AttachedVolume       `json:"os-extended-volumes:volumes_attached"`
 	AvailabilityZone string                 `json:"OS-EXT-AZ:availability_zone"`
