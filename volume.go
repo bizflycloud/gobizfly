@@ -257,7 +257,7 @@ func (v *volume) Detach(ctx context.Context, id string, serverID string) (*Volum
 // Restore restores a volume from a snapshot.
 func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Task, error) {
 	var payload = &VolumeAction{
-		Type:       "restore",
+		Type:       "restore_volume",
 		SnapshotID: snapshotID}
 
 	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.itemActionPath(id), payload)
