@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -117,6 +118,11 @@ func (s *snapshot) List(ctx context.Context, opts *ListOptions) ([]*Snapshot, er
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, snapshotPath, nil)
 	if err != nil {
 		return nil, err
+	}
+	if opts.VolumeId != "" {
+		params, _ := url.ParseQuery("")
+		params.Add("volume_id", opts.VolumeId)
+		req.URL.RawQuery = params.Encode()
 	}
 
 	resp, err := s.client.Do(ctx, req)
