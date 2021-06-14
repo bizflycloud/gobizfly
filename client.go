@@ -263,7 +263,6 @@ func (c *Client) SetKeystoneToken(s string) {
 type ListOptions struct {
 	Page  int `json:"page,omitempty"`
 	Limit int `json:"limit,omitempty"`
-	VolumeId string `json:"volume_id,omitempty"`
 }
 
 func errorFromStatus(code int, msg string) error {
