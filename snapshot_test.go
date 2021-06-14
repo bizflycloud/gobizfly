@@ -153,7 +153,7 @@ func TestSnapshotList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	snapshots, err := client.Snapshot.List(ctx, &ListOptions{})
+	snapshots, err := client.Snapshot.List(ctx, &ListSnasphotsOptions{})
 	require.NoError(t, err)
 	assert.Len(t, snapshots, 2)
 	volume := snapshots[0]

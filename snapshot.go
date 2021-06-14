@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -18,9 +19,13 @@ const (
 
 var _ SnapshotService = (*snapshot)(nil)
 
+type ListSnasphotsOptions struct {
+	VolumeId string `json:"volume_id,omitempty"`
+}
+
 // SnapshotService is an interface to interact with BizFly API Snapshot endpoint.
 type SnapshotService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*Snapshot, error)
+	List(ctx context.Context, opts *ListSnasphotsOptions) ([]*Snapshot, error)
 	Create(ctx context.Context, scr *SnapshotCreateRequest) (*Snapshot, error)
 	Get(ctx context.Context, id string) (*Snapshot, error)
 	Delete(ctx context.Context, id string) error
@@ -113,10 +118,15 @@ func (s *snapshot) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Sna
 }
 
 // List lists all snapshot of user
-func (s *snapshot) List(ctx context.Context, opts *ListOptions) ([]*Snapshot, error) {
+func (s *snapshot) List(ctx context.Context, opts *ListSnasphotsOptions) ([]*Snapshot, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, snapshotPath, nil)
 	if err != nil {
 		return nil, err
+	}
+	if opts.VolumeId != "" {
+		params, _ := url.ParseQuery("")
+		params.Add("volume_id", opts.VolumeId)
+		req.URL.RawQuery = params.Encode()
 	}
 
 	resp, err := s.client.Do(ctx, req)
