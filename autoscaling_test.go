@@ -269,7 +269,7 @@ func Test_policy_List(t *testing.T) {
 	mux.HandleFunc(testlib.AutoScalingURL(p.resourcePath("09ea7069-2767-4d86-b125-0549827e30f7")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `{
-          "scale_out_info": [
+          "scale_out_policy": [
             {
               "range_time": 300,
               "type": "CHANGE_IN_CAPACITY",
@@ -281,20 +281,20 @@ func Test_policy_List(t *testing.T) {
               "id": "5f1fd6f0e48a89000e37a1b5"
             }
           ],
-          "deletion_info": {},
-          "load_balancer_info": {},
-          "scale_in_info": [],
+          "deletion_policy": {},
+          "load_balancer_policy": {},
+          "scale_in_policy": [],
           "doing_task": []
         }`
 		_, _ = fmt.Fprint(w, resp)
 	})
 	policies, err := client.AutoScaling.Policies().List(ctx, "09ea7069-2767-4d86-b125-0549827e30f7")
 	require.NoError(t, err)
-	scaleOutPolicy := policies.ScaleOutPolicyInformations[0]
+	scaleOutPolicy := policies.ScaleOutPolicies[0]
 
 	policyID := "5f1fd6f0e48a89000e37a1b5"
 	policyType := "CHANGE_IN_CAPACITY"
-	assert.Equal(t, ScalePolicyInformation{
+	assert.Equal(t, ScalePolicy{
 		RangeTime:  300,
 		BestEffort: true,
 		CoolDown:   300,
