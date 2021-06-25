@@ -24,10 +24,10 @@ var _ ContainerRegistryService = (*containerRegistry)(nil)
 
 type ContainerRegistryService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Repository, error)
-	Create(ctx context.Context, crpl *createRepositoryPayload) error
+	Create(ctx context.Context, crpl *CreateRepositoryPayload) error
 	Delete(ctx context.Context, repositoryName string) error
 	GetTags(ctx context.Context, repositoryName string) (*TagRepository, error)
-	EditRepo(ctx context.Context, repositoryName string, erpl *editRepositoryPayload) error
+	EditRepo(ctx context.Context, repositoryName string, erpl *EditRepositoryPayload) error
 	DeleteTag(ctx context.Context, tagName string, repositoryName string) error
 	GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
 }
@@ -44,7 +44,7 @@ type Repositories struct {
 	Repositories []Repository `json:"repositories"`
 }
 
-type createRepositoryPayload struct {
+type CreateRepositoryPayload struct {
 	Name   string `json:"name"`
 	Public bool   `json:"public"`
 }
@@ -60,7 +60,7 @@ type RepositoryTag struct {
 	Fixes           int    `json:"fixes"`
 }
 
-type editRepositoryPayload struct {
+type EditRepositoryPayload struct {
 	Public bool `json:"public"`
 }
 
@@ -112,7 +112,7 @@ func (c *containerRegistry) List(ctx context.Context, opts *ListOptions) ([]*Rep
 	return data.Repositories, nil
 }
 
-func (c *containerRegistry) Create(ctx context.Context, crpl *createRepositoryPayload) error {
+func (c *containerRegistry) Create(ctx context.Context, crpl *CreateRepositoryPayload) error {
 	req, err := c.client.NewRequest(ctx, http.MethodPost, containerRegistryName, c.resourcePath(), &crpl)
 	if err != nil {
 		return err
@@ -154,7 +154,7 @@ func (c *containerRegistry) GetTags(ctx context.Context, repositoryName string) 
 	return data, nil
 }
 
-func (c *containerRegistry) EditRepo(ctx context.Context, repositoryName string, erpl *editRepositoryPayload) error {
+func (c *containerRegistry) EditRepo(ctx context.Context, repositoryName string, erpl *EditRepositoryPayload) error {
 	req, err := c.client.NewRequest(ctx, http.MethodPatch, containerRegistryName, strings.Join([]string{registryPath, repositoryName}, "/"), erpl)
 	if err != nil {
 		return err
