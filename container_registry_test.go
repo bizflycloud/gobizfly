@@ -47,11 +47,11 @@ func TestRepoCreate(t *testing.T) {
 
 	mux.HandleFunc(testlib.RegistryURL(registryPath), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
-		var payload *createRepositoryPayload
+		var payload *CreateRepositoryPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, false, payload.Public)
 	})
-	err := client.ContainerRegistry.Create(ctx, &createRepositoryPayload{
+	err := client.ContainerRegistry.Create(ctx, &CreateRepositoryPayload{
 		Name:   "abc",
 		Public: false,
 	})
@@ -111,11 +111,11 @@ func TestEditRepo(t *testing.T) {
 	mux.HandleFunc(strings.Join([]string{testlib.RegistryURL(registryPath), "ji84wqtzr77ogo6b"}, "/"),
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodPatch, r.Method)
-			var payload *editRepositoryPayload
+			var payload *EditRepositoryPayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, false, payload.Public)
 		})
-	err := client.ContainerRegistry.EditRepo(ctx, "ji84wqtzr77ogo6b", &editRepositoryPayload{
+	err := client.ContainerRegistry.EditRepo(ctx, "ji84wqtzr77ogo6b", &EditRepositoryPayload{
 		Public: false,
 	})
 	require.NoError(t, err)
