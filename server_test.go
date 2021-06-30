@@ -215,7 +215,7 @@ func TestServerDelete(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	err := client.Server.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477")
+	err := client.Server.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477", []string{})
 	require.NoError(t, err)
 
 }
