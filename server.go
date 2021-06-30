@@ -60,6 +60,10 @@ type Flavor struct {
 	VCPU int    `json:"vcpu"`
 }
 
+type DeletedVolumes struct {
+	Ids []string `json:"delete_volume"`
+}
+
 // Server contains server information.
 type Server struct {
 	ID               string                 `json:"id"`
@@ -144,7 +148,7 @@ type ServerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
-	Delete(ctx context.Context, id string) error
+	Delete(ctx context.Context, id string, deletedRootDisk []string) error
 	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
 	Start(ctx context.Context, id string) (*Server, error)
 	Stop(ctx context.Context, id string) (*Server, error)
@@ -293,8 +297,11 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 }
 
 // Delete deletes a server.
-func (s *server) Delete(ctx context.Context, id string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, nil)
+func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) error {
+	deletedVolumes := &DeletedVolumes{
+		Ids: deletedRootDisk,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deletedVolumes)
 	if err != nil {
 		return err
 	}
