@@ -30,6 +30,7 @@ type ContainerRegistryService interface {
 	EditRepo(ctx context.Context, repositoryName string, erpl *EditRepositoryPayload) error
 	DeleteTag(ctx context.Context, tagName string, repositoryName string) error
 	GetTag(ctx context.Context, repositoryName string, tagName string, vulnerabilities string) (*Image, error)
+	GenerateToken(ctx context.Context, gtpl *GenerateTokenPayload) (*TokenResp, error)
 }
 
 type Repository struct {
@@ -83,6 +84,22 @@ type Image struct {
 type TagRepository struct {
 	Repository Repository      `json:"repository"`
 	Tags       []RepositoryTag `json:"tags"`
+}
+
+type GenerateTokenPayload struct {
+	ExpiresIn int     `json:"expires_in"`
+	Scopes    []Scope `json:"scopes"`
+}
+
+type Scope struct {
+	Action     []string `json:"actions"`
+	Repository string   `json:"repository"`
+}
+
+type TokenResp struct {
+	Token     string `json:"token"`
+	ExpiresIn int    `json:"expires_in"`
+	IssuedAt  string `json:"issued_at"`
 }
 
 func (c *containerRegistry) resourcePath() string {
@@ -197,6 +214,23 @@ func (c *containerRegistry) GetTag(ctx context.Context, repositoryName string, t
 		return nil, err
 	}
 	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (c *containerRegistry) GenerateToken(ctx context.Context, gtpl *GenerateTokenPayload) (*TokenResp, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodPost, containerRegistryName, tokenPath, gtpl)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var data *TokenResp
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
