@@ -5,7 +5,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
