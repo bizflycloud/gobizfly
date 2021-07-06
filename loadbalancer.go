@@ -344,7 +344,7 @@ func (l *listener) Get(ctx context.Context, id string) (*Listener, error) {
 
 func (l *listener) Update(ctx context.Context, id string, lur *ListenerUpdateRequest) (*Listener, error) {
 	var data struct {
-		Listener *ListenerUpdateRequest
+		Listener *ListenerUpdateRequest `json:"listener"`
 	}
 	data.Listener = lur
 	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, l.itemPath(id), &data)
