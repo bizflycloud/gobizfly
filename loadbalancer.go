@@ -570,10 +570,10 @@ type SessionPersistence struct {
 type PoolCreateRequest struct {
 	Description        *string             `json:"description,omitempty"`
 	LBAlgorithm        string              `json:"lb_algorithm"`
-	ListenerID         *string             `json:"listener_id"`
+	ListenerID         *string             `json:"listener_id,omitempty"`
 	Name               *string             `json:"name,omitempty"`
 	Protocol           string              `json:"protocol"`
-	SessionPersistence *SessionPersistence `json:"session_persistence"`
+	SessionPersistence *SessionPersistence `json:"session_persistence,omitempty"`
 }
 
 // PoolUpdateRequest represents update pool request payload.
