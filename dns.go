@@ -44,6 +44,10 @@ type Zone struct {
 	Active     bool     `json:"active"`
 }
 
+type WarpedZonePayload struct {
+	Zones *CreateZonePayload `json:"zones"`
+}
+
 type ExtendedZone struct {
 	Zone
 	RecordsSet []RecordSet `json:"record_set"`
@@ -198,7 +202,10 @@ func (d *dnsService) ListZones(ctx context.Context, opts *ListOptions) (*ListZon
 }
 
 func (d *dnsService) CreateZone(ctx context.Context, czpl *CreateZonePayload) (*ExtendedZone, error) {
-	req, err := d.client.NewRequest(ctx, http.MethodPost, dnsName, d.resourcePath(), czpl)
+	payload := WarpedZonePayload{
+		Zones: czpl,
+	}
+	req, err := d.client.NewRequest(ctx, http.MethodPost, dnsName, d.resourcePath(), payload)
 	if err != nil {
 		return nil, err
 	}
