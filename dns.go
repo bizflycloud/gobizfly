@@ -48,6 +48,10 @@ type WarpedZonePayload struct {
 	Zones *CreateZonePayload `json:"zones"`
 }
 
+type WarpedRecordPayload struct {
+	Record interface{} `json:"record"`
+}
+
 type ExtendedZone struct {
 	Zone
 	RecordsSet []RecordSet `json:"record_set"`
@@ -251,7 +255,10 @@ func (d *dnsService) DeleteZone(ctx context.Context, zoneID string) error {
 }
 
 func (d *dnsService) CreateRecord(ctx context.Context, zoneID string, crpl interface{}) (*Record, error) {
-	req, err := d.client.NewRequest(ctx, http.MethodPost, dnsName, strings.Join([]string{d.zoneItemPath(zoneID), "record"}, "/"), crpl)
+	payload := WarpedRecordPayload{
+		Record: crpl,
+	}
+	req, err := d.client.NewRequest(ctx, http.MethodPost, dnsName, strings.Join([]string{d.zoneItemPath(zoneID), "record"}, "/"), &payload)
 	if err != nil {
 		return nil, err
 	}
