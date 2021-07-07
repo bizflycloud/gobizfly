@@ -5,7 +5,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -55,9 +54,8 @@ type RecordSet struct {
 	Name              string            `json:"name"`
 	Type              string            `json:"type"`
 	TTL               string            `json:"ttl"`
-	Data              []string          `json:"data"`
-	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data"`
 }
+
 type Meta struct {
 	MaxResults int `json:"max_results"`
 	Total      int `json:"total"`
@@ -250,7 +248,6 @@ func (d *dnsService) CreateRecord(ctx context.Context, zoneID string, crpl inter
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(req.URL)
 	resp, err := d.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
