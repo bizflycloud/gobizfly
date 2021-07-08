@@ -285,35 +285,38 @@ func TestVPCCreate(t *testing.T) {
 		var payload *CreateVPCPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "test", payload.Name)
-		resp := `{
-    "id": "41f40298-8d05-4889-9672-f03cfccd719f",
-    "name": "test",
-    "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
-    "admin_state_up": true,
-    "mtu": 1500,
-    "status": "ACTIVE",
-    "subnets": [],
-    "shared": false,
-    "project_id": "bc8d2790fc9a46949818b942c0a824de",
-    "port_security_enabled": true,
-    "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
-    "router:external": false,
-    "provider:network_type": "gre",
-    "provider:physical_network": null,
-    "provider:segmentation_id": 2393,
-    "availability_zone_hints": [
-        "HN1",
-        "HN2"
-    ],
-    "is_default": true,
-    "availability_zones": [],
-    "ipv4_address_scope": null,
-    "ipv6_address_scope": null,
-    "description": "",
-    "tags": [],
-    "created_at": "2021-02-03T06:59:35Z",
-    "updated_at": "2021-02-03T06:59:36Z",
-    "revision_number": 1
+		resp := `
+{
+    "network": {
+        "id": "41f40298-8d05-4889-9672-f03cfccd719f",
+        "name": "test",
+        "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+        "admin_state_up": true,
+        "mtu": 1500,
+        "status": "ACTIVE",
+        "subnets": [],
+        "shared": false,
+        "project_id": "bc8d2790fc9a46949818b942c0a824de",
+        "port_security_enabled": true,
+        "qos_policy_id": "ab305294-df0d-4f22-88d7-3b7f06167bb0",
+        "router:external": false,
+        "provider:network_type": "gre",
+        "provider:physical_network": null,
+        "provider:segmentation_id": 2393,
+        "availability_zone_hints": [
+            "HN1",
+            "HN2"
+        ],
+        "is_default": true,
+        "availability_zones": [],
+        "ipv4_address_scope": null,
+        "ipv6_address_scope": null,
+        "description": "",
+        "tags": [],
+        "created_at": "2021-02-03T06:59:35Z",
+        "updated_at": "2021-02-03T06:59:36Z",
+        "revision_number": 1
+    }
 }
 `
 		_, _ = fmt.Fprint(writer, resp)
