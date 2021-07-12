@@ -56,6 +56,7 @@ type Client struct {
 	DNS               DNSService
 	Account           AccountService
 	VPC               VPCService
+	NetworkInterface  NetworkInterfaceService
 
 	Snapshot SnapshotService
 
@@ -175,6 +176,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.DNS = &dnsService{client: c}
 	c.Account = &accountService{client: c}
 	c.VPC = &vpcService{client: c}
+	c.NetworkInterface = &networkInterfaceService{client: c}
 	return c, nil
 }
 
