@@ -10,8 +10,7 @@ import (
 )
 
 const (
-	vpcPath              = "/vpc-networks"
-	networkInterfacePath = "/network-interfaces"
+	vpcPath = "/vpc-networks"
 )
 
 var _ VPCService = (*vpcService)(nil)
@@ -136,10 +135,6 @@ type CreateNetworkInterfacePayload struct {
 
 type UpdateNetworkInterfacePayload struct {
 	Name string `json:"name"`
-}
-
-func (v vpcService) resourceNetworkInterfacePath(netInterfaceID string) string {
-	return strings.Join([]string{networkInterfacePath, netInterfaceID}, "/")
 }
 
 func (v vpcService) resourcePath() string {
