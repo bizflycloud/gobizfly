@@ -13,7 +13,7 @@ const (
 
 var _ NetworkInterfaceService = (*networkInterfaceService)(nil)
 
-type ListNetworkInterfacesOptions struct {
+type ListNetworkInterfaceOptions struct {
 	NetworkID string `json:"network_id"`
 	Status    string `json:"status"`
 }
@@ -27,7 +27,7 @@ type NetworkInterfaceService interface {
 	UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, unip *UpdateNetworkInterfacePayload) (*NetworkInterface, error)
 	DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error
 	GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error)
-	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfacesOptions) ([]*NetworkInterface, error)
+	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
 }
 
 type NetworkInterface struct {
@@ -144,7 +144,7 @@ func (n networkInterfaceService) DeleteNetworkInterface(ctx context.Context, net
 	return resp.Body.Close()
 }
 
-func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfacesOptions) ([]*NetworkInterface, error) {
+func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, networkInterfacePath, nil)
 	if err != nil {
 		return nil, err
