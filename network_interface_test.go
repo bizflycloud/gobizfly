@@ -14,7 +14,7 @@ import (
 func TestNetworkInterfaceList(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL("/network-interfaces"), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(networkInterfacePath), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		resp := `[
     {
@@ -120,7 +120,7 @@ func TestNetworkInterfaceList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	networkInterfaces, err := client.NetworkInterface.ListNetworkInterface(ctx)
+	networkInterfaces, err := client.NetworkInterface.ListNetworkInterface(ctx, &ListNetworkInterfacesOptions{})
 	require.NoError(t, err)
 	assert.Len(t, networkInterfaces, 3)
 	assert.Equal(t, 1, networkInterfaces[0].RevisionNumber)

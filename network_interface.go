@@ -13,6 +13,11 @@ const (
 
 var _ NetworkInterfaceService = (*networkInterfaceService)(nil)
 
+type ListNetworkInterfacesOptions struct {
+	NetworkID string `json:"network_id"`
+	Status    string `json:"status"`
+}
+
 type networkInterfaceService struct {
 	client *Client
 }
@@ -22,7 +27,7 @@ type NetworkInterfaceService interface {
 	UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, unip *UpdateNetworkInterfacePayload) (*NetworkInterface, error)
 	DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error
 	GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error)
-	ListNetworkInterface(ctx context.Context) ([]*NetworkInterface, error)
+	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfacesOptions) ([]*NetworkInterface, error)
 }
 
 type NetworkInterface struct {
@@ -139,11 +144,17 @@ func (n networkInterfaceService) DeleteNetworkInterface(ctx context.Context, net
 	return resp.Body.Close()
 }
 
-func (n networkInterfaceService) ListNetworkInterface(ctx context.Context) ([]*NetworkInterface, error) {
+func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfacesOptions) ([]*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, networkInterfacePath, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	params := req.URL.Query()
+	params.Add("network_id", opts.NetworkID)
+	params.Add("status", opts.Status)
+	req.URL.RawQuery = params.Encode()
+
 	var data []*NetworkInterface
 	resp, err := n.client.Do(ctx, req)
 	if err != nil {
