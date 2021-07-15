@@ -20,18 +20,19 @@ type firewall struct {
 }
 
 type BaseFirewall struct {
-	ID             string         `json:"id"`
-	Name           string         `json:"name"`
-	Description    string         `json:"description"`
-	Tags           []string       `json:"tags"`
-	CreatedAt      string         `json:"created_at"`
-	UpdatedAt      string         `json:"updated_at"`
-	RevisionNumber int            `json:"revision_number"`
-	ProjectID      string         `json:"project_id"`
-	ServersCount   int            `json:"servers_count"`
-	RulesCount     int            `json:"rules_count"`
-	InBound        []FirewallRule `json:"inbound"`
-	OutBound       []FirewallRule `json:"outbound"`
+	ID                    string         `json:"id"`
+	Name                  string         `json:"name"`
+	Description           string         `json:"description"`
+	Tags                  []string       `json:"tags"`
+	CreatedAt             string         `json:"created_at"`
+	UpdatedAt             string         `json:"updated_at"`
+	RevisionNumber        int            `json:"revision_number"`
+	ProjectID             string         `json:"project_id"`
+	ServersCount          int            `json:"servers_count"`
+	RulesCount            int            `json:"rules_count"`
+	NetworkInterfaceCount int            `json:"network_interface_count"`
+	InBound               []FirewallRule `json:"inbound"`
+	OutBound              []FirewallRule `json:"outbound"`
 }
 
 type Firewall struct {
@@ -41,7 +42,8 @@ type Firewall struct {
 
 type FirewallDetail struct {
 	BaseFirewall
-	Servers []*Server `json:"servers"`
+	Servers          []*Server           `json:"servers"`
+	NetworkInterface []*NetworkInterface `json:"network_interface"`
 }
 
 type FirewallRule struct {
@@ -77,10 +79,11 @@ type FirewallSingleRuleCreateRequest struct {
 }
 
 type FirewallRequestPayload struct {
-	Name     string                      `json:"name"`
-	InBound  []FirewallRuleCreateRequest `json:"inbound,omitempty"`
-	OutBound []FirewallRuleCreateRequest `json:"outbound,omitempty"`
-	Targets  []string                    `json:"targets,omitempty"`
+	Name              string                      `json:"name"`
+	InBound           []FirewallRuleCreateRequest `json:"inbound,omitempty"`
+	OutBound          []FirewallRuleCreateRequest `json:"outbound,omitempty"`
+	Targets           []string                    `json:"targets,omitempty"`
+	NetworkInterfaces []string                    `json:"network_interfaces,omitempty"`
 }
 
 type FirewallDeleteResponse struct {
