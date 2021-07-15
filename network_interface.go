@@ -64,8 +64,8 @@ type FixedIp struct {
 }
 
 type CreateNetworkInterfacePayload struct {
-	AttachedServer string `json:"attached_server"`
-	FixedIP        string `json:"fixed_ip"`
+	AttachedServer string `json:"attached_server,omitempty"`
+	FixedIP        string `json:"fixed_ip,omitempty"`
 	Name           string `json:"name"`
 }
 
