@@ -28,7 +28,7 @@ type NetworkInterfaceService interface {
 	DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error
 	GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error)
 	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
-	ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
+	ActionVPCNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
 }
 
 type NetworkInterface struct {
@@ -166,7 +166,7 @@ func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts 
 	return data, nil
 }
 
-func (n networkInterfaceService) ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
+func (n networkInterfaceService) ActionVPCNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), payload)
 	if err != nil {
 		return nil, err
