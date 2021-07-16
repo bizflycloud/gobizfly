@@ -322,7 +322,7 @@ func TestNetworkInterfaceAction(t *testing.T) {
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	networkInterface, err := client.NetworkInterface.ActionNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
+	networkInterface, err := client.NetworkInterface.ActionVPCNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
 		Action:   "attach_server",
 		ServerID: "21da0a9e-a59f-456f-a4c3-a0248a29eb9c",
 	})
