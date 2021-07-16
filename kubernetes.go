@@ -16,7 +16,7 @@ import (
 const (
 	clusterPath = "/_"
 	kubeConfig  = "kubeconfig"
-	k8sVersion = "/k8s_versions"
+	k8sVersion  = "/k8s_versions"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -64,7 +64,7 @@ type ControllerVersion struct {
 
 type KubernetesVersionResp struct {
 	ControllerVersions []ControllerVersion `json:"controller_versions"`
-	WorkerVersion []string `json:"worker_versions"`
+	WorkerVersion      []string            `json:"worker_versions"`
 }
 
 type Clusters struct {
