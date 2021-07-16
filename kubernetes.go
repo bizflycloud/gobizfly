@@ -16,6 +16,7 @@ import (
 const (
 	clusterPath = "/_"
 	kubeConfig  = "kubeconfig"
+	k8sVersion = "/k8s_versions"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -36,6 +37,7 @@ type KubernetesEngineService interface {
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
+	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResp, error)
 }
 
 type WorkerPool struct {
@@ -58,6 +60,11 @@ type ControllerVersion struct {
 	Name        string `json:"name,omitempty" yaml:"name,omitempty"`
 	Description string `json:"description" yaml:"description"`
 	K8SVersion  string `json:"kubernetes_version" yaml:"kubernetes_version"`
+}
+
+type KubernetesVersionResp struct {
+	ControllerVersions []ControllerVersion `json:"controller_versions"`
+	WorkerVersion []string `json:"worker_versions"`
 }
 
 type Clusters struct {
@@ -324,4 +331,22 @@ func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID 
 	}
 	bodyString := string(bodyBytes)
 	return bodyString, nil
+}
+
+func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResp, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, k8sVersion, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data *KubernetesVersionResp
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
 }
