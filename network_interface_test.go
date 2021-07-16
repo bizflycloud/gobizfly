@@ -126,13 +126,13 @@ func TestNetworkInterfaceList(t *testing.T) {
 	assert.Equal(t, 1, networkInterfaces[0].RevisionNumber)
 }
 
-func TestVPCNetworkInterfaceCreate(t *testing.T) {
+func TestNetworkInterfaceCreate(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
 	mux.HandleFunc(testlib.CloudServerURL(n.resourceCreateNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665")), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		var payload *CreateNetworkInterfacePayload
+		var payload *NetworkInterfaceRequestPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "test", payload.Name)
 		resp := `{
@@ -170,7 +170,7 @@ func TestVPCNetworkInterfaceCreate(t *testing.T) {
         }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	networkInterface, err := client.NetworkInterface.CreateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", &CreateNetworkInterfacePayload{
+	networkInterface, err := client.NetworkInterface.CreateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", &NetworkInterfaceRequestPayload{
 		Name: "test",
 	})
 	require.NoError(t, err)
@@ -178,7 +178,7 @@ func TestVPCNetworkInterfaceCreate(t *testing.T) {
 	assert.Equal(t, true, networkInterface.AdminStateUp)
 }
 
-func TestVPCNetworkInterfaceGet(t *testing.T) {
+func TestNetworkInterfaceGet(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
@@ -225,14 +225,14 @@ func TestVPCNetworkInterfaceGet(t *testing.T) {
 	assert.Equal(t, "2021-07-12T08:55:31Z", vpc.CreatedAt)
 }
 
-func TestVPCNetworkInterfaceUpdate(t *testing.T) {
+func TestNetworkInterfaceUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
 	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
-			var payload *UpdateNetworkInterfacePayload
+			var payload *NetworkInterfaceRequestPayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "test_update", payload.Name)
 			resp := `{
@@ -270,11 +270,64 @@ func TestVPCNetworkInterfaceUpdate(t *testing.T) {
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	networkInterface, err := client.NetworkInterface.UpdateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &UpdateNetworkInterfacePayload{
+	networkInterface, err := client.NetworkInterface.UpdateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
 		Name: "test_update",
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "test_update", networkInterface.Name)
+}
+
+func TestNetworkInterfaceAction(t *testing.T) {
+	setup()
+	defer teardown()
+	var n networkInterfaceService
+	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
+		func(writer http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, http.MethodPut, r.Method)
+			var payload *NetworkInterfaceRequestPayload
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+			assert.Equal(t, "attach_server", payload.Action)
+			assert.Equal(t, "21da0a9e-a59f-456f-a4c3-a0248a29eb9c", payload.ServerID)
+			resp := `{
+                "id": "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34",
+                "name": "test-name",
+                "network_id": "99b82e5d-98c3-403f-9ff5-8b5b940e3665",
+                "tenant_id": "7c759790478644f88e7a58fca8dc6658",
+                "mac_address": "fa:16:3e:53:9f:78",
+                "admin_state_up": true,
+                "status": "DOWN",
+                "device_id": "21da0a9e-a59f-456f-a4c3-a0248a29eb9c",
+                "device_owner": "compute:HN1",
+                "fixed_ips": [
+                    {
+                        "subnet_id": "2ee5f576-a90e-46a1-b314-4533924bbc46",
+                        "ip_address": "10.108.16.5"
+                    }
+                ],
+                "allowed_address_pairs": [],
+                "extra_dhcp_opts": [],
+                "security_groups": [
+                    "e87c2f6c-32ec-43d7-b27e-804c4b463238"
+                ],
+                "description": "",
+                "binding:vnic_type": "normal",
+                "port_security_enabled": true,
+                "qos_policy_id": null,
+                "tags": [],
+                "created_at": "2021-07-14T08:12:56Z",
+                "updated_at": "2021-07-15T10:29:30Z",
+                "revision_number": 17,
+                "project_id": "7c759790478644f88e7a58fca8dc6658",
+                "firewalls": []
+            }`
+			_, _ = fmt.Fprint(writer, resp)
+		})
+	networkInterface, err := client.NetworkInterface.ActionNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
+		Action:   "attach_server",
+		ServerID: "21da0a9e-a59f-456f-a4c3-a0248a29eb9c",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "21da0a9e-a59f-456f-a4c3-a0248a29eb9c", networkInterface.DeviceID)
 }
 
 func TestNetworkInterfaceDelete(t *testing.T) {

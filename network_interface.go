@@ -23,11 +23,12 @@ type networkInterfaceService struct {
 }
 
 type NetworkInterfaceService interface {
-	CreateNetworkInterface(ctx context.Context, networkID string, cnip *CreateNetworkInterfacePayload) (*NetworkInterface, error)
-	UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, unip *UpdateNetworkInterfacePayload) (*NetworkInterface, error)
+	CreateNetworkInterface(ctx context.Context, networkID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
+	UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
 	DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error
 	GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error)
 	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
+	ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
 }
 
 type NetworkInterface struct {
@@ -63,14 +64,12 @@ type FixedIp struct {
 	IPAddress string `json:"ip_address"`
 }
 
-type CreateNetworkInterfacePayload struct {
+type NetworkInterfaceRequestPayload struct {
 	AttachedServer string `json:"attached_server,omitempty"`
 	FixedIP        string `json:"fixed_ip,omitempty"`
+	ServerID       string `json:"server_id,omitempty"`
 	Name           string `json:"name"`
-}
-
-type UpdateNetworkInterfacePayload struct {
-	Name string `json:"name"`
+	Action         string `json:"action"`
 }
 
 func (n networkInterfaceService) resourceCreateNetworkInterfacePath(networkID string) string {
@@ -81,8 +80,8 @@ func (n networkInterfaceService) resourceNetworkInterfacePath(networkID string, 
 	return strings.Join([]string{vpcPath, networkID, "network-interfaces", netInterfaceID}, "/")
 }
 
-func (n networkInterfaceService) CreateNetworkInterface(ctx context.Context, networkID string, cnip *CreateNetworkInterfacePayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.resourceCreateNetworkInterfacePath(networkID), cnip)
+func (n networkInterfaceService) CreateNetworkInterface(ctx context.Context, networkID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.resourceCreateNetworkInterfacePath(networkID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -115,8 +114,8 @@ func (n networkInterfaceService) GetNetworkInterface(ctx context.Context, networ
 	return data, nil
 }
 
-func (n networkInterfaceService) UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, unip *UpdateNetworkInterfacePayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), unip)
+func (n networkInterfaceService) UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -156,6 +155,23 @@ func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts 
 	req.URL.RawQuery = params.Encode()
 
 	var data []*NetworkInterface
+	resp, err := n.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func (n networkInterfaceService) ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), payload)
+	if err != nil {
+		return nil, err
+	}
+	var data *NetworkInterface
 	resp, err := n.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
