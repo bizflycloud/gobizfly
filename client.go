@@ -210,7 +210,6 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Tenant-Name", c.tenantName)
 	req.Header.Add("X-Tenant-Id", c.tenantID)
-	fmt.Printf("%+v\n", req.Header)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
