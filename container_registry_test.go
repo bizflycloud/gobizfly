@@ -189,7 +189,7 @@ func TestGenToken(t *testing.T) {
 		ExpiresIn: 6969,
 		Scopes: []Scope{
 			{
-				Action: []string{"pull", "push"},
+				Action:     []string{"pull", "push"},
 				Repository: "test",
 			},
 		},

@@ -58,10 +58,10 @@ type ExtendedZone struct {
 }
 
 type RecordSet struct {
-	ID                string            `json:"id"`
-	Name              string            `json:"name"`
-	Type              string            `json:"type"`
-	TTL               string            `json:"ttl"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	TTL  string `json:"ttl"`
 }
 
 type Meta struct {
@@ -149,7 +149,7 @@ type UpdateRecordPayload struct {
 	Name              string            `json:"name,omitempty"`
 	Type              string            `json:"type,omitempty"`
 	TTL               int               `json:"ttl,omitempty"`
-	Data              []MXData     `json:"data,omitempty"`
+	Data              []MXData          `json:"data,omitempty"`
 	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data,omitempty"`
 }
 
@@ -163,7 +163,7 @@ type Record struct {
 	ZoneID            string            `json:"zone_id"`
 	Type              string            `json:"type"`
 	TTL               int               `json:"ttl"`
-	Data              []interface{}    `json:"data"`
+	Data              []interface{}     `json:"data"`
 	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data"`
 }
 

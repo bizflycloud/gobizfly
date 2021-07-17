@@ -19,7 +19,7 @@ const (
 	ua                      = "bizfly-client-go/" + version
 	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
 	mediaType               = "application/json; charset=utf-8"
-	accountName             = "account"
+	accountName             = "bizfly_account"
 	loadBalancerServiceName = "load_balancer"
 	serverServiceName       = "cloud_server"
 	autoScalingServiceName  = "auto_scaling"
@@ -210,6 +210,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Tenant-Name", c.tenantName)
 	req.Header.Add("X-Tenant-Id", c.tenantID)
+	fmt.Printf("%+v\n", req.Header)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
@@ -243,7 +244,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
 			return
 		}
-		c.SetKeystoneToken(tok.KeystoneToken)
+		c.SetKeystoneToken(tok)
 		req.Header.Set("X-Auth-Token", c.keystoneToken)
 		resp, err = c.do(ctx, req)
 	}
@@ -257,8 +258,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
-func (c *Client) SetKeystoneToken(s string) {
-	c.keystoneToken = s
+func (c *Client) SetKeystoneToken(token *Token) {
+	c.keystoneToken = token.KeystoneToken
+	c.tenantID = token.TenantID
 }
 
 // ListOptions specifies the optional parameters for List method.

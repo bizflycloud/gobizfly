@@ -11,7 +11,7 @@ import (
 
 const (
 	regionsPath   = "/regions"
-	usersInfoPath = "/users/info"
+	usersInfoPath = "/user"
 )
 
 type accountService struct {
