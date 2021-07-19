@@ -47,8 +47,7 @@ func TestNetworkInterfaceList(t *testing.T) {
         "updated_at": "2021-07-12T08:55:31Z",
         "revision_number": 1,
         "project_id": "7c759790478644f88e7a58fca8dc6658",
-        "attached_server": {},
-        "firewalls": []
+        "attached_server": {}
     },
     {
         "id": "f8f78df1-43f1-4c73-9f4c-7d64fecb3b35",
@@ -80,8 +79,7 @@ func TestNetworkInterfaceList(t *testing.T) {
         "updated_at": "2021-07-12T08:55:31Z",
         "revision_number": 1,
         "project_id": "7c759790478644f88e7a58fca8dc6658",
-        "attached_server": {},
-        "firewalls": []
+        "attached_server": {}
     },
     {
         "id": "f8f78df1-43f1-4c73-9f4c-7d64fecb3b36",
@@ -113,8 +111,7 @@ func TestNetworkInterfaceList(t *testing.T) {
         "updated_at": "2021-07-12T08:55:31Z",
         "revision_number": 1,
         "project_id": "7c759790478644f88e7a58fca8dc6658",
-        "attached_server": {},
-        "firewalls": []
+        "attached_server": {}
     }
 ]
 `
@@ -165,8 +162,7 @@ func TestNetworkInterfaceCreate(t *testing.T) {
             "updated_at": "2021-07-12T08:55:31Z",
             "revision_number": 1,
             "project_id": "7c759790478644f88e7a58fca8dc6658",
-            "attached_server": {},
-            "firewalls": []
+            "attached_server": {}
         }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
@@ -215,8 +211,7 @@ func TestNetworkInterfaceGet(t *testing.T) {
                 "updated_at": "2021-07-12T08:55:31Z",
                 "revision_number": 1,
                 "project_id": "7c759790478644f88e7a58fca8dc6658",
-                "attached_server": {},
-                "firewalls": []
+                "attached_server": {}
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
@@ -265,8 +260,7 @@ func TestNetworkInterfaceUpdate(t *testing.T) {
                 "updated_at": "2021-07-12T08:55:31Z",
                 "revision_number": 1,
                 "project_id": "7c759790478644f88e7a58fca8dc6658",
-                "attached_server": {},
-                "firewalls": []
+                "attached_server": {}
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
@@ -317,8 +311,7 @@ func TestNetworkInterfaceAction(t *testing.T) {
                 "created_at": "2021-07-14T08:12:56Z",
                 "updated_at": "2021-07-15T10:29:30Z",
                 "revision_number": 17,
-                "project_id": "7c759790478644f88e7a58fca8dc6658",
-                "firewalls": []
+                "project_id": "7c759790478644f88e7a58fca8dc6658"
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})

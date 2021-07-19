@@ -58,7 +58,6 @@ type NetworkInterface struct {
 	ProjectID           string    `json:"project_id"`
 	AttachedServer      struct {
 	} `json:"attached_server"`
-	Firewalls []string `json:"firewalls"`
 }
 
 type FixedIp struct {
