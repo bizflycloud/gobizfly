@@ -14,8 +14,10 @@ const (
 var _ NetworkInterfaceService = (*networkInterfaceService)(nil)
 
 type ListNetworkInterfaceOptions struct {
-	NetworkID string `json:"network_id"`
-	Status    string `json:"status"`
+	VPCNetworkID string `json:"vpc-network-id,omitempty"`
+	Status       string `json:"status,omitempty"`
+	Detailed     string `json:"detailed,omitempty"`
+	Type         string `json:"type,omitempty"`
 }
 
 type networkInterfaceService struct {
@@ -23,12 +25,12 @@ type networkInterfaceService struct {
 }
 
 type NetworkInterfaceService interface {
-	CreateNetworkInterface(ctx context.Context, networkID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
-	UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
-	DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error
-	GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error)
-	ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
-	ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error)
+	Create(ctx context.Context, networkInterfaceID string, payload *CreateNetworkInterfacePayload) (*NetworkInterface, error)
+	Update(ctx context.Context, networkInterfaceID string, payload *UpdateNetworkInterfacePayload) (*NetworkInterface, error)
+	Delete(ctx context.Context, networkInterfaceID string) error
+	Get(ctx context.Context, networkInterfaceID string) (*NetworkInterface, error)
+	Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error)
+	List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
 }
 
 type NetworkInterface struct {
@@ -64,24 +66,40 @@ type FixedIp struct {
 	IPAddress string `json:"ip_address"`
 }
 
-type NetworkInterfaceRequestPayload struct {
-	AttachedServer string `json:"attached_server,omitempty"`
-	FixedIP        string `json:"fixed_ip,omitempty"`
-	ServerID       string `json:"server_id,omitempty"`
-	Name           string `json:"name"`
-	Action         string `json:"action"`
+type UpdateNetworkInterfacePayload struct {
+	Name string `json:"name"`
 }
 
-func (n networkInterfaceService) resourceCreateNetworkInterfacePath(networkID string) string {
+type CreateNetworkInterfacePayload struct {
+	AttachedServer string `json:"attached_server,omitempty"`
+	FixedIP        string `json:"fixed_ip,omitempty"`
+	Name           string `json:"name"`
+}
+
+type ActionNetworkInterfacePayload struct {
+	Action         string   `json:"action,omitempty"`
+	ServerID       string   `json:"server_id,omitempty"`
+	SecurityGroups []string `json:"security_groups,omitempty"`
+}
+
+func (n networkInterfaceService) createPath(networkID string) string {
 	return strings.Join([]string{vpcPath, networkID, "network-interfaces"}, "/")
 }
 
-func (n networkInterfaceService) resourceNetworkInterfacePath(networkID string, netInterfaceID string) string {
-	return strings.Join([]string{vpcPath, networkID, "network-interfaces", netInterfaceID}, "/")
+func (n networkInterfaceService) actionPath(id string) string {
+	return strings.Join([]string{networkInterfacePath, id, "action"}, "/")
 }
 
-func (n networkInterfaceService) CreateNetworkInterface(ctx context.Context, networkID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.resourceCreateNetworkInterfacePath(networkID), payload)
+func (n networkInterfaceService) resourcePath() string {
+	return networkInterfacePath
+}
+
+func (n networkInterfaceService) itemPath(id string) string {
+	return strings.Join([]string{networkInterfacePath, id}, "/")
+}
+
+func (n networkInterfaceService) Create(ctx context.Context, networkID string, payload *CreateNetworkInterfacePayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.createPath(networkID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +115,8 @@ func (n networkInterfaceService) CreateNetworkInterface(ctx context.Context, net
 	return data, nil
 }
 
-func (n networkInterfaceService) GetNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), nil)
+func (n networkInterfaceService) Get(ctx context.Context, networkInterfaceID string) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +132,8 @@ func (n networkInterfaceService) GetNetworkInterface(ctx context.Context, networ
 	return data, nil
 }
 
-func (n networkInterfaceService) UpdateNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), payload)
+func (n networkInterfaceService) Update(ctx context.Context, networkInterfaceID string, payload *UpdateNetworkInterfacePayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.itemPath(networkInterfaceID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -131,8 +149,8 @@ func (n networkInterfaceService) UpdateNetworkInterface(ctx context.Context, net
 	return data, nil
 }
 
-func (n networkInterfaceService) DeleteNetworkInterface(ctx context.Context, networkID string, netInterfaceID string) error {
-	req, err := n.client.NewRequest(ctx, http.MethodDelete, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), nil)
+func (n networkInterfaceService) Delete(ctx context.Context, networkInterfaceID string) error {
+	req, err := n.client.NewRequest(ctx, http.MethodDelete, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
 		return err
 	}
@@ -143,15 +161,17 @@ func (n networkInterfaceService) DeleteNetworkInterface(ctx context.Context, net
 	return resp.Body.Close()
 }
 
-func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, networkInterfacePath, nil)
+func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	params := req.URL.Query()
-	params.Add("network_id", opts.NetworkID)
+	params.Add("vpc-network-id", opts.VPCNetworkID)
 	params.Add("status", opts.Status)
+	params.Add("detailed", opts.Detailed)
+	params.Add("type", opts.Type)
 	req.URL.RawQuery = params.Encode()
 
 	var data []*NetworkInterface
@@ -166,8 +186,8 @@ func (n networkInterfaceService) ListNetworkInterface(ctx context.Context, opts 
 	return data, nil
 }
 
-func (n networkInterfaceService) ActionNetworkInterface(ctx context.Context, networkID string, netInterfaceID string, payload *NetworkInterfaceRequestPayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.resourceNetworkInterfacePath(networkID, netInterfaceID), payload)
+func (n networkInterfaceService) Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error) {
+	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.actionPath(networkInterfaceID), payload)
 	if err != nil {
 		return nil, err
 	}

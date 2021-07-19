@@ -120,7 +120,7 @@ func TestNetworkInterfaceList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	networkInterfaces, err := client.NetworkInterface.ListNetworkInterface(ctx, &ListNetworkInterfaceOptions{})
+	networkInterfaces, err := client.NetworkInterface.List(ctx, &ListNetworkInterfaceOptions{})
 	require.NoError(t, err)
 	assert.Len(t, networkInterfaces, 3)
 	assert.Equal(t, 1, networkInterfaces[0].RevisionNumber)
@@ -130,9 +130,9 @@ func TestNetworkInterfaceCreate(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
-	mux.HandleFunc(testlib.CloudServerURL(n.resourceCreateNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665")), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(n.createPath("99b82e5d-98c3-403f-9ff5-8b5b940e3665")), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		var payload *NetworkInterfaceRequestPayload
+		var payload *CreateNetworkInterfacePayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "test", payload.Name)
 		resp := `{
@@ -170,7 +170,7 @@ func TestNetworkInterfaceCreate(t *testing.T) {
         }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	networkInterface, err := client.NetworkInterface.CreateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", &NetworkInterfaceRequestPayload{
+	networkInterface, err := client.NetworkInterface.Create(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", &CreateNetworkInterfacePayload{
 		Name: "test",
 	})
 	require.NoError(t, err)
@@ -182,7 +182,7 @@ func TestNetworkInterfaceGet(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
-	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
+	mux.HandleFunc(testlib.CloudServerURL(n.itemPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
 			resp := `{
@@ -220,19 +220,19 @@ func TestNetworkInterfaceGet(t *testing.T) {
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.NetworkInterface.GetNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")
+	networkInterface, err := client.NetworkInterface.Get(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")
 	require.NoError(t, err)
-	assert.Equal(t, "2021-07-12T08:55:31Z", vpc.CreatedAt)
+	assert.Equal(t, "2021-07-12T08:55:31Z", networkInterface.CreatedAt)
 }
 
 func TestNetworkInterfaceUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
-	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
+	mux.HandleFunc(testlib.CloudServerURL(n.itemPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
-			var payload *NetworkInterfaceRequestPayload
+			var payload *UpdateNetworkInterfacePayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "test_update", payload.Name)
 			resp := `{
@@ -270,7 +270,7 @@ func TestNetworkInterfaceUpdate(t *testing.T) {
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	networkInterface, err := client.NetworkInterface.UpdateNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
+	networkInterface, err := client.NetworkInterface.Update(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &UpdateNetworkInterfacePayload{
 		Name: "test_update",
 	})
 	require.NoError(t, err)
@@ -281,10 +281,10 @@ func TestNetworkInterfaceAction(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
-	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
+	mux.HandleFunc(testlib.CloudServerURL(n.actionPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
-			var payload *NetworkInterfaceRequestPayload
+			var payload *ActionNetworkInterfacePayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "attach_server", payload.Action)
 			assert.Equal(t, "21da0a9e-a59f-456f-a4c3-a0248a29eb9c", payload.ServerID)
@@ -322,7 +322,7 @@ func TestNetworkInterfaceAction(t *testing.T) {
             }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	networkInterface, err := client.NetworkInterface.ActionNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &NetworkInterfaceRequestPayload{
+	networkInterface, err := client.NetworkInterface.Action(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34", &ActionNetworkInterfacePayload{
 		Action:   "attach_server",
 		ServerID: "21da0a9e-a59f-456f-a4c3-a0248a29eb9c",
 	})
@@ -334,9 +334,9 @@ func TestNetworkInterfaceDelete(t *testing.T) {
 	setup()
 	defer teardown()
 	var n networkInterfaceService
-	mux.HandleFunc(testlib.CloudServerURL(n.resourceNetworkInterfacePath("99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
+	mux.HandleFunc(testlib.CloudServerURL(n.itemPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.NetworkInterface.DeleteNetworkInterface(ctx, "99b82e5d-98c3-403f-9ff5-8b5b940e3665", "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34"))
+	require.NoError(t, client.NetworkInterface.Delete(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34"))
 }
