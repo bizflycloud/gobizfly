@@ -187,7 +187,7 @@ func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInte
 }
 
 func (n networkInterfaceService) Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error) {
-	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.actionPath(networkInterfaceID), payload)
+	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.actionPath(networkInterfaceID), payload)
 	if err != nil {
 		return nil, err
 	}

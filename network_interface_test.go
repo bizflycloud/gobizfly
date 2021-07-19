@@ -283,7 +283,7 @@ func TestNetworkInterfaceAction(t *testing.T) {
 	var n networkInterfaceService
 	mux.HandleFunc(testlib.CloudServerURL(n.actionPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
-			assert.Equal(t, http.MethodPut, r.Method)
+			assert.Equal(t, http.MethodPost, r.Method)
 			var payload *ActionNetworkInterfacePayload
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "attach_server", payload.Action)
