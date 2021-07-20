@@ -207,7 +207,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
-	req.Header.Add("X-Tenant-Name", c.projectID)
+	req.Header.Add("X-Tenant-Name", c.projectName)
 	req.Header.Add("X-Tenant-Id", c.projectID)
 
 	if c.authType == "" {
