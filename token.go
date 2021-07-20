@@ -34,8 +34,8 @@ type TokenCreateRequest struct {
 type Token struct {
 	KeystoneToken string `json:"token"`
 	ExpiresAt     string `json:"expires_at"`
-	ProjectName   string `json:"tenant_name"`
-	ProjectId     string `json:"tenant_id"`
+	ProjectName   string `json:"project_name"`
+	ProjectId     string `json:"project_id"`
 }
 
 type token struct {
