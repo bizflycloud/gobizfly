@@ -17,6 +17,7 @@ const (
 	listenerPath             = "/listener"
 	poolPath                 = "/pool"
 	healthMonitorPath        = "/healthmonitor"
+	poolsPath                = "/pools"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
@@ -389,6 +390,7 @@ type MemberService interface {
 	Update(ctx context.Context, poolID, id string, req *MemberUpdateRequest) (*Member, error)
 	Delete(ctx context.Context, poolID, id string) error
 	Create(ctx context.Context, poolID string, req *MemberCreateRequest) (*Member, error)
+	BatchUpdate(ctx context.Context, poolID string, members *BatchMemberUpdateRequest) error
 }
 
 // MemberUpdateRequest represents update member request payload.
@@ -399,6 +401,20 @@ type MemberUpdateRequest struct {
 	MonitorAddress *string `json:"monitor_address"`
 	MonitorPort    *int    `json:"monitor_port"`
 	Backup         bool    `json:"backup"`
+}
+
+type ExtendMemberUpdateRequest struct {
+	Name           string `json:"name"`
+	Address        string `json:"address"`
+	ProtocolPort   int    `json:"protocol_port"`
+	Weight         int    `json:"weight,omitempty"`
+	MonitorAddress string `json:"monitor_address,omitempty"`
+	MonitorPort    int    `json:"monitor_port,omitempty"`
+	Backup         bool   `json:"backup,omitempty"`
+}
+
+type BatchMemberUpdateRequest struct {
+	Members []ExtendMemberUpdateRequest `json:"members"`
 }
 
 // MemberCreateRequest represents create member request payload
@@ -507,6 +523,19 @@ func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdat
 		return nil, err
 	}
 	return respData.Member, nil
+}
+
+func (m *member) BatchUpdate(ctx context.Context, poolID string, members *BatchMemberUpdateRequest) error {
+	req, err := m.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, m.resourcePath(poolID), &members)
+	if err != nil {
+		return err
+	}
+	resp, err := m.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
 }
 
 func (m *member) Delete(ctx context.Context, poolID, id string) error {

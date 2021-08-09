@@ -1148,3 +1148,39 @@ func TestHealthMonitorDelete(t *testing.T) {
 
 	require.NoError(t, client.HealthMonitor.Delete(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2"))
 }
+
+func TestBatchUpdateMember(t *testing.T) {
+	setup()
+	defer teardown()
+	var member member
+	mux.HandleFunc(testlib.LoadBalancerURL(member.resourcePath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
+		var payload BatchMemberUpdateRequest
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+
+		require.Equal(t, http.MethodPut, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	var members = BatchMemberUpdateRequest{
+		Members: []ExtendMemberUpdateRequest{
+			{
+				Name:           "test_members1",
+				Weight:         1,
+				MonitorAddress: "12.12.123.1",
+				MonitorPort:    90,
+				Backup:         false,
+				Address:        "123.123.123.123",
+				ProtocolPort:   111,
+			},
+			{
+				Name: "test_member2",
+				Weight: 2,
+				ProtocolPort: 80,
+				MonitorAddress: "112.12.123.1",
+				MonitorPort: 90,
+				Address: "1.1.11.1",
+			},
+		},
+	}
+	err := client.Member.BatchUpdate(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2", &members)
+	require.NoError(t, err)
+}
