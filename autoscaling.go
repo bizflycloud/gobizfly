@@ -188,7 +188,6 @@ type ASTask struct {
 
 // ASMetadata - Medata of an auto scaling group
 type ASMetadata struct {
-	Alarms           ASAlarms     `json:"alarms"`
 	DeletionPolicy   string       `json:"deletion_policy"`
 	ScaleInReceiver  string       `json:"scale_in_receiver"`
 	ScaleOutReceiver string       `json:"scale_out_receiver"`
@@ -256,6 +255,7 @@ type PolicyAutoScalingCreateRequest struct {
 	RangeTime  int    `json:"range_time,omitempty"`
 	ScaleSize  int    `json:"number,omitempty"`
 	Threshold  int    `json:"threshold,omitempty"`
+	Type       string `json:"policy_type,omitempty"`
 }
 
 // PolicyDeletionCreateRequest represents payload use create a  policy
@@ -1042,6 +1042,7 @@ func (lc *launchConfiguration) Create(ctx context.Context, lcr *LaunchConfigurat
 }
 
 func (p *policy) CreateAutoScaling(ctx context.Context, clusterID string, pcr *PolicyAutoScalingCreateRequest) (*TaskResponses, error) {
+	pcr.Type = policyTypeAutoScaling
 	req, err := p.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, p.resourcePath(clusterID), &pcr)
 	if err != nil {
 		return nil, err

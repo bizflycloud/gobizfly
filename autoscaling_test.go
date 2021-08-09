@@ -42,22 +42,7 @@ func Test_autoScalingGroup_List(t *testing.T) {
               ],
               "config": {},
               "metadata": {
-                "alarms": {
-                  "scale_out": {
-                    "auto_scaling": [
-                      "5e0eab07045cab000f301648",
-                      "5e0eab49045cab000eb033a7"
-                    ],
-                    "load_balancer": []
-                  },
-                  "scale_in": {
-                    "auto_scaling": [
-                      "5e0eab07045cab000f301648",
-                      "5e0eab49045cab000eb033a7"
-                    ],
-                    "load_balancer": []
-                  }
-                },
+                "deletion_policy": "04e6595b-a8e5-4701-a118-6c4095dd7cd7",
                 "webhook_ids": {
                   "scale_out": {
                     "id": "e7ff2be5-50bc-491e-b9bf-69eba6865a2f",
@@ -102,8 +87,7 @@ func Test_autoScalingGroup_List(t *testing.T) {
 	assert.Equal(t, "ef69815f-d7a7-4107-9f13-cc14d5b7e742", ASGroup.Metadata.WebhookIDs.ScaleIn.ID)
 	assert.Equal(t, "receiver-31e8465b-CLUSTER_SCALE_OUT", ASGroup.Metadata.WebhookIDs.ScaleOut.Name)
 	assert.Equal(t, "e7ff2be5-50bc-491e-b9bf-69eba6865a2f", ASGroup.Metadata.WebhookIDs.ScaleOut.ID)
-	assert.Equal(t, []string{"5e0eab07045cab000f301648", "5e0eab49045cab000eb033a7"}, ASGroup.Metadata.Alarms.ScaleIn.AutoScaling)
-	assert.Equal(t, []string{"5e0eab07045cab000f301648", "5e0eab49045cab000eb033a7"}, ASGroup.Metadata.Alarms.ScaleOut.AutoScaling)
+	assert.Equal(t, "04e6595b-a8e5-4701-a118-6c4095dd7cd7", ASGroup.Metadata.DeletionPolicy)
 	assert.Equal(t, []string{"7133bd53-507b-4648-b9e5-df648d00e9ec"}, ASGroup.NodeIDs)
 
 }
