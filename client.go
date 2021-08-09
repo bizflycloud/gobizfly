@@ -19,7 +19,7 @@ const (
 	ua                      = "bizfly-client-go/" + version
 	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
 	mediaType               = "application/json; charset=utf-8"
-	accountName             = "account"
+	accountName             = "bizfly_account"
 	loadBalancerServiceName = "load_balancer"
 	serverServiceName       = "cloud_server"
 	autoScalingServiceName  = "auto_scaling"
@@ -56,6 +56,7 @@ type Client struct {
 	DNS               DNSService
 	Account           AccountService
 	VPC               VPCService
+	NetworkInterface  NetworkInterfaceService
 
 	Snapshot SnapshotService
 
@@ -78,8 +79,7 @@ type Client struct {
 	appCredID     string
 	appCredSecret string
 	// TODO: this will be removed in near future
-	tenantName string
-	tenantID   string
+	projectID  string
 	regionName string
 	services   []*Service
 }
@@ -122,7 +122,7 @@ func WithRegionName(region string) Option {
 // Deprecated: X-Tenant-Name header required will be removed in API server.
 func WithTenantName(tenant string) Option {
 	return func(c *Client) error {
-		c.tenantName = tenant
+		c.projectName = tenant
 		return nil
 	}
 }
@@ -132,7 +132,7 @@ func WithTenantName(tenant string) Option {
 // Deprecated: X-Tenant-Id header required will be removed in API server.
 func WithTenantID(id string) Option {
 	return func(c *Client) error {
-		c.tenantID = id
+		c.projectID = id
 		return nil
 	}
 }
@@ -175,6 +175,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.DNS = &dnsService{client: c}
 	c.Account = &accountService{client: c}
 	c.VPC = &vpcService{client: c}
+	c.NetworkInterface = &networkInterfaceService{client: c}
 	return c, nil
 }
 
@@ -206,8 +207,8 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
-	req.Header.Add("X-Tenant-Name", c.tenantName)
-	req.Header.Add("X-Tenant-Id", c.tenantID)
+	req.Header.Add("X-Tenant-Name", c.projectName)
+	req.Header.Add("X-Tenant-Id", c.projectID)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
@@ -241,7 +242,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
 			return
 		}
-		c.SetKeystoneToken(tok.KeystoneToken)
+		c.SetKeystoneToken(tok)
 		req.Header.Set("X-Auth-Token", c.keystoneToken)
 		resp, err = c.do(ctx, req)
 	}
@@ -255,8 +256,9 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
-func (c *Client) SetKeystoneToken(s string) {
-	c.keystoneToken = s
+func (c *Client) SetKeystoneToken(token *Token) {
+	c.keystoneToken = token.KeystoneToken
+	c.projectID = token.ProjectId
 }
 
 // ListOptions specifies the optional parameters for List method.

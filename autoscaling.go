@@ -189,7 +189,7 @@ type ASTask struct {
 // ASMetadata - Medata of an auto scaling group
 type ASMetadata struct {
 	Alarms           ASAlarms     `json:"alarms"`
-	DeletionPolicy   []string     `json:"deletion_policy"`
+	DeletionPolicy   string       `json:"deletion_policy"`
 	ScaleInReceiver  string       `json:"scale_in_receiver"`
 	ScaleOutReceiver string       `json:"scale_out_receiver"`
 	WebhookIDs       ASWebhookIDs `json:"webhook_ids"`

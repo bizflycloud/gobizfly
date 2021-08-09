@@ -34,6 +34,8 @@ type TokenCreateRequest struct {
 type Token struct {
 	KeystoneToken string `json:"token"`
 	ExpiresAt     string `json:"expires_at"`
+	ProjectName   string `json:"project_name"`
+	ProjectId     string `json:"project_id"`
 }
 
 type token struct {
@@ -82,7 +84,7 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 	t.client.authMethod = tcr.AuthMethod
 	t.client.username = tcr.Username
 	t.client.password = tcr.Password
-	t.client.projectName = tcr.ProjectName
+	t.client.projectName = tok.ProjectName
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
 	t.client.services = services
