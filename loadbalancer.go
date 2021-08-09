@@ -17,7 +17,6 @@ const (
 	listenerPath             = "/listener"
 	poolPath                 = "/pool"
 	healthMonitorPath        = "/healthmonitor"
-	poolsPath                = "/pools"
 )
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
