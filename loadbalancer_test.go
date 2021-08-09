@@ -1163,21 +1163,25 @@ func TestBatchUpdateMember(t *testing.T) {
 	var members = BatchMemberUpdateRequest{
 		Members: []ExtendMemberUpdateRequest{
 			{
-				Name:           "test_members1",
-				Weight:         1,
-				MonitorAddress: "12.12.123.1",
-				MonitorPort:    90,
-				Backup:         false,
-				Address:        "123.123.123.123",
-				ProtocolPort:   111,
+				MemberUpdateRequest: MemberUpdateRequest{
+					Name:           "test_members1",
+					Weight:         1,
+					MonitorAddress: "12.12.123.1",
+					MonitorPort:    90,
+					Backup:         false,
+				},
+				Address:      "123.123.123.123",
+				ProtocolPort: 111,
 			},
 			{
-				Name: "test_member2",
-				Weight: 2,
+				MemberUpdateRequest: MemberUpdateRequest{
+					Name:           "test_member2",
+					Weight:         2,
+					MonitorAddress: "112.12.123.1",
+					MonitorPort:    90,
+				},
 				ProtocolPort: 80,
-				MonitorAddress: "112.12.123.1",
-				MonitorPort: 90,
-				Address: "1.1.11.1",
+				Address:      "1.1.11.1",
 			},
 		},
 	}

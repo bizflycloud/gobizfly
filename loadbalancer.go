@@ -394,22 +394,17 @@ type MemberService interface {
 
 // MemberUpdateRequest represents update member request payload.
 type MemberUpdateRequest struct {
-	Name           string  `json:"name"`
-	Weight         int     `json:"weight"`
-	AdminStateUp   bool    `json:"admin_state_up"`
-	MonitorAddress *string `json:"monitor_address"`
-	MonitorPort    *int    `json:"monitor_port"`
-	Backup         bool    `json:"backup"`
-}
-
-type ExtendMemberUpdateRequest struct {
 	Name           string `json:"name"`
-	Address        string `json:"address"`
-	ProtocolPort   int    `json:"protocol_port"`
 	Weight         int    `json:"weight,omitempty"`
 	MonitorAddress string `json:"monitor_address,omitempty"`
 	MonitorPort    int    `json:"monitor_port,omitempty"`
 	Backup         bool   `json:"backup,omitempty"`
+}
+
+type ExtendMemberUpdateRequest struct {
+	MemberUpdateRequest
+	Address      string `json:"address"`
+	ProtocolPort int    `json:"protocol_port"`
 }
 
 type BatchMemberUpdateRequest struct {
