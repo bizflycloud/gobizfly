@@ -64,6 +64,7 @@ type Subnet struct {
 	GatewayIP       string              `json:"gateway_ip"`
 	CIDR            string              `json:"cidr"`
 	AllocationPools []map[string]string `json:"allocation_pools"`
+	HostRoutes      []map[string]string `json:"host_routes"`
 	DNSNameServers  []string            `json:"dns_nameservers"`
 	Description     string              `json:"description"`
 	ServiceTypes    []string            `json:"service_types"`
