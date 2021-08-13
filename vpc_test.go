@@ -362,7 +362,12 @@ func TestVPCGet(t *testing.T) {
                         "end": "10.108.31.254"
                     }
                 ],
-                "host_routes": [],
+                "host_routes": [
+        {
+            "destination": "192.168.211.110/32",
+            "nexthop": "10.241.10.129"
+        }
+],
                 "dns_nameservers": [
                     "103.92.35.110",
                     "208.67.222.222"
@@ -416,6 +421,7 @@ func TestVPCGet(t *testing.T) {
 	vpc, err := client.VPC.Get(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50")
 	require.NoError(t, err)
 	assert.Equal(t, "2021-01-28T02:50:49Z", vpc.CreatedAt)
+	assert.Equal(t, "10.241.10.129", vpc.Subnets[0].HostRoutes[0].NextHop)
 }
 
 func TestVPCUpdate(t *testing.T) {

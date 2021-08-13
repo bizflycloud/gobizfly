@@ -52,27 +52,37 @@ type VPC struct {
 }
 
 type Subnet struct {
-	ID              string              `json:"id"`
-	Name            string              `json:"name"`
-	TenantID        string              `json:"tenant_id"`
-	NetworkID       string              `json:"network_id"`
-	IPVersion       int                 `json:"ip_version"`
-	SubnetPoolID    string              `json:"subnet_pool_id"`
-	EnableDHCP      bool                `json:"enable_dhcp"`
-	IPv6RaMode      string              `json:"ipv6_ra_mode"`
-	IPv6AddressMode string              `json:"ipv6_address_mode"`
-	GatewayIP       string              `json:"gateway_ip"`
-	CIDR            string              `json:"cidr"`
-	AllocationPools []map[string]string `json:"allocation_pools"`
-	HostRoutes      []map[string]string `json:"host_routes"`
-	DNSNameServers  []string            `json:"dns_nameservers"`
-	Description     string              `json:"description"`
-	ServiceTypes    []string            `json:"service_types"`
-	Tags            []string            `json:"tags"`
-	CreatedAt       string              `json:"created_at"`
-	UpdatedAt       string              `json:"updated_at"`
-	RevisionNumber  int                 `json:"revision_number"`
-	ProjectID       string              `json:"project_id"`
+	ID              string           `json:"id"`
+	Name            string           `json:"name"`
+	TenantID        string           `json:"tenant_id"`
+	NetworkID       string           `json:"network_id"`
+	IPVersion       int              `json:"ip_version"`
+	SubnetPoolID    string           `json:"subnet_pool_id"`
+	EnableDHCP      bool             `json:"enable_dhcp"`
+	IPv6RaMode      string           `json:"ipv6_ra_mode"`
+	IPv6AddressMode string           `json:"ipv6_address_mode"`
+	GatewayIP       string           `json:"gateway_ip"`
+	CIDR            string           `json:"cidr"`
+	AllocationPools []AllocationPool `json:"allocation_pools"`
+	HostRoutes      []HostRoute      `json:"host_routes"`
+	DNSNameServers  []string         `json:"dns_nameservers"`
+	Description     string           `json:"description"`
+	ServiceTypes    []string         `json:"service_types"`
+	Tags            []string         `json:"tags"`
+	CreatedAt       string           `json:"created_at"`
+	UpdatedAt       string           `json:"updated_at"`
+	RevisionNumber  int              `json:"revision_number"`
+	ProjectID       string           `json:"project_id"`
+}
+
+type HostRoute struct {
+	Destination string `json:"destination"`
+	NextHop     string `json:"nexthop"`
+}
+
+type AllocationPool struct {
+	Start string `json:"start"`
+	End   string `json:"end"`
 }
 
 type CreateVPCPayload struct {
