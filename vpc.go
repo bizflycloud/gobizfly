@@ -64,7 +64,6 @@ type Subnet struct {
 	GatewayIP       string              `json:"gateway_ip"`
 	CIDR            string              `json:"cidr"`
 	AllocationPools []map[string]string `json:"allocation_pools"`
-	HostRoutes      []string            `json:"host_routes"`
 	DNSNameServers  []string            `json:"dns_nameservers"`
 	Description     string              `json:"description"`
 	ServiceTypes    []string            `json:"service_types"`
@@ -119,9 +118,7 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 	if err != nil {
 		return nil, err
 	}
-	var data *struct {
-		Network *VPC `json:"network"`
-	}
+	var data *VPC
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -130,7 +127,7 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Network, nil
+	return data, nil
 }
 
 func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error) {
@@ -138,9 +135,7 @@ func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPay
 	if err != nil {
 		return nil, err
 	}
-	var data *struct {
-		Network *VPC `json:"network"`
-	}
+	var data *VPC
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -149,7 +144,7 @@ func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPay
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Network, nil
+	return data, nil
 }
 
 func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error) {
@@ -157,9 +152,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, e
 	if err != nil {
 		return nil, err
 	}
-	var data *struct {
-		Network *VPC `json:"network"`
-	}
+	var data *VPC
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -168,7 +161,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, e
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Network, nil
+	return data, nil
 }
 
 func (v vpcService) Delete(ctx context.Context, vpcID string) error {
