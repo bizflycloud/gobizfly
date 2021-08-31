@@ -82,7 +82,7 @@ type FirewallRequestPayload struct {
 	Name              string                      `json:"name"`
 	InBound           []FirewallRuleCreateRequest `json:"inbound,omitempty"`
 	OutBound          []FirewallRuleCreateRequest `json:"outbound,omitempty"`
-	Targets           []string                    `json:"targets,omitempty"`
+	Targets           []string                    `json:"targets,omitempty"`  // Deprecated: This field will be removed in the near future
 	NetworkInterfaces []string                    `json:"network_interfaces,omitempty"`
 }
 

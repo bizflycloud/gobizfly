@@ -224,6 +224,9 @@ type ServerCreateRequest struct {
 	AvailabilityZone string        `json:"availability_zone"`
 	OS               *ServerOS     `json:"os"`
 	Quantity         int           `json:"quantity,omitempty"`
+	NetworkInterface []string      `json:"network_interfaces,omitempty"`
+	Firewalls        []string      `json:"firewalls"`
+	NetworkPlan      string        `json:"network_plan"`
 }
 
 // itemActionPath return http path of server action
