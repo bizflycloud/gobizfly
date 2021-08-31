@@ -180,6 +180,9 @@ func TestServerCreate(t *testing.T) {
 		assert.Equal(t, "2c_2g", payload[0].FlavorName)
 		assert.Equal(t, "HDD", payload[0].RootDisk.Type)
 		assert.Equal(t, 40, payload[0].RootDisk.Size)
+		assert.Equal(t, "free_datatransfer", payload[0].NetworkPlan)
+		assert.Equal(t, []string{"123", "456", "678"}, payload[0].Firewalls)
+		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterface)
 		resp := `
 {
 	"task_id": [
@@ -198,6 +201,9 @@ func TestServerCreate(t *testing.T) {
 		Type:             "premium",
 		AvailabilityZone: "HN1",
 		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
+		Firewalls: []string{"123", "456", "678"},
+		NetworkPlan: "free_datatransfer",
+		NetworkInterface: []string{"123", "456"},
 	}
 	task, err := client.Server.Create(ctx, scr)
 	require.NoError(t, err)
