@@ -444,7 +444,7 @@ type AutoScalingNode struct {
 	PhysicalID   string                 `json:"physical_id"`
 	StatusReason string                 `json:"status_reason"`
 	ID           string                 `json:"id"`
-	Addresses    map[string]interface{} `json:"addresses"`
+	Addresses    map[string]interface{} `json:"addresses,omitempty"`
 }
 
 // AutoScalingNodesDelete is represents a list cloud server being deleted
@@ -730,7 +730,7 @@ func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolici
 	return data, nil
 }
 
-func (n *node) List(ctx context.Context, clusterID string) ([]*AutoScalingNode, error) {
+func (n *node) List(ctx context.Context, clusterID string, all bool) ([]*AutoScalingNode, error) {
 	if clusterID == "" {
 		return nil, errors.New("Auto Scaling Group ID is required")
 	}
@@ -739,6 +739,13 @@ func (n *node) List(ctx context.Context, clusterID string) ([]*AutoScalingNode, 
 	if err != nil {
 		return nil, err
 	}
+
+	if all {
+		q := req.URL.Query()
+		q.Add("all", "true")
+		req.URL.RawQuery = q.Encode()
+	}
+
 	resp, err := n.client.Do(ctx, req)
 	if err != nil {
 		return nil, err

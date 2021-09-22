@@ -334,7 +334,7 @@ func Test_node_List(t *testing.T) {
         }`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	nodes, err := client.AutoScaling.Nodes().List(ctx, "09ea7069-2767-4d86-b125-0549827e30f7")
+	nodes, err := client.AutoScaling.Nodes().List(ctx, "09ea7069-2767-4d86-b125-0549827e30f7", true)
 	require.NoError(t, err)
 	node := nodes[0]
 
