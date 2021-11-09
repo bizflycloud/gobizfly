@@ -23,6 +23,7 @@ type SSHKeyService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error)
 	Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyCreateResponse, error)
 	Delete(ctx context.Context, keyname string) (*SSHKeyDeleteResponse, error)
+	Get(ctx context.Context, keyname string) (*SSHKey, error)
 }
 
 type SSHKey struct {
@@ -49,6 +50,9 @@ type SSHKeyDeleteResponse struct {
 	Message string `json:"message"`
 }
 
+func (s *sshkey) itemPath(keyname string) string {
+	return sshKeyBasePath + "/" + keyname
+}
 func (s *sshkey) List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, sshKeyBasePath, nil)
 	if err != nil {
@@ -66,6 +70,23 @@ func (s *sshkey) List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error
 		return nil, err
 	}
 	return sshKeys, nil
+}
+
+func (s *sshkey) Get(ctx context.Context, keyname string) (*SSHKey, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, s.itemPath(keyname), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var sshKey *SSHKey
+	if err := json.NewDecoder(resp.Body).Decode(&sshKey); err != nil {
+		return nil, err
+	}
+	return sshKey, nil
 }
 
 func (s *sshkey) Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyCreateResponse, error) {
