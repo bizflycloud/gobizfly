@@ -225,8 +225,8 @@ type ServerCreateRequest struct {
 	OS               *ServerOS     `json:"os"`
 	Quantity         int           `json:"quantity,omitempty"`
 	NetworkInterface []string      `json:"network_interfaces,omitempty"`
-	Firewalls        []string      `json:"firewalls"`
-	NetworkPlan      string        `json:"network_plan"`
+	Firewalls        []string      `json:"firewalls,omitempty"`
+	NetworkPlan      string        `json:"network_plan,omitempty"`
 }
 
 // itemActionPath return http path of server action
