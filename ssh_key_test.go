@@ -86,3 +86,25 @@ func TestSSHKeyCreate(t *testing.T) {
 	assert.Equal(t, "ssh-key-1601308814384", sshkey.Name)
 	assert.Equal(t, "55d38aecb1034c06b99c1c87fb6f0740", sshkey.UserID)
 }
+
+func TestSSHKeyGet(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(testlib.CloudServerURL(sshKeyBasePath + "/sapd1"), func(writer http.ResponseWriter, request *http.Request) {
+		require.Equal(t, http.MethodGet, request.Method)
+		resp := `
+    {
+            "name": "sapd1",
+            "public_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgXX0Kdd3XKojgj7maVd3PsPApzh9n2lT2CtgcJs8jw9i3mit5SZu02QFS772Pa9VdGeSjbqxtADLRpnuigW5ii0dHBQTgWqx593Cs7QKRhyRPb88u0TFCZynRwfMRnb6qngiKoWp5TtaHuIY+7kS8SyqNVIwoCYlr9a4ePX8rwydf9crhJocgKb2LgQkdW3TBE5QAvxbruYlj201jjXFeE5BtE4QER0QyY5MqW8MAgG98N3w95pKIffhHZ4TO4A3zgpWbNn1ROproZgV+9COzZ7WYuvPWqWdLAntd9b1/lLnDrDHXa/lrefJXJVamhz4i1cfIZ/p+aFWG0a7DpL5b saphi@saphi-kma\n",
+            "fingerprint": "28:56:9e:4b:bb:a0:91:71:42:37:40:a2:d0:66:24:17"
+    }
+]
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	sshkey, err := client.SSHKey.Get(ctx, "sapd1")
+	require.NoError(t, err)
+	assert.Equal(t, "sapd1", sshkey.Name)
+	assert.Equal(t, "28:56:9e:4b:bb:a0:91:71:42:37:40:a2:d0:66:24:17", sshkey.FingerPrint)
+}
