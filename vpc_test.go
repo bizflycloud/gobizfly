@@ -287,7 +287,6 @@ func TestVPCCreate(t *testing.T) {
 		assert.Equal(t, "test", payload.Name)
 		resp := `
 {
-    "network": {
         "id": "41f40298-8d05-4889-9672-f03cfccd719f",
         "name": "test",
         "tenant_id": "bc8d2790fc9a46949818b942c0a824de",
@@ -316,7 +315,7 @@ func TestVPCCreate(t *testing.T) {
         "created_at": "2021-02-03T06:59:35Z",
         "updated_at": "2021-02-03T06:59:36Z",
         "revision_number": 1
-    }
+  
 }
 `
 		_, _ = fmt.Fprint(writer, resp)
@@ -338,7 +337,6 @@ func TestVPCGet(t *testing.T) {
 			assert.Equal(t, http.MethodGet, r.Method)
 			resp := `
 {
-    "network": {
         "id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
         "name": "asdfasdf",
         "tenant_id": "ebbed256d9414b0598719c42dc17e837",
@@ -364,7 +362,12 @@ func TestVPCGet(t *testing.T) {
                         "end": "10.108.31.254"
                     }
                 ],
-                "host_routes": [],
+                "host_routes": [
+        {
+            "destination": "192.168.211.110/32",
+            "nexthop": "10.241.10.129"
+        }
+],
                 "dns_nameservers": [
                     "103.92.35.110",
                     "208.67.222.222"
@@ -411,7 +414,6 @@ func TestVPCGet(t *testing.T) {
         ],
         "ports": [],
         "is_default": true
-    }
 }
 `
 			_, _ = fmt.Fprint(writer, resp)
@@ -419,6 +421,7 @@ func TestVPCGet(t *testing.T) {
 	vpc, err := client.VPC.Get(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50")
 	require.NoError(t, err)
 	assert.Equal(t, "2021-01-28T02:50:49Z", vpc.CreatedAt)
+	assert.Equal(t, "10.241.10.129", vpc.Subnets[0].HostRoutes[0].NextHop)
 }
 
 func TestVPCUpdate(t *testing.T) {
@@ -432,7 +435,6 @@ func TestVPCUpdate(t *testing.T) {
 			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 			assert.Equal(t, "test_update", payload.Name)
 			resp := `{
-    "network": {
         "id": "0e03c7c5-267b-41f9-baa7-c4d2f2283d50",
         "name": "test_update",
         "tenant_id": "ebbed256d9414b0598719c42dc17e837",
@@ -505,7 +507,6 @@ func TestVPCUpdate(t *testing.T) {
         ],
         "ports": [],
         "is_default": false
-    }
 }
 `
 			_, _ = fmt.Fprint(writer, resp)

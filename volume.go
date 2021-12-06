@@ -27,17 +27,23 @@ type VolumeService interface {
 	Attach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error)
 	Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error)
 	Restore(ctx context.Context, id string, snapshotID string) (*Task, error)
+	Patch(ctx context.Context, id string, req *VolumePatchRequest) (*Volume, error)
 }
 
 // VolumeCreateRequest represents create new volume request payload.
 type VolumeCreateRequest struct {
 	Name             string `json:"name"`
+	Description      string `json:"description"`
 	Size             int    `json:"size"`
 	VolumeType       string `json:"volume_type"`
 	VolumeCategory   string `json:"category"`
 	AvailabilityZone string `json:"availability_zone"`
 	SnapshotID       string `json:"snapshot_id,omitempty"`
 	ServerID         string `json:"instance_uuid,omitempty"`
+}
+
+type VolumePatchRequest struct {
+	Description string `json:"description"`
 }
 
 // VolumeAttachment contains volume attachment information.
@@ -179,6 +185,10 @@ func (v *volume) itemActionPath(id string) string {
 	return strings.Join([]string{volumeBasePath, id, "action"}, "/")
 }
 
+func (v *volume) itemPath(id string) string {
+	return strings.Join([]string{volumeBasePath, id}, "/")
+}
+
 // ExtendVolume extends capacity of a volume.
 func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Task, error) {
 	var payload = &VolumeAction{
@@ -277,4 +287,21 @@ func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Ta
 		return nil, err
 	}
 	return t, nil
+}
+
+func (v *volume) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) (*Volume, error) {
+	req, err := v.client.NewRequest(ctx, http.MethodPatch, serverServiceName, v.itemPath(id), bpr)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := v.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var volume *Volume
+	if err := json.NewDecoder(resp.Body).Decode(&volume); err != nil {
+		return nil, err
+	}
+	return volume, nil
 }
