@@ -63,6 +63,7 @@ type NetworkInterface struct {
 type FixedIp struct {
 	SubnetID  string `json:"subnet_id"`
 	IPAddress string `json:"ip_address"`
+	IPVersion int    `json:"ip_version"`
 }
 
 type UpdateNetworkInterfacePayload struct {
