@@ -22,7 +22,7 @@ type WanIPService interface {
 	List(ctx context.Context) ([]*WanIP, error)
 	Get(ctx context.Context, wanIPId string) (*WanIP, error)
 	Delete(ctx context.Context, wanIpId string) error
-	Action(ctx context.Context, wanIpId string, payload *ActionWanIpPayload) (*WanIP, error)
+	Action(ctx context.Context, wanIpId string, payload *ActionWanIpPayload) error
 }
 
 type WanIP struct {
@@ -131,16 +131,12 @@ func (w wanIPService) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
-func (w wanIPService) Action(ctx context.Context, id string, payload *ActionWanIpPayload) (*WanIP, error) {
+func (w wanIPService) Action(ctx context.Context, id string, payload *ActionWanIpPayload) error {
 	req, err := w.client.NewRequest(ctx, http.MethodPost, serverServiceName, w.actionPath(id), payload)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	resp, err := w.client.Do(ctx, req)
 	defer resp.Body.Close()
-	if err != nil {
-		return nil, err
-	}
-	wanIp, err := w.Get(ctx, id)
-	return wanIp, err
+	return err
 }

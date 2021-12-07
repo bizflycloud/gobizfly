@@ -188,56 +188,13 @@ func TestWanIPAttachServer(t *testing.T) {
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
-			resp := `{
-  "id": "ceebf0de-1fc2-4a08-a200-1906a30abe7e",
-  "name": "demo_4",
-  "network_id": "c8812eaa-6ed8-4ef7-8e20-575d2a23e7b1",
-  "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-  "mac_address": "fa:16:3e:43:82:b4",
-  "admin_state_up": true,
-  "status": "ACTIVE",
-  "device_id": "123",
-  "device_owner": "",
-  "fixed_ips": [
-    {
-      "subnet_id": "7969d050-f95c-4b27-b310-352a99002159",
-      "ip_address": "10.3.247.148"
-    }
-  ],
-  "allowed_address_pairs": [],
-  "extra_dhcp_opts": [],
-  "security_groups": [
-    "f7f9ed60-46c4-471b-98d5-3e48006bb9ef"
-  ],
-  "description": "",
-  "binding:vnic_type": "normal",
-  "port_security_enabled": true,
-  "qos_policy_id": null,
-  "tags": [
-    "paid"
-  ],
-  "created_at": "2021-09-14T11:39:35Z",
-  "updated_at": "2021-09-14T11:39:36Z",
-  "revision_number": 2,
-  "project_id": "ebbed256d9414b0598719c42dc17e837",
-  "bandwidth": 100000,
-  "billing_type": "paid",
-  "attached_server": {},
-  "availability_zone": "HN2"
-}
-`
-			_, _ = fmt.Fprint(writer, resp)
 		})
 	payload := ActionWanIpPayload{
 		Action:   "attach_server",
 		ServerId: "123",
 	}
-	wanIp, err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
-	assert.Equal(t, "paid", wanIp.BillingType)
-	assert.Equal(t, 100000, wanIp.Bandwidth)
-	assert.Equal(t, "ACTIVE", wanIp.Status)
-	assert.Equal(t, "123", wanIp.DeviceID)
 }
 
 func TestWanIPDetachServer(t *testing.T) {
@@ -247,55 +204,12 @@ func TestWanIPDetachServer(t *testing.T) {
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
-			resp := `{
-  "id": "ceebf0de-1fc2-4a08-a200-1906a30abe7e",
-  "name": "demo_4",
-  "network_id": "c8812eaa-6ed8-4ef7-8e20-575d2a23e7b1",
-  "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-  "mac_address": "fa:16:3e:43:82:b4",
-  "admin_state_up": true,
-  "status": "DOWN",
-  "device_id": "",
-  "device_owner": "",
-  "fixed_ips": [
-    {
-      "subnet_id": "7969d050-f95c-4b27-b310-352a99002159",
-      "ip_address": "10.3.247.148"
-    }
-  ],
-  "allowed_address_pairs": [],
-  "extra_dhcp_opts": [],
-  "security_groups": [
-    "f7f9ed60-46c4-471b-98d5-3e48006bb9ef"
-  ],
-  "description": "",
-  "binding:vnic_type": "normal",
-  "port_security_enabled": true,
-  "qos_policy_id": null,
-  "tags": [
-    "paid"
-  ],
-  "created_at": "2021-09-14T11:39:35Z",
-  "updated_at": "2021-09-14T11:39:36Z",
-  "revision_number": 2,
-  "project_id": "ebbed256d9414b0598719c42dc17e837",
-  "bandwidth": 100000,
-  "billing_type": "paid",
-  "attached_server": {},
-  "availability_zone": "HN2"
-}
-`
-			_, _ = fmt.Fprint(writer, resp)
 		})
 	payload := ActionWanIpPayload{
 		Action: "detach_server",
 	}
-	wanIp, err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
-	assert.Equal(t, "paid", wanIp.BillingType)
-	assert.Equal(t, 100000, wanIp.Bandwidth)
-	assert.Equal(t, "DOWN", wanIp.Status)
-	assert.Equal(t, "", wanIp.DeviceID)
 }
 
 func TestWanIPConvertToPaid(t *testing.T) {
@@ -305,53 +219,10 @@ func TestWanIPConvertToPaid(t *testing.T) {
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
-			resp := `{
-  "id": "ceebf0de-1fc2-4a08-a200-1906a30abe7e",
-  "name": "demo_4",
-  "network_id": "c8812eaa-6ed8-4ef7-8e20-575d2a23e7b1",
-  "tenant_id": "ebbed256d9414b0598719c42dc17e837",
-  "mac_address": "fa:16:3e:43:82:b4",
-  "admin_state_up": true,
-  "status": "ACTIVE",
-  "device_id": "123",
-  "device_owner": "",
-  "fixed_ips": [
-    {
-      "subnet_id": "7969d050-f95c-4b27-b310-352a99002159",
-      "ip_address": "10.3.247.148"
-    }
-  ],
-  "allowed_address_pairs": [],
-  "extra_dhcp_opts": [],
-  "security_groups": [
-    "f7f9ed60-46c4-471b-98d5-3e48006bb9ef"
-  ],
-  "description": "",
-  "binding:vnic_type": "normal",
-  "port_security_enabled": true,
-  "qos_policy_id": null,
-  "tags": [
-    "paid"
-  ],
-  "created_at": "2021-09-14T11:39:35Z",
-  "updated_at": "2021-09-14T11:39:36Z",
-  "revision_number": 2,
-  "project_id": "ebbed256d9414b0598719c42dc17e837",
-  "bandwidth": 100000,
-  "billing_type": "paid",
-  "attached_server": {},
-  "availability_zone": "HN2"
-}
-`
-			_, _ = fmt.Fprint(writer, resp)
 		})
 	payload := ActionWanIpPayload{
 		Action: "convert_to_paid",
 	}
-	wanIp, err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
-	assert.Equal(t, "paid", wanIp.BillingType)
-	assert.Equal(t, 100000, wanIp.Bandwidth)
-	assert.Equal(t, "ACTIVE", wanIp.Status)
-	assert.Equal(t, "123", wanIp.DeviceID)
 }
