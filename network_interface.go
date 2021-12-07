@@ -168,10 +168,20 @@ func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInte
 	}
 
 	params := req.URL.Query()
-	params.Add("vpc-network-id", opts.VPCNetworkID)
-	params.Add("status", opts.Status)
-	params.Add("detailed", opts.Detailed)
-	params.Add("type", opts.Type)
+	if opts != nil {
+		if opts.VPCNetworkID != "" {
+			params.Add("vpc-network-id", opts.VPCNetworkID)
+		}
+		if opts.Status != "" {
+			params.Add("status", opts.Status)
+		}
+		if opts.Detailed != "" {
+			params.Add("detailed", opts.Detailed)
+		}
+		if opts.Type != "" {
+			params.Add("type", opts.Type)
+		}
+	}
 	req.URL.RawQuery = params.Encode()
 
 	var data []*NetworkInterface
