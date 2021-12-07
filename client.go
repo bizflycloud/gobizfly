@@ -57,6 +57,7 @@ type Client struct {
 	Account           AccountService
 	VPC               VPCService
 	NetworkInterface  NetworkInterfaceService
+	WanIP             WanIPService
 
 	Snapshot SnapshotService
 
@@ -176,6 +177,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Account = &accountService{client: c}
 	c.VPC = &vpcService{client: c}
 	c.NetworkInterface = &networkInterfaceService{client: c}
+	c.WanIP = &wanIPService{client: c}
 	return c, nil
 }
 
