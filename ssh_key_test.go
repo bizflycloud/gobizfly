@@ -91,7 +91,7 @@ func TestSSHKeyGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(testlib.CloudServerURL(sshKeyBasePath + "/lam621"), func(writer http.ResponseWriter, request *http.Request) {
+	mux.HandleFunc(testlib.CloudServerURL(sshKeyBasePath+"/lam621"), func(writer http.ResponseWriter, request *http.Request) {
 		require.Equal(t, http.MethodGet, request.Method)
 		resp := `
 {

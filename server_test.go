@@ -201,8 +201,8 @@ func TestServerCreate(t *testing.T) {
 		Type:             "premium",
 		AvailabilityZone: "HN1",
 		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
-		Firewalls: []string{"123", "456", "678"},
-		NetworkPlan: "free_datatransfer",
+		Firewalls:        []string{"123", "456", "678"},
+		NetworkPlan:      "free_datatransfer",
 		NetworkInterface: []string{"123", "456"},
 	}
 	task, err := client.Server.Create(ctx, scr)

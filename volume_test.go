@@ -600,4 +600,4 @@ func TestPatchVolume(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, resp.Description, "test_description")
 
-	}
+}
