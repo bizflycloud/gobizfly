@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	wanIpPath = "/wan-ips"
+	wanIpPath = "/wanips"
 )
 
 var _ WanIPService = (*wanIPService)(nil)
@@ -53,6 +53,8 @@ type WanIP struct {
 	AvailabilityZone    string    `json:"availability_zone"`
 	IsMain              bool      `json:"is_main"`
 	AttachedServer      Server    `json:"attached_server"`
+	IpAddress           string    `json:"ip_address"`
+	IpVersion           int       `json:"ip_version"`
 }
 
 type CreateWanIpPayload struct {
@@ -134,11 +136,11 @@ func (w wanIPService) Action(ctx context.Context, id string, payload *ActionWanI
 	if err != nil {
 		return nil, err
 	}
-	var wanIp *WanIP
 	resp, err := w.client.Do(ctx, req)
 	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&wanIp); err != nil {
+	if err != nil {
 		return nil, err
 	}
-	return wanIp, nil
+	wanIp, err := w.Get(ctx, id)
+	return wanIp, err
 }
