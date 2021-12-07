@@ -87,6 +87,9 @@ func (w wanIPService) Create(ctx context.Context, payload *CreateWanIpPayload) (
 	}
 	var wanIP *WanIP
 	resp, err := w.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIP); err != nil {
 		return nil, err
@@ -101,6 +104,9 @@ func (w wanIPService) List(ctx context.Context) ([]*WanIP, error) {
 	}
 	var wanIps []*WanIP
 	resp, err := w.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIps); err != nil {
 		return nil, err
@@ -115,6 +121,9 @@ func (w wanIPService) Get(ctx context.Context, id string) (*WanIP, error) {
 	}
 	var wanIp *WanIP
 	resp, err := w.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIp); err != nil {
 		return nil, err
@@ -128,6 +137,9 @@ func (w wanIPService) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	resp, err := w.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
 	return resp.Body.Close()
 }
 
@@ -137,6 +149,9 @@ func (w wanIPService) Action(ctx context.Context, id string, payload *ActionWanI
 		return err
 	}
 	resp, err := w.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
 	defer resp.Body.Close()
 	return err
 }
