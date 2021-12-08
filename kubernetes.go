@@ -147,7 +147,7 @@ type UpdateWorkerPoolRequest struct {
 	EnableAutoScaling bool `json:"enable_autoscaling,omitempty" yaml:"enable_autoscaling,omitempty"`
 	MinSize           int  `json:"min_size,omitempty" yaml:"min_size,omitempty"`
 	MaxSize           int  `json:"max_size,omitempty" yaml:"max_size,omitempty"`
-	UpdateStrategy    string `json:"update_strategy,omitempty" yaml:"update_strategy,omitempty`
+	UpdateStrategy    string `json:"update_strategy,omitempty" yaml:"update_strategy,omitempty"`
 }
 
 func (c *kubernetesEngineService) resourcePath() string {
