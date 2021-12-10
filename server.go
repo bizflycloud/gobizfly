@@ -214,19 +214,20 @@ type ServerOS struct {
 
 // ServerCreateRequest represents create a new server payload.
 type ServerCreateRequest struct {
-	Name             string        `json:"name"`
-	FlavorName       string        `json:"flavor"`
-	SSHKey           string        `json:"sshkey,omitempty"`
-	Password         bool          `json:"password"`
-	RootDisk         *ServerDisk   `json:"rootdisk"`
-	DataDisks        []*ServerDisk `json:"datadisks,omitempty"`
-	Type             string        `json:"type"`
-	AvailabilityZone string        `json:"availability_zone"`
-	OS               *ServerOS     `json:"os"`
-	Quantity         int           `json:"quantity,omitempty"`
-	NetworkInterface []string      `json:"network_interfaces,omitempty"`
-	Firewalls        []string      `json:"firewalls,omitempty"`
-	NetworkPlan      string        `json:"network_plan,omitempty"`
+	Name                 string        `json:"name"`
+	FlavorName           string        `json:"flavor"`
+	SSHKey               string        `json:"sshkey,omitempty"`
+	Password             bool          `json:"password"`
+	RootDisk             *ServerDisk   `json:"rootdisk"`
+	DataDisks            []*ServerDisk `json:"datadisks,omitempty"`
+	Type                 string        `json:"type"`
+	AvailabilityZone     string        `json:"availability_zone"`
+	OS                   *ServerOS     `json:"os"`
+	Quantity             int           `json:"quantity,omitempty"`
+	NetworkInterface     []string      `json:"network_interfaces,omitempty"`
+	WanNetworkInterfaces []string      `json:"wan_network_interfaces,omitempty"`
+	Firewalls            []string      `json:"firewalls,omitempty"`
+	NetworkPlan          string        `json:"network_plan,omitempty"`
 }
 
 // itemActionPath return http path of server action
