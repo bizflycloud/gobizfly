@@ -166,6 +166,7 @@ type ServerService interface {
 	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error)
 	DeleteCustomImage(ctx context.Context, imageID string) error
 	GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error)
+	AttachWanIps(ctx context.Context, id string, wanIps []string) error
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -188,6 +189,7 @@ type ServerAction struct {
 	FirewallIDs   []string `json:"firewall_ids,omitempty"`
 	NewType       string   `json:"new_type,omitempty"`
 	VPCNetworkIDs []string `json:"vpc_network_ids,omitempty"`
+	AttachWanIPs  []string `json:"wan_ips,omitempty"`
 }
 
 // ServerTask contains task information.
@@ -228,6 +230,7 @@ type ServerCreateRequest struct {
 	WanNetworkInterfaces []string      `json:"wan_network_interfaces,omitempty"`
 	Firewalls            []string      `json:"firewalls,omitempty"`
 	NetworkPlan          string        `json:"network_plan,omitempty"`
+	VPCNetworkIds        []string      `json:"vpc_network_ids,omitempty"`
 }
 
 // itemActionPath return http path of server action
@@ -616,6 +619,22 @@ func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Serve
 		return nil, err
 	}
 	return server, nil
+}
+
+func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) error {
+	payload := &ServerAction{
+		Action:       "attach_wan_ips",
+		AttachWanIPs: wanIpIds,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }
 
 func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
