@@ -86,6 +86,7 @@ type Server struct {
 	Category         string                 `json:"category"`
 	IPAddresses      IPAddress              `json:"ip_addresses"`
 	RegionName       string                 `json:"region_name"`
+	NetworkPlan      string                 `json:"network_plan"`
 }
 
 type CreateCustomImagePayload struct {
