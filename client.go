@@ -29,6 +29,7 @@ const (
 	containerRegistryName   = "container_registry"
 	cdnName                 = "cdn"
 	dnsName                 = "dns"
+	databaseServiceName     = "cloud_database"
 )
 
 var (
@@ -59,6 +60,7 @@ type Client struct {
 	VPC                   VPCService
 	NetworkInterface      NetworkInterfaceService
 	WanIP                 WanIPService
+	CloudDatabase         CloudDatabaseService
 
 	Snapshot SnapshotService
 
@@ -180,6 +182,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.VPC = &vpcService{client: c}
 	c.NetworkInterface = &networkInterfaceService{client: c}
 	c.WanIP = &wanIPService{client: c}
+	c.CloudDatabase = &cloudDatabaseService{client: c}
 	return c, nil
 }
 

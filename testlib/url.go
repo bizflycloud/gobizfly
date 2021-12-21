@@ -47,3 +47,7 @@ func DNSURL(path string) string {
 func VPCURL(path string) string {
 	return "/api/vpc-networks" + path
 }
+
+func DatabaseURL(path string) string {
+	return "/api/cloud-database" + path
+}
