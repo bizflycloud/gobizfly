@@ -56,6 +56,8 @@ type NetworkInterface struct {
 	UpdatedAt           string    `json:"updated_at"`
 	RevisionNumber      int       `json:"revision_number"`
 	ProjectID           string    `json:"project_id"`
+	Type                string    `json:"type"`
+	BillingType         string    `json:"billing_type"`
 	AttachedServer      struct {
 	} `json:"attached_server"`
 }
