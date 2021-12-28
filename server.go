@@ -5,8 +5,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -149,7 +147,7 @@ type ServerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
 	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
-	Delete(ctx context.Context, id string, deletedRootDisk []string) error
+	Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error)
 	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
 	Start(ctx context.Context, id string) (*Server, error)
 	Stop(ctx context.Context, id string) (*Server, error)
@@ -305,20 +303,24 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 }
 
 // Delete deletes a server.
-func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) error {
+func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
 	deletedVolumes := &DeletedVolumes{
 		Ids: deletedRootDisk,
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deletedVolumes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-	return resp.Body.Close()
+	defer resp.Body.Close()
+	var task *ServerTask
+	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
+		return nil, err
+	}
+	return task, nil
 }
 
 // Resize resizes a server.

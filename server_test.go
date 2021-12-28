@@ -215,15 +215,18 @@ func TestServerDelete(t *testing.T) {
 	setup()
 	defer teardown()
 	mux.HandleFunc(testlib.CloudServerURL("/servers")+"/"+"c0f541d1-385a-4b0f-8c9a-5bd583475477", func(w http.ResponseWriter, r *http.Request) {
-
-		resp := `test
-		`
+		resp := `
+{
+    "task_id": "725620b1-92b2-48f4-a878-9c1662f35b39"
+}
+`
 		_, _ = fmt.Fprint(w, resp)
+
 	})
 
-	err := client.Server.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477", []string{})
+	task, err := client.Server.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477", []string{})
 	require.NoError(t, err)
-
+	assert.Equal(t, task.TaskID, "725620b1-92b2-48f4-a878-9c1662f35b39")
 }
 
 func TestServerSoftReboot(t *testing.T) {
