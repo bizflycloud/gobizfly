@@ -254,7 +254,7 @@ func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, 
 		return nil, err
 	}
 	params := req.URL.Query()
-	if opts.detailed == true {
+	if opts.detailed {
 		params.Add("detailed", "True")
 	}
 	if len(opts.fields) != 0 {

@@ -155,7 +155,7 @@ func TestServerGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	servers, err := client.Server.List(ctx, &ListOptions{})
+	servers, err := client.Server.List(ctx, &ServerListOptions{})
 	require.NoError(t, err)
 	server := servers[0]
 	assert.Equal(t, "c0f541d1-385a-4b0f-8c9a-5bd583475477", server.ID)
