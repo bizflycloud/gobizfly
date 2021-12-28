@@ -142,9 +142,14 @@ type server struct {
 	client *Client
 }
 
+type ServerListOptions struct {
+	detailed bool
+	fields   []string
+}
+
 // ServerService is an interface to interact with BizFly Cloud API.
 type ServerService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
+	List(ctx context.Context, opts *ServerListOptions) ([]*Server, error)
 	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
 	Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error)
@@ -242,12 +247,20 @@ func (s *server) itemCustomImagePath(id string) string {
 }
 
 // List lists all servers.
-func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error) {
+func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, error) {
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
+	params := req.URL.Query()
+	if opts.detailed == true {
+		params.Add("detailed", "True")
+	}
+	if len(opts.fields) != 0 {
+		params.Add("fields", strings.Join(opts.fields, ","))
+	}
+	req.URL.RawQuery = params.Encode()
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
