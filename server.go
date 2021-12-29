@@ -5,8 +5,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -144,12 +142,17 @@ type server struct {
 	client *Client
 }
 
+type ServerListOptions struct {
+	detailed bool
+	fields   []string
+}
+
 // ServerService is an interface to interact with BizFly Cloud API.
 type ServerService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*Server, error)
+	List(ctx context.Context, opts *ServerListOptions) ([]*Server, error)
 	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
 	Get(ctx context.Context, id string) (*Server, error)
-	Delete(ctx context.Context, id string, deletedRootDisk []string) error
+	Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error)
 	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
 	Start(ctx context.Context, id string) (*Server, error)
 	Stop(ctx context.Context, id string) (*Server, error)
@@ -244,12 +247,20 @@ func (s *server) itemCustomImagePath(id string) string {
 }
 
 // List lists all servers.
-func (s *server) List(ctx context.Context, opts *ListOptions) ([]*Server, error) {
+func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, error) {
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
+	params := req.URL.Query()
+	if opts.detailed {
+		params.Add("detailed", "True")
+	}
+	if len(opts.fields) != 0 {
+		params.Add("fields", strings.Join(opts.fields, ","))
+	}
+	req.URL.RawQuery = params.Encode()
 
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
@@ -305,20 +316,24 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 }
 
 // Delete deletes a server.
-func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) error {
+func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
 	deletedVolumes := &DeletedVolumes{
 		Ids: deletedRootDisk,
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deletedVolumes)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	resp, err := s.client.Do(ctx, req)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
-	return resp.Body.Close()
+	defer resp.Body.Close()
+	var task *ServerTask
+	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
+		return nil, err
+	}
+	return task, nil
 }
 
 // Resize resizes a server.
