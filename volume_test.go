@@ -25,6 +25,7 @@ func TestVolumeList(t *testing.T) {
 	{
 		"status": "in-use",
 		"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+		"billing_plan": "saving_plan",
 		"attachments": [
 			{
 				"server_id": "2b2628b1-0d11-4fd7-8d63-4ec24ff493ea",
@@ -144,6 +145,7 @@ func TestVolumeList(t *testing.T) {
 	assert.Len(t, volumes, 1)
 	volume := volumes[0]
 	assert.Equal(t, "7b099bbb-21e9-48f9-8cec-4076d78fa201", volume.ID)
+	assert.Equal(t, "saving_plan", volume.BillingPlan)
 }
 
 func TestVolumeGet(t *testing.T) {
@@ -156,6 +158,7 @@ func TestVolumeGet(t *testing.T) {
 {
 	"status": "in-use",
 	"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
+	"billing_plan": "saving_plan",
 	"attachments": [
 		{
 			"server_id": "2b2628b1-0d11-4fd7-8d63-4ec24ff493ea",
@@ -297,10 +300,12 @@ func TestVolumeCreate(t *testing.T) {
 		assert.Equal(t, 20, volume.Size)
 		assert.Equal(t, "SSD", volume.VolumeType)
 		assert.Equal(t, "premium", volume.VolumeCategory)
+		assert.Equal(t, "saving_plan", volume.BillingPlan)
 
 		resp := `
 {
 	"status": "available",
+	"billing_plan": "saving_plan",
 	"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
 	"attachments": [],
 	"availability_zone": "HN1",
@@ -333,6 +338,7 @@ func TestVolumeCreate(t *testing.T) {
 		VolumeType:       "SSD",
 		AvailabilityZone: "HN1",
 		VolumeCategory:   "premium",
+		BillingPlan:      "saving_plan",
 	})
 
 	require.NoError(t, err)
@@ -340,6 +346,7 @@ func TestVolumeCreate(t *testing.T) {
 	assert.Equal(t, 20, volume.Size)
 	assert.Equal(t, "", volume.SnapshotID)
 	assert.Equal(t, "HN1", volume.AvailabilityZone)
+	assert.Equal(t, "saving_plan", volume.BillingPlan)
 }
 
 func TestVolumeExtend(t *testing.T) {

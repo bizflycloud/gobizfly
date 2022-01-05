@@ -55,6 +55,7 @@ type Snapshot struct {
 	CreateAt         string            `json:"created_at"`
 	FromVolume       Volume            `json:"volume"`
 	Category         string            `json:"category"`
+	BillingPlan      string            `json:"billing_plan"`
 }
 
 type snapshot struct {

@@ -40,6 +40,7 @@ type VolumeCreateRequest struct {
 	AvailabilityZone string `json:"availability_zone"`
 	SnapshotID       string `json:"snapshot_id,omitempty"`
 	ServerID         string `json:"instance_uuid,omitempty"`
+	BillingPlan      string `json:"billing_plan,omitempty"`
 }
 
 type VolumePatchRequest struct {
@@ -75,6 +76,7 @@ type Volume struct {
 	Metadata         map[string]string  `json:"metadata"`
 	Attachments      []VolumeAttachment `json:"attachments"`
 	Category         string             `json:"category"`
+	BillingPlan      string             `json:"billing_plan"`
 }
 
 type volume struct {
