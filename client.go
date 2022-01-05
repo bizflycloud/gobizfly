@@ -51,6 +51,7 @@ type Client struct {
 	Member            MemberService
 	HealthMonitor     HealthMonitorService
 	KubernetesEngine  KubernetesEngineService
+	Backup            BackupService
 	ContainerRegistry ContainerRegistryService
 	CDN               CDNService
 	DNS               DNSService
@@ -168,6 +169,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
 	c.Service = &service{client: c}
+	c.Backup = &backupService{client: c}
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
