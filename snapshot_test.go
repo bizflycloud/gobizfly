@@ -24,6 +24,7 @@ func TestSnapshotList(t *testing.T) {
 [
    {
       "status":"available",
+      "billing_plan": "on_demand",
       "volume_type_id":"ec6fb900-1ae0-4e9e-90e0-53a6063f95e1",
       "description":null,
       "updated_at":"2020-05-06T16:45:14.000000",
@@ -156,8 +157,9 @@ func TestSnapshotList(t *testing.T) {
 	snapshots, err := client.Snapshot.List(ctx, &ListSnasphotsOptions{})
 	require.NoError(t, err)
 	assert.Len(t, snapshots, 2)
-	volume := snapshots[0]
-	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", volume.Id)
+	snapshot := snapshots[0]
+	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", snapshot.Id)
+	assert.Equal(t, "on_demand", snapshot.BillingPlan)
 }
 
 func TestSnapshotGet(t *testing.T) {
@@ -178,6 +180,7 @@ func TestSnapshotGet(t *testing.T) {
    "size":20,
    "os-extended-snapshot-attributes:progress":"100%",
    "name":"ducpx-snapshot-test",
+   "billing_plan": "on_demand",
    "os-extended-snapshot-attributes:project_id":"1e7f10a9850b45b488a3f0417ccb60e0",
    "created_at":"2020-05-07T02:22:23.000000",
    "metadata":{
@@ -260,6 +263,7 @@ func TestSnapshotGet(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5", snapshot.Id, "check snapshot id")
 	require.Equal(t, "ducpx-snapshot-test", snapshot.Name, "check snapshot name")
+	require.Equal(t, "on_demand", snapshot.BillingPlan)
 }
 
 func TestSnapshotCreate(t *testing.T) {

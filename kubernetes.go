@@ -143,10 +143,10 @@ type WorkerPoolWithNodes struct {
 }
 
 type UpdateWorkerPoolRequest struct {
-	DesiredSize       int  `json:"desired_size,omitempty" yaml:"desired_size,omitempty"`
-	EnableAutoScaling bool `json:"enable_autoscaling,omitempty" yaml:"enable_autoscaling,omitempty"`
-	MinSize           int  `json:"min_size,omitempty" yaml:"min_size,omitempty"`
-	MaxSize           int  `json:"max_size,omitempty" yaml:"max_size,omitempty"`
+	DesiredSize       int    `json:"desired_size,omitempty" yaml:"desired_size,omitempty"`
+	EnableAutoScaling bool   `json:"enable_autoscaling,omitempty" yaml:"enable_autoscaling,omitempty"`
+	MinSize           int    `json:"min_size,omitempty" yaml:"min_size,omitempty"`
+	MaxSize           int    `json:"max_size,omitempty" yaml:"max_size,omitempty"`
 	UpdateStrategy    string `json:"update_strategy,omitempty" yaml:"update_strategy,omitempty"`
 }
 
