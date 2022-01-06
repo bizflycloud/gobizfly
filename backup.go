@@ -17,7 +17,7 @@ type backupService struct {
 }
 
 type BackupService interface {
-	Create(ctx context.Context, payload *CreateBackupPayload) (*Backup, error)
+	Create(ctx context.Context, payload *CreateBackupPayload) (*ExtendedBackup, error)
 	Get(ctx context.Context, backupID string) (*ExtendedBackup, error)
 	List(ctx context.Context) ([]*Backup, error)
 	Delete(ctx context.Context, backupID string) error
@@ -71,21 +71,23 @@ func (b backupService) itemPath(id string) string {
 	return b.resourcePath() + "/" + id
 }
 
-func (b backupService) Create(ctx context.Context, payload *CreateBackupPayload) (*Backup, error) {
+func (b backupService) Create(ctx context.Context, payload *CreateBackupPayload) (*ExtendedBackup, error) {
 	req, err := b.client.NewRequest(ctx, http.MethodPost, serverServiceName, b.resourcePath(), payload)
 	if err != nil {
 		return nil, err
 	}
-	var backup *Backup
+	var dataResponse struct {
+		Data *ExtendedBackup `json:"data"`
+	}
 	resp, err := b.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&backup); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&dataResponse); err != nil {
 		return nil, err
 	}
-	return backup, nil
+	return dataResponse.Data, nil
 }
 
 func (b backupService) Get(ctx context.Context, backupID string) (*ExtendedBackup, error) {
