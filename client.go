@@ -42,23 +42,23 @@ var (
 
 // Client represents BizFly API client.
 type Client struct {
-	AutoScaling       AutoScalingService
-	CloudWatcher      CloudWatcherService
-	Token             TokenService
-	LoadBalancer      LoadBalancerService
-	Listener          ListenerService
-	Pool              PoolService
-	Member            MemberService
-	HealthMonitor     HealthMonitorService
-	KubernetesEngine  KubernetesEngineService
-	Backup            BackupService
-	ContainerRegistry ContainerRegistryService
-	CDN               CDNService
-	DNS               DNSService
-	Account           AccountService
-	VPC               VPCService
-	NetworkInterface  NetworkInterfaceService
-	WanIP             WanIPService
+	AutoScaling           AutoScalingService
+	CloudWatcher          CloudWatcherService
+	Token                 TokenService
+	LoadBalancer          LoadBalancerService
+	Listener              ListenerService
+	Pool                  PoolService
+	Member                MemberService
+	HealthMonitor         HealthMonitorService
+	KubernetesEngine      KubernetesEngineService
+	ScheduledVolumeBackup ScheduledVolumeBackup
+	ContainerRegistry     ContainerRegistryService
+	CDN                   CDNService
+	DNS                   DNSService
+	Account               AccountService
+	VPC                   VPCService
+	NetworkInterface      NetworkInterfaceService
+	WanIP                 WanIPService
 
 	Snapshot SnapshotService
 
@@ -169,7 +169,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Volume = &volume{client: c}
 	c.Server = &server{client: c}
 	c.Service = &service{client: c}
-	c.Backup = &backupService{client: c}
+	c.ScheduledVolumeBackup = &scheduledVolumeBackup{client: c}
 	c.Firewall = &firewall{client: c}
 	c.SSHKey = &sshkey{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}

@@ -35,7 +35,7 @@ func TestBackupList(t *testing.T) {
 ]`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	backups, err := client.Backup.List(ctx)
+	backups, err := client.ScheduledVolumeBackup.List(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(backups))
 	assert.Equal(t, "6016290450b0b5a3708df3dc", backups[0].ID)
@@ -175,7 +175,7 @@ func TestBackupCreate(t *testing.T) {
 }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	backup, err := client.Backup.Create(ctx, &CreateBackupPayload{
+	backup, err := client.ScheduledVolumeBackup.Create(ctx, &CreateBackupPayload{
 		ResourceID: "36089786-0b73-4787-923d-cbb0a2a34377",
 		Frequency:  "1440",
 		Hour:       2,
@@ -190,7 +190,7 @@ func TestBackupCreate(t *testing.T) {
 func TestBackupGet(t *testing.T) {
 	setup()
 	defer teardown()
-	var b backupService
+	var b scheduledVolumeBackup
 	mux.HandleFunc(testlib.CloudServerURL(b.itemPath("6016290450b0b5a3708df3dc")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
@@ -296,7 +296,7 @@ func TestBackupGet(t *testing.T) {
 }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	backup, err := client.Backup.Get(ctx, "6016290450b0b5a3708df3dc")
+	backup, err := client.ScheduledVolumeBackup.Get(ctx, "6016290450b0b5a3708df3dc")
 	require.NoError(t, err)
 	assert.Equal(t, "saving_plan", backup.BillingPlan)
 	assert.Equal(t, "1440", backup.Options.Frequency)
@@ -306,18 +306,18 @@ func TestBackupGet(t *testing.T) {
 func TestBackupDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var b backupService
+	var b scheduledVolumeBackup
 	mux.HandleFunc(testlib.CloudServerURL(b.itemPath("6016290450b0b5a3708df3dc")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.Backup.Delete(ctx, "6016290450b0b5a3708df3dc"))
+	require.NoError(t, client.ScheduledVolumeBackup.Delete(ctx, "6016290450b0b5a3708df3dc"))
 }
 
 func TestBackupUpdate(t *testing.T) {
 	setup()
 	defer teardown()
-	var b backupService
+	var b scheduledVolumeBackup
 	mux.HandleFunc(testlib.CloudServerURL(b.itemPath("6016290450b0b5a3708df3dc")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
@@ -423,7 +423,7 @@ func TestBackupUpdate(t *testing.T) {
 }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	backup, err := client.Backup.Update(ctx, "6016290450b0b5a3708df3dc", &UpdateBackupPayload{
+	backup, err := client.ScheduledVolumeBackup.Update(ctx, "6016290450b0b5a3708df3dc", &UpdateBackupPayload{
 		Frequency: "2880",
 	})
 	require.NoError(t, err)
