@@ -16,49 +16,49 @@ type cloudBackupService struct {
 }
 
 type CloudBackupService interface {
-	CloudBackupActivity(ctx context.Context) ([]*Activity, error)
+	CloudBackupActivity(ctx context.Context) ([]*CloudBackupActivity, error)
 
-	ListTenantRecoveryPoints(ctx context.Context) ([]*MachineRecoveryPoint, error)
-	DeleteMultipleRecoveryPoints(ctx context.Context, payload DeleteMultipleRecoveryPointPayload) error
-	ListDirectoryRecoveryPoints(ctx context.Context, machineId string, directoryId string) ([]*MachineRecoveryPoint, error)
-	RecoveryPointAction(ctx context.Context, recoveryPointId string, payload *RecoveryPointActionPayload) (*MachineRecoveryPoint, error)
-	ListMachineRecoveryPoints(ctx context.Context, machineId string) ([]*ExtendedRecoveryPoint, error)
-	GetRecoveryPoint(ctx context.Context, recoveryPointId string) (*MachineRecoveryPoint, error)
+	ListTenantRecoveryPoints(ctx context.Context) ([]*CloudBackupMachineRecoveryPoint, error)
+	DeleteMultipleRecoveryPoints(ctx context.Context, payload CloudBackupDeleteMultipleRecoveryPointPayload) error
+	ListDirectoryRecoveryPoints(ctx context.Context, machineId string, directoryId string) ([]*CloudBackupMachineRecoveryPoint, error)
+	RecoveryPointAction(ctx context.Context, recoveryPointId string, payload *CloudBackupRecoveryPointActionPayload) (*CloudBackupMachineRecoveryPoint, error)
+	ListMachineRecoveryPoints(ctx context.Context, machineId string) ([]*CloudBackupExtendedRecoveryPoint, error)
+	GetRecoveryPoint(ctx context.Context, recoveryPointId string) (*CloudBackupMachineRecoveryPoint, error)
 	DeleteRecoveryPoint(ctx context.Context, recoveryPointId string) error
-	ListRecoveryPointItems(ctx context.Context, recoveryPointId string) ([]*RecoveryPointItem, error)
-	RestoreRecoveryPoint(ctx context.Context, recoveryPointId string, payload *RestoreRecoveryPointPayload) error
+	ListRecoveryPointItems(ctx context.Context, recoveryPointId string) ([]*CloudBackupRecoveryPointItem, error)
+	RestoreRecoveryPoint(ctx context.Context, recoveryPointId string, payload *CloudBackupRestoreRecoveryPointPayload) error
 
-	ListStorageVaults(ctx context.Context) ([]*StorageVault, error)
-	GetStorageVault(ctx context.Context, vaultId string) (*StorageVault, error)
-	CreateStorageVault(ctx context.Context, payload *CreateStorageVaultPayload) (*StorageVault, error)
+	ListStorageVaults(ctx context.Context) ([]*CloudBackupStorageVault, error)
+	GetStorageVault(ctx context.Context, vaultId string) (*CloudBackupStorageVault, error)
+	CreateStorageVault(ctx context.Context, payload *CloudBackupCreateStorageVaultPayload) (*CloudBackupStorageVault, error)
 
-	ListTenantMachines(ctx context.Context, listOption *ListMachineParams) ([]*Machine, error)
-	CreateMachine(ctx context.Context, payload *CreateMachinePayload) (*ExtendedMachine, error)
-	GetMachine(ctx context.Context, machineId string) (*Machine, error)
-	PatchMachine(ctx context.Context, machineId string, payload *PatchMachinePayload) (*Machine, error)
-	DeleteMachine(ctx context.Context, machineId string, payload *DeleteMachinePayload) error
-	ActionMachine(ctx context.Context, machineId string, payload *ActionMachinePayload) error
-	ResetMachineSecretKey(ctx context.Context, machineId string) (*ExtendedMachine, error)
+	ListTenantMachines(ctx context.Context, listOption *CloudBackupListMachineParams) ([]*CloudBackupMachine, error)
+	CreateMachine(ctx context.Context, payload *CloudBackupCreateMachinePayload) (*CloudBackupExtendedMachine, error)
+	GetMachine(ctx context.Context, machineId string) (*CloudBackupMachine, error)
+	PatchMachine(ctx context.Context, machineId string, payload *CloudBackupPatchMachinePayload) (*CloudBackupMachine, error)
+	DeleteMachine(ctx context.Context, machineId string, payload *CloudBackupDeleteMachinePayload) error
+	ActionMachine(ctx context.Context, machineId string, payload *CloudBackupActionMachinePayload) error
+	ResetMachineSecretKey(ctx context.Context, machineId string) (*CloudBackupExtendedMachine, error)
 
-	ActionDirectory(ctx context.Context, machineId string, payload *StateDirectoryAction) error
-	ListMachineBackupDirectories(ctx context.Context, machineId string) ([]*BackupDirectory, error)
-	CreateBackupDirectory(ctx context.Context, machineId string, payload *CreateDirectoryPayload) (*BackupDirectory, error)
-	GetBackupDirectory(ctx context.Context, machineId string, directoryId string) (*BackupDirectory, error)
-	PatchBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *PatchDirectoryPayload) (*BackupDirectory, error)
-	DeleteBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *DeleteDirectoryPayload) error
-	ListTenantDirectories(ctx context.Context) ([]*BackupDirectory, error)
-	ActionBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *ActionDirectoryPayload) error
-	DeleteMultipleDirectories(ctx context.Context, machineId string, payload *DeleteMultipleDirectoriesPayload) error
-	ActionMultipleDirectories(ctx context.Context, machineId string, payload *ActionMultipleDirectoriesPayload) error
+	ActionDirectory(ctx context.Context, machineId string, payload *CloudBackupStateDirectoryAction) error
+	ListMachineBackupDirectories(ctx context.Context, machineId string) ([]*CloudBackupDirectory, error)
+	CreateBackupDirectory(ctx context.Context, machineId string, payload *CloudBackupCreateDirectoryPayload) (*CloudBackupDirectory, error)
+	GetBackupDirectory(ctx context.Context, machineId string, directoryId string) (*CloudBackupDirectory, error)
+	PatchBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupPatchDirectoryPayload) (*CloudBackupDirectory, error)
+	DeleteBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupDeleteDirectoryPayload) error
+	ListTenantDirectories(ctx context.Context) ([]*CloudBackupDirectory, error)
+	ActionBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupActionDirectoryPayload) error
+	DeleteMultipleDirectories(ctx context.Context, machineId string, payload *CloudBackupDeleteMultipleDirectoriesPayload) error
+	ActionMultipleDirectories(ctx context.Context, machineId string, payload *CloudBackupActionMultipleDirectoriesPayload) error
 
-	ListTenantPolicies(ctx context.Context) ([]*Policy, error)
-	CreatePolicy(ctx context.Context, payload *CreatePolicyPayload) (*Policy, error)
-	GetBackupDirectoryPolicy(ctx context.Context, machineId string, directoryId string) (*Policy, error)
-	GetPolicy(ctx context.Context, policyId string) (*Policy, error)
-	PatchPolicy(ctx context.Context, policyId string, payload *PatchPolicyPayload) (*Policy, error)
+	ListTenantPolicies(ctx context.Context) ([]*CloudBackupPolicy, error)
+	CreatePolicy(ctx context.Context, payload *CloudBackupCreatePolicyPayload) (*CloudBackupPolicy, error)
+	GetBackupDirectoryPolicy(ctx context.Context, machineId string, directoryId string) (*CloudBackupPolicy, error)
+	GetPolicy(ctx context.Context, policyId string) (*CloudBackupPolicy, error)
+	PatchPolicy(ctx context.Context, policyId string, payload *CloudBackupPatchPolicyPayload) (*CloudBackupPolicy, error)
 	DeletePolicy(ctx context.Context, policyId string) error
-	ListAppliedPolicyDirectories(ctx context.Context, policyId string) ([]*BackupDirectory, error)
-	ActionPolicyDirectory(ctx context.Context, policyId string, payload *ActionPolicyDirectoryPayload) error
+	ListAppliedPolicyDirectories(ctx context.Context, policyId string) ([]*CloudBackupDirectory, error)
+	ActionPolicyDirectory(ctx context.Context, policyId string, payload *CloudBackupActionPolicyDirectoryPayload) error
 }
 
 func (cb *cloudBackupService) dashboardPath() string {

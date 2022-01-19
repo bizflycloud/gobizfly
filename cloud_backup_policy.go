@@ -7,7 +7,15 @@ import (
 	"strings"
 )
 
-type Policy struct {
+type CloudBackupCreatePolicyPayload struct {
+	Name            string `json:"name"`
+	StorageType     string `json:"storage_type"`
+	SchedulePattern string `json:"schedule_pattern"`
+	RetentionDays   int    `json:"retention_days"`
+	Description     string `json:"description,omitempty"`
+}
+
+type CloudBackupPolicy struct {
 	Id              string `json:"id"`
 	Name            string `json:"name"`
 	SchedulePattern string `json:"schedule_pattern"`
@@ -22,31 +30,13 @@ type Policy struct {
 	Retentions      int    `json:"retentions"`
 }
 
-type CreatePolicyPayload struct {
-	Name            string `json:"name"`
-	StorageType     string `json:"storage_type"`
-	SchedulePattern string `json:"schedule_pattern"`
-	RetentionDays   int    `json:"retention_days"`
-	Description     string `json:"description,omitempty"`
-}
-
-type CloudBackupPolicy struct {
-	CreatedAt       string `json:"created_at"`
-	Id              string `json:"id"`
-	Name            string `json:"name"`
-	RetentionDays   int    `json:"retention_days"`
-	SchedulePattern string `json:"schedule_pattern"`
-	TenantId        string `json:"tenant_id"`
-	UpdatedAt       string `json:"updated_at"`
-}
-
-type PatchPolicyPayload struct {
+type CloudBackupPatchPolicyPayload struct {
 	Name            string `json:"name,omitempty"`
 	SchedulePattern string `json:"schedule_pattern,omitempty"`
 	RetentionDays   int    `json:"retention_days,omitempty"`
 }
 
-type ExtendedCloudBackupPolicy struct {
+type CloudBackupFullPolicy struct {
 	CloudBackupPolicy
 	RetentionDays     int      `json:"retention_days"`
 	RetentionHours    int      `json:"retention_hours"`
@@ -55,12 +45,12 @@ type ExtendedCloudBackupPolicy struct {
 	BackupDirectories []string `json:"backup_directories"`
 }
 
-type ActionPolicyDirectoryPayload struct {
+type CloudBackupActionPolicyDirectoryPayload struct {
 	Action      string `json:"action"`
 	DirectoryId string `json:"directory_id"`
 }
 
-func (cb *cloudBackupService) CreatePolicy(ctx context.Context, payload *CreatePolicyPayload) (*Policy, error) {
+func (cb *cloudBackupService) CreatePolicy(ctx context.Context, payload *CloudBackupCreatePolicyPayload) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		cb.policyPath(), payload)
 	if err != nil {
@@ -71,14 +61,14 @@ func (cb *cloudBackupService) CreatePolicy(ctx context.Context, payload *CreateP
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var policy *Policy
+	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
 	}
 	return policy, nil
 }
 
-func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, machineId string, directoryId string) (*Policy, error) {
+func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, machineId string, directoryId string) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId, "policies"}, "/"), nil)
 	if err != nil {
@@ -89,14 +79,14 @@ func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, mach
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var policy *Policy
+	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
 	}
 	return policy, nil
 }
 
-func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyId string) (*Policy, error) {
+func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyId string) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemPolicyPath(policyId), nil)
 	if err != nil {
@@ -107,14 +97,14 @@ func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyId string) (*
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var policy *Policy
+	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
 	}
 	return policy, nil
 }
 
-func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyId string, payload *PatchPolicyPayload) (*Policy, error) {
+func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyId string, payload *CloudBackupPatchPolicyPayload) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
 		cb.itemPolicyPath(policyId), payload)
 	if err != nil {
@@ -125,7 +115,7 @@ func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyId string, 
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var policy *Policy
+	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
 	}
@@ -145,7 +135,7 @@ func (cb *cloudBackupService) DeletePolicy(ctx context.Context, policyId string)
 	return nil
 }
 
-func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, policyId string) ([]*BackupDirectory, error) {
+func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, policyId string) ([]*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemPolicyPath(policyId), "directories"}, "/"), nil)
 	if err != nil {
@@ -156,14 +146,14 @@ func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, 
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var directories []*BackupDirectory
+	var directories []*CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directories); err != nil {
 		return nil, err
 	}
 	return directories, nil
 }
 
-func (cb *cloudBackupService) ActionPolicyDirectory(ctx context.Context, policyId string, payload *ActionPolicyDirectoryPayload) error {
+func (cb *cloudBackupService) ActionPolicyDirectory(ctx context.Context, policyId string, payload *CloudBackupActionPolicyDirectoryPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		strings.Join([]string{cb.itemPolicyPath(policyId), "action"}, "/"), payload)
 	if err != nil {

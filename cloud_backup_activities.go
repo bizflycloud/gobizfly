@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type Activity struct {
+type CloudBackupActivity struct {
 	Action            string `json:"action"`
 	BackupDirectoryId string `json:"backup_directory_id"`
 	CreatedAt         string `json:"created_at"`
@@ -23,7 +23,7 @@ type Activity struct {
 	UserId            string `json:"user_id"`
 }
 
-func (cb *cloudBackupService) CloudBackupActivity(ctx context.Context) ([]*Activity, error) {
+func (cb *cloudBackupService) CloudBackupActivity(ctx context.Context) ([]*CloudBackupActivity, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName, cb.activityPath(), nil)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (cb *cloudBackupService) CloudBackupActivity(ctx context.Context) ([]*Activ
 	}
 	defer resp.Body.Close()
 	var data struct {
-		ActivityData []*Activity `json:"activities"`
+		ActivityData []*CloudBackupActivity `json:"activities"`
 	}
 	if err = json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err

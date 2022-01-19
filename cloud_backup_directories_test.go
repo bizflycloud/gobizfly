@@ -135,7 +135,7 @@ func TestActionDirectory(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	err := client.CloudBackup.ActionDirectory(ctx, "123", &StateDirectoryAction{
+	err := client.CloudBackup.ActionDirectory(ctx, "123", &CloudBackupStateDirectoryAction{
 		Action:            "active",
 		BackupDirectories: []string{"123"},
 	})
@@ -175,7 +175,7 @@ func TestCreateBackupDirectory(t *testing.T) {
 
 			fmt.Fprint(writer, resp)
 		})
-	directory, err := client.CloudBackup.CreateBackupDirectory(ctx, "123", &CreateDirectoryPayload{
+	directory, err := client.CloudBackup.CreateBackupDirectory(ctx, "123", &CloudBackupCreateDirectoryPayload{
 		Name: "test",
 		Path: "/home/vinh/cho-meo-bo-ngua",
 	})
@@ -291,7 +291,7 @@ func TestCloudBackupService_PatchBackupDirectory(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	directory, err := client.CloudBackup.PatchBackupDirectory(ctx, "123", "456", &PatchDirectoryPayload{
+	directory, err := client.CloudBackup.PatchBackupDirectory(ctx, "123", "456", &CloudBackupPatchDirectoryPayload{
 		Name: "test_123",
 	})
 	require.NoError(t, err)
@@ -307,7 +307,7 @@ func TestCloudBackupService_DeleteBackupDirectory(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	err := client.CloudBackup.DeleteBackupDirectory(ctx, "123", "456", &DeleteDirectoryPayload{
+	err := client.CloudBackup.DeleteBackupDirectory(ctx, "123", "456", &CloudBackupDeleteDirectoryPayload{
 		Keep: true,
 	})
 	require.NoError(t, err)
@@ -386,7 +386,7 @@ func TestCloudBackupService_ActionBackupDirectory(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	err := client.CloudBackup.ActionBackupDirectory(ctx, "123", "456", &ActionDirectoryPayload{
+	err := client.CloudBackup.ActionBackupDirectory(ctx, "123", "456", &CloudBackupActionDirectoryPayload{
 		Action: "deactive",
 	})
 	require.NoError(t, err)
@@ -400,7 +400,7 @@ func TestCloudBackupService_DeleteMultipleDirectories(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	err := client.CloudBackup.DeleteMultipleDirectories(ctx, "123", &DeleteMultipleDirectoriesPayload{
+	err := client.CloudBackup.DeleteMultipleDirectories(ctx, "123", &CloudBackupDeleteMultipleDirectoriesPayload{
 		BackupDirectories: []string{"123", "456"},
 		Keep:              true,
 	})
@@ -415,7 +415,7 @@ func TestCloudBackupService_ActionMultipleDirectories(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	err := client.CloudBackup.ActionMultipleDirectories(ctx, "123", &ActionMultipleDirectoriesPayload{
+	err := client.CloudBackup.ActionMultipleDirectories(ctx, "123", &CloudBackupActionMultipleDirectoriesPayload{
 		BackupDirectories: []string{"123", "456"},
 		Action:            "deactive",
 	})

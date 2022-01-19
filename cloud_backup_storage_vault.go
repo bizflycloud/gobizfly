@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-type StorageVault struct {
+type CloudBackupStorageVault struct {
 	CreatedAt        string `json:"created_at"`
 	CredentialType   string `json:"credential_type"`
 	DataUsage        string `json:"data_usage"`
@@ -21,7 +21,7 @@ type StorageVault struct {
 	UpdatedAt        string `json:"updated_at"`
 }
 
-type CreateStorageVaultPayload struct {
+type CloudBackupCreateStorageVaultPayload struct {
 	AwsAccessKeyId     string `json:"aws_access_key_id"`
 	AwsSecretAccessKey string `json:"aws_secret_access_key"`
 	EndpointUrl        string `json:"endpoint_url"`
@@ -31,7 +31,7 @@ type CreateStorageVaultPayload struct {
 	CredentialType     string `json:"credential_type"`
 }
 
-func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*StorageVault, error) {
+func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.storageVaultsPath(), nil)
 	if err != nil {
@@ -42,7 +42,7 @@ func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*Storage
 		return nil, err
 	}
 	var data struct {
-		StorageVaults []*StorageVault `json:"storage_vaults"`
+		StorageVaults []*CloudBackupStorageVault `json:"storage_vaults"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -51,7 +51,7 @@ func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*Storage
 	return data.StorageVaults, nil
 }
 
-func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId string) (*StorageVault, error) {
+func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId string) (*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemStorageVaultPath(valutId), nil)
 	if err != nil {
@@ -62,14 +62,14 @@ func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId strin
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var vault *StorageVault
+	var vault *CloudBackupStorageVault
 	if err := json.NewDecoder(resp.Body).Decode(&vault); err != nil {
 		return nil, err
 	}
 	return vault, nil
 }
 
-func (cb *cloudBackupService) CreateStorageVault(ctx context.Context, payload *CreateStorageVaultPayload) (*StorageVault, error) {
+func (cb *cloudBackupService) CreateStorageVault(ctx context.Context, payload *CloudBackupCreateStorageVaultPayload) (*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		cb.storageVaultsPath(), payload)
 	if err != nil {
@@ -80,7 +80,7 @@ func (cb *cloudBackupService) CreateStorageVault(ctx context.Context, payload *C
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var vault *StorageVault
+	var vault *CloudBackupStorageVault
 	if err := json.NewDecoder(resp.Body).Decode(&vault); err != nil {
 		return nil, err
 	}

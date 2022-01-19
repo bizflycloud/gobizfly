@@ -139,7 +139,7 @@ func TestCreateStorageVault(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	vault, err := client.CloudBackup.CreateStorageVault(ctx, &CreateStorageVaultPayload{
+	vault, err := client.CloudBackup.CreateStorageVault(ctx, &CloudBackupCreateStorageVaultPayload{
 		AwsAccessKeyId:     "key_id",
 		AwsSecretAccessKey: "access_key",
 		EndpointUrl:        "/test",

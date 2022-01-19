@@ -71,7 +71,7 @@ func TestDeleteMultipleRecoveryPoint(t *testing.T) {
 			assert.Equal(t, r.Method, http.MethodDelete)
 		})
 	deleteRecoveryPoint := []string{"123", "456", "789"}
-	err := client.CloudBackup.DeleteMultipleRecoveryPoints(ctx, DeleteMultipleRecoveryPointPayload{
+	err := client.CloudBackup.DeleteMultipleRecoveryPoints(ctx, CloudBackupDeleteMultipleRecoveryPointPayload{
 		RecoveryPointIds: deleteRecoveryPoint,
 	})
 	require.NoError(t, err)
@@ -261,7 +261,7 @@ func TestRecoveryPointAction(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	recoveryPoint, err := client.CloudBackup.RecoveryPointAction(ctx, "123", &RecoveryPointActionPayload{
+	recoveryPoint, err := client.CloudBackup.RecoveryPointAction(ctx, "123", &CloudBackupRecoveryPointActionPayload{
 		Action: "convert_to_manual_recovery_point",
 	})
 	require.NoError(t, err)

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-type RecoveryPoint struct {
+type CloudBackupRecoveryPoint struct {
 	RecoveryPointType string `json:"recovery_point_type"`
 	Status            string `json:"status"`
 	CreatedAt         string `json:"created_at"`
@@ -16,7 +16,7 @@ type RecoveryPoint struct {
 	Id                string `json:"id"`
 }
 
-type File struct {
+type CloudBackupFile struct {
 	Id           string `json:"id"`
 	ItemName     string `json:"item_name"`
 	Size         int    `json:"size"`
@@ -30,21 +30,21 @@ type File struct {
 	Status       string `json:"status"`
 }
 
-type RecoveryPointActionPayload struct {
+type CloudBackupRecoveryPointActionPayload struct {
 	Action string `json:"action"`
 }
-type MachineRecoveryPoint struct {
-	BackupDirectory   BackupDirectory `json:"backup_directory"`
-	CreatedAt         string          `json:"created_at"`
-	Id                string          `json:"id"`
-	Name              string          `json:"name"`
-	RecoveryPointType string          `json:"recovery_point_type"`
-	Status            string          `json:"status"`
-	UpdatedAt         string          `json:"updated_at"`
+type CloudBackupMachineRecoveryPoint struct {
+	BackupDirectory   CloudBackupDirectory `json:"backup_directory"`
+	CreatedAt         string               `json:"created_at"`
+	Id                string               `json:"id"`
+	Name              string               `json:"name"`
+	RecoveryPointType string               `json:"recovery_point_type"`
+	Status            string               `json:"status"`
+	UpdatedAt         string               `json:"updated_at"`
 }
 
-type ExtendedRecoveryPoint struct {
-	MachineRecoveryPoint
+type CloudBackupExtendedRecoveryPoint struct {
+	CloudBackupMachineRecoveryPoint
 	IndexHash   string `json:"index_hash,omitempty"`
 	LocalSize   int    `json:"local_size,omitempty"`
 	Method      string `json:"method,omitempty"`
@@ -53,7 +53,7 @@ type ExtendedRecoveryPoint struct {
 	TotalFiles  int    `json:"total_files,omitempty"`
 }
 
-type RecoveryPointItem struct {
+type CloudBackupRecoveryPointItem struct {
 	AccessMode  string `json:"access_mode"`
 	AccessTime  string `json:"access_time"`
 	ChangeTime  string `json:"change_time"`
@@ -74,49 +74,49 @@ type RecoveryPointItem struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
-type RestoreRecoveryPointPayload struct {
+type CloudBackupRestoreRecoveryPointPayload struct {
 	RecoveryPointId string `json:"recovery_point_id"`
 	Path            string `json:"path"`
 }
 
-type StateDirectoryAction struct {
+type CloudBackupStateDirectoryAction struct {
 	Action            string   `json:"action"`
 	BackupDirectories []string `json:"backup_directories"`
 }
 
-type CreateDirectoryPayload struct {
+type CloudBackupCreateDirectoryPayload struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description,omitempty"`
 	Path        string   `json:"path"`
 	Policies    []string `json:"policies,omitempty"`
 }
 
-type PatchDirectoryPayload struct {
+type CloudBackupPatchDirectoryPayload struct {
 	Name        string   `json:"name,omitempty"`
 	Description string   `json:"description,omitempty"`
 	Policies    []string `json:"policies,omitempty"`
 }
 
-type DeleteDirectoryPayload struct {
+type CloudBackupDeleteDirectoryPayload struct {
 	Keep bool `json:"keep"`
 }
 
-type ActionDirectoryPayload struct {
+type CloudBackupActionDirectoryPayload struct {
 	Action      string `json:"action"`
 	StorageType string `json:"storage_type,omitempty"`
 	Name        string `json:"name,omitempty"`
 }
 
-type DeleteMultipleRecoveryPointPayload struct {
+type CloudBackupDeleteMultipleRecoveryPointPayload struct {
 	RecoveryPointIds []string `json:"recovery_point_ids"`
 }
 
-type DeleteMultipleDirectoriesPayload struct {
+type CloudBackupDeleteMultipleDirectoriesPayload struct {
 	BackupDirectories []string `json:"backup_directories"`
 	Keep              bool     `json:"keep"`
 }
 
-func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*MachineRecoveryPoint, error) {
+func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName, cb.recoveryPointPath(), nil)
 	if err != nil {
 		return nil, err
@@ -126,14 +126,14 @@ func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var recoveryPoints []*MachineRecoveryPoint
+	var recoveryPoints []*CloudBackupMachineRecoveryPoint
 	if err := json.NewDecoder(resp.Body).Decode(&recoveryPoints); err != nil {
 		return nil, err
 	}
 	return recoveryPoints, nil
 }
 
-func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, payload DeleteMultipleRecoveryPointPayload) error {
+func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, payload CloudBackupDeleteMultipleRecoveryPointPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName, cb.recoveryPointPath(), payload)
 	if err != nil {
 		return err
@@ -146,7 +146,7 @@ func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, 
 	return nil
 }
 
-func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, machineId string, directoryId string) ([]*MachineRecoveryPoint, error) {
+func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, machineId string, directoryId string) ([]*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.machineDirectoryRecoveryPointPath(machineId, directoryId), nil)
 	if err != nil {
@@ -158,7 +158,7 @@ func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, m
 	}
 	defer resp.Body.Close()
 	var data struct {
-		RecoveryPoints []*MachineRecoveryPoint `json:"recovery_points"`
+		RecoveryPoints []*CloudBackupMachineRecoveryPoint `json:"recovery_points"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -166,7 +166,7 @@ func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, m
 	return data.RecoveryPoints, nil
 }
 
-func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recoveryPointId string) ([]*File, error) {
+func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recoveryPointId string) ([]*CloudBackupFile, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "files"}, "/"), nil)
 	if err != nil {
@@ -177,14 +177,14 @@ func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recove
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var files []*File
+	var files []*CloudBackupFile
 	if err := json.NewDecoder(resp.Body).Decode(&files); err != nil {
 		return nil, err
 	}
 	return files, nil
 }
 
-func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryPointId string, payload *RecoveryPointActionPayload) (*MachineRecoveryPoint, error) {
+func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryPointId string, payload *CloudBackupRecoveryPointActionPayload) (*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "action"}, "/"), payload)
 	if err != nil {
@@ -195,14 +195,14 @@ func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryP
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var recoveryPoint *MachineRecoveryPoint
+	var recoveryPoint *CloudBackupMachineRecoveryPoint
 	if err = json.NewDecoder(resp.Body).Decode(&recoveryPoint); err != nil {
 		return nil, err
 	}
 	return recoveryPoint, nil
 }
 
-func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, machineId string) ([]*ExtendedRecoveryPoint, error) {
+func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, machineId string) ([]*CloudBackupExtendedRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemMachinePath(machineId), nil)
 	if err != nil {
@@ -214,7 +214,7 @@ func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, mac
 	}
 	defer resp.Body.Close()
 	var recoveryPoints struct {
-		RecoveryPoints []*ExtendedRecoveryPoint `json:"recovery_points"`
+		RecoveryPoints []*CloudBackupExtendedRecoveryPoint `json:"recovery_points"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&recoveryPoints); err != nil {
 		return nil, err
@@ -222,7 +222,7 @@ func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, mac
 	return recoveryPoints.RecoveryPoints, nil
 }
 
-func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPointId string) (*MachineRecoveryPoint, error) {
+func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPointId string) (*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemRecoveryPointPath(recoveryPointId), nil)
 	if err != nil {
@@ -233,7 +233,7 @@ func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPoin
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var recoveryPoint *MachineRecoveryPoint
+	var recoveryPoint *CloudBackupMachineRecoveryPoint
 	if err := json.NewDecoder(resp.Body).Decode(&recoveryPoint); err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (cb *cloudBackupService) DeleteRecoveryPoint(ctx context.Context, recoveryP
 	return nil
 }
 
-func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recoveryPointId string) ([]*RecoveryPointItem, error) {
+func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recoveryPointId string) ([]*CloudBackupRecoveryPointItem, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "items"}, "/"), nil)
 	if err != nil {
@@ -265,7 +265,7 @@ func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recove
 	}
 	defer resp.Body.Close()
 	var data struct {
-		Items []*RecoveryPointItem `json:"items"`
+		Items []*CloudBackupRecoveryPointItem `json:"items"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -273,7 +273,7 @@ func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recove
 	return data.Items, nil
 }
 
-func (cb *cloudBackupService) RestoreRecoveryPoint(ctx context.Context, recoveryPointId string, payload *RestoreRecoveryPointPayload) error {
+func (cb *cloudBackupService) RestoreRecoveryPoint(ctx context.Context, recoveryPointId string, payload *CloudBackupRestoreRecoveryPointPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "action"}, "/"), payload)
 	if err != nil {

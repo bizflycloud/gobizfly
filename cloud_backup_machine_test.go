@@ -58,7 +58,7 @@ func TestListTenantMachine(t *testing.T) {
 ]`
 			fmt.Fprint(writer, resp)
 		})
-	machines, err := client.CloudBackup.ListTenantMachines(ctx, &ListMachineParams{})
+	machines, err := client.CloudBackup.ListTenantMachines(ctx, &CloudBackupListMachineParams{})
 	require.NoError(t, err)
 	assert.Equal(t, 2, len(machines))
 	assert.Equal(t, "98dbba57-60c7-4c22-8087-8313997ea776", machines[1].TenantId)
@@ -116,7 +116,7 @@ func TestCreateMachine(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	machine, err := client.CloudBackup.CreateMachine(ctx, &CreateMachinePayload{
+	machine, err := client.CloudBackup.CreateMachine(ctx, &CloudBackupCreateMachinePayload{
 		Name:         "machine_name",
 		HostName:     "host_name",
 		IpAddress:    "1.2.3.4",
@@ -214,7 +214,7 @@ func TestPatchMachine(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	machine, err := client.CloudBackup.PatchMachine(ctx, "123", &PatchMachinePayload{
+	machine, err := client.CloudBackup.PatchMachine(ctx, "123", &CloudBackupPatchMachinePayload{
 		Name:         "Nginx Server",
 		HostName:     "nginx-1",
 		IpAddress:    "10.3.35.12",
@@ -235,7 +235,7 @@ func TestDeleteMachine(t *testing.T) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
 	directoryIds := []string{"123", "456"}
-	err := client.CloudBackup.DeleteMachine(ctx, "123", &DeleteMachinePayload{
+	err := client.CloudBackup.DeleteMachine(ctx, "123", &CloudBackupDeleteMachinePayload{
 		Keep:         true,
 		DirectoryIds: directoryIds,
 	})
@@ -251,7 +251,7 @@ func TestActionMachine(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	err := client.CloudBackup.ActionMachine(ctx, "123", &ActionMachinePayload{
+	err := client.CloudBackup.ActionMachine(ctx, "123", &CloudBackupActionMachinePayload{
 		Action: "enable",
 	})
 	require.NoError(t, err)

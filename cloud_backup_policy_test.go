@@ -160,7 +160,7 @@ func TestCreatePolicy(t *testing.T) {
 			fmt.Fprint(writer, resp)
 		},
 	)
-	policy, err := client.CloudBackup.CreatePolicy(ctx, &CreatePolicyPayload{
+	policy, err := client.CloudBackup.CreatePolicy(ctx, &CloudBackupCreatePolicyPayload{
 		Name:            "policy1",
 		SchedulePattern: "* * * *",
 		StorageType:     "123",
@@ -248,7 +248,7 @@ func TestPatchPolicy(t *testing.T) {
 }`
 			fmt.Fprint(writer, resp)
 		})
-	policy, err := client.CloudBackup.PatchPolicy(ctx, "123", &PatchPolicyPayload{
+	policy, err := client.CloudBackup.PatchPolicy(ctx, "123", &CloudBackupPatchPolicyPayload{
 		Name: "123213123",
 	})
 	require.NoError(t, err)
@@ -324,7 +324,7 @@ func TestCloudBackupService_ActionPolicyDirectory(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	err := client.CloudBackup.ActionPolicyDirectory(ctx, "123", &ActionPolicyDirectoryPayload{
+	err := client.CloudBackup.ActionPolicyDirectory(ctx, "123", &CloudBackupActionPolicyDirectoryPayload{
 		Action:      "apply_directory",
 		DirectoryId: "123123213123",
 	})
