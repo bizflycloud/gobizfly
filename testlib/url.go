@@ -4,6 +4,10 @@ func CloudServerURL(path string) string {
 	return "/iaas-cloud/api" + path
 }
 
+func CloudBackupURL(path string) string {
+	return "/api/cloud-backup" + path
+}
+
 func LoadBalancerURL(path string) string {
 	return "/api/loadbalancers" + path
 }
