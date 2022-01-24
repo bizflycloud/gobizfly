@@ -22,6 +22,7 @@ const (
 	accountName             = "bizfly_account"
 	loadBalancerServiceName = "load_balancer"
 	serverServiceName       = "cloud_server"
+	cloudBackupServiceName  = "cloud-backup"
 	autoScalingServiceName  = "auto_scaling"
 	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
@@ -43,6 +44,7 @@ var (
 // Client represents BizFly API client.
 type Client struct {
 	AutoScaling           AutoScalingService
+	CloudBackup           CloudBackupService
 	CloudWatcher          CloudWatcherService
 	Token                 TokenService
 	LoadBalancer          LoadBalancerService
@@ -158,6 +160,7 @@ func NewClient(options ...Option) (*Client, error) {
 	}
 
 	c.AutoScaling = &autoscalingService{client: c}
+	c.CloudBackup = &cloudBackupService{client: c}
 	c.CloudWatcher = &cloudwatcherService{client: c}
 	c.Snapshot = &snapshot{client: c}
 	c.Token = &token{client: c}
