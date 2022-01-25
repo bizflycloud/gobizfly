@@ -19,6 +19,7 @@ type firewall struct {
 	client *Client
 }
 
+// BaseFirewall - contains base information fields of a firewall
 type BaseFirewall struct {
 	ID                    string         `json:"id"`
 	Name                  string         `json:"name"`
@@ -35,17 +36,20 @@ type BaseFirewall struct {
 	OutBound              []FirewallRule `json:"outbound"`
 }
 
+// Firewall - contains information fields of a firewall and the applied servers
 type Firewall struct {
 	BaseFirewall
 	Servers []string `json:"servers"`
 }
 
+// FirewallDetail - contains information fields of a firewall and the applied servers and network interfaces
 type FirewallDetail struct {
 	BaseFirewall
 	Servers          []*Server           `json:"servers"`
 	NetworkInterface []*NetworkInterface `json:"network_interface"`
 }
 
+// FirewallRule - contains information fields of a firewall rule
 type FirewallRule struct {
 	ID             string   `json:"id"`
 	FirewallID     string   `json:"security_group_id"`
@@ -66,6 +70,7 @@ type FirewallRule struct {
 	PortRange      string   `json:"port_range"`
 }
 
+// FirewallRuleCreateRequest - payload for creating a firewall rule
 type FirewallRuleCreateRequest struct {
 	Type      string `json:"type"`
 	Protocol  string `json:"protocol"`
@@ -73,11 +78,13 @@ type FirewallRuleCreateRequest struct {
 	CIDR      string `json:"cidr"`
 }
 
+// FirewallSingleRuleCreateRequest - payload for creating a single direction firewall rule
 type FirewallSingleRuleCreateRequest struct {
 	FirewallRuleCreateRequest
 	Direction string `json:"direction"`
 }
 
+// FirewallRequestPayload - payload for creating a firewall
 type FirewallRequestPayload struct {
 	Name              string                      `json:"name"`
 	InBound           []FirewallRuleCreateRequest `json:"inbound,omitempty"`
