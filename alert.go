@@ -51,55 +51,6 @@ const (
 	secretsResourcePath   = "/secrets"
 )
 
-// Comparison is represents comparison payload in alarms
-type Comparison struct {
-	CompareType string  `json:"compare_type"`
-	Measurement string  `json:"measurement"`
-	RangeTime   int     `json:"range_time"`
-	Value       float64 `json:"value"`
-}
-
-// AlarmInstancesMonitors is represents instances payload - which servers will be monitored
-type AlarmInstancesMonitors struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// AlarmVolumesMonitor is represents volumes payload - which volumes will be monitored
-type AlarmVolumesMonitor struct {
-	ID     string `json:"id,omitempty"`
-	Name   string `json:"name,omitempty"`
-	Device string `json:"device,omitempty"`
-}
-
-// HTTPHeaders is is represents http headers - which using call to http_url
-type HTTPHeaders struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
-// AlarmLoadBalancersMonitor is represents load balancer payload - which load balancer will be monitored
-type AlarmLoadBalancersMonitor struct {
-	LoadBalancerID   string `json:"load_balancer_id"`
-	LoadBalancerName string `json:"load_balancer_name"`
-	TargetID         string `json:"target_id"`
-	TargetName       string `json:"target_name,omitempty"`
-	TargetType       string `json:"target_type"`
-}
-
-// AlarmReceiversUse is represents receiver's payload will be use create alarms
-type AlarmReceiversUse struct {
-	AutoscaleClusterName string `json:"autoscale_cluster_name,omitempty"`
-	EmailAddress         string `json:"email_address,omitempty"`
-	Name                 string `json:"name"`
-	ReceiverID           string `json:"receiver_id"`
-	SlackChannelName     string `json:"slack_channel_name,omitempty"`
-	SMSInterval          int    `json:"sms_interval,omitempty"`
-	SMSNumber            string `json:"sms_number,omitempty"`
-	TelegramChatID       string `json:"telegram_chat_id,omitempty"`
-	WebhookURL           string `json:"webhook_url,omitempty"`
-}
-
 type agents struct {
 	client *Client
 }
