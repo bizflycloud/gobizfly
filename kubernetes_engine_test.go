@@ -45,7 +45,7 @@ func TestClusterList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	clusters, err := client.KubernetesEngine.ListClusters(ctx, &ListOptions{})
+	clusters, err := client.KubernetesEngine.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, clusters, 1)
 	assert.LessOrEqual(t, "ji84wqtzr77ogo6b", clusters[0].UID)
@@ -111,7 +111,7 @@ func TestClusterGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	cluster, err := client.KubernetesEngine.GetCluster(ctx, "ji84wqtzr77ogo6b")
+	cluster, err := client.KubernetesEngine.Get(ctx, "ji84wqtzr77ogo6b")
 	require.NoError(t, err)
 	assert.Equal(t, "deploy_test", cluster.Name)
 }
@@ -182,7 +182,7 @@ func TestClusterCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	cluster, err := client.KubernetesEngine.CreateCluster(ctx, &ClusterCreateRequest{
+	cluster, err := client.KubernetesEngine.Create(ctx, &ClusterCreateRequest{
 		Name:        "my-kubernetes-cluster-1",
 		Version:     "v1.18.6-5f7d3a91",
 		AutoUpgrade: true,
@@ -217,7 +217,7 @@ func TestClusterDelete(t *testing.T) {
 			require.Equal(t, http.MethodDelete, request.Method)
 			writer.WriteHeader(http.StatusNoContent)
 		})
-	require.NoError(t, client.KubernetesEngine.DeleteCluster(ctx, "ji84wqtzr77ogo6b"))
+	require.NoError(t, client.KubernetesEngine.Delete(ctx, "ji84wqtzr77ogo6b"))
 }
 
 func TestAddWorkerPool(t *testing.T) {
