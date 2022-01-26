@@ -19,6 +19,17 @@ type firewall struct {
 	client *Client
 }
 
+type FirewallService interface {
+	List(ctx context.Context, opts *ListOptions) ([]*Firewall, error)
+	Create(ctx context.Context, fcr *FirewallRequestPayload) (*FirewallDetail, error)
+	Get(ctx context.Context, id string) (*FirewallDetail, error)
+	Delete(ctx context.Context, id string) (*FirewallDeleteResponse, error)
+	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
+	Update(ctx context.Context, id string, ufr *FirewallRequestPayload) (*FirewallDetail, error)
+	DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error)
+	CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error)
+}
+
 // BaseFirewall - contains base information fields of a firewall
 type BaseFirewall struct {
 	ID                    string         `json:"id"`
@@ -93,27 +104,19 @@ type FirewallRequestPayload struct {
 	NetworkInterfaces []string                    `json:"network_interfaces,omitempty"`
 }
 
+// FirewallDeleteResponse represents the response body when deleting a firewall
 type FirewallDeleteResponse struct {
 	Message string `json:"message"`
 }
 
+// FirewallRemoveServerRequest represents the request body when removing a server from a firewall
 type FirewallRemoveServerRequest struct {
 	Servers []string `json:"servers"`
 }
 
+// FirewallRuleCreateResponse represents the response body when creating a firewall rule
 type FirewallRuleCreateResponse struct {
 	Rule FirewallRule `json:"security_group_rule"`
-}
-
-type FirewallService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*Firewall, error)
-	Create(ctx context.Context, fcr *FirewallRequestPayload) (*FirewallDetail, error)
-	Get(ctx context.Context, id string) (*FirewallDetail, error)
-	Delete(ctx context.Context, id string) (*FirewallDeleteResponse, error)
-	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
-	Update(ctx context.Context, id string, ufr *FirewallRequestPayload) (*FirewallDetail, error)
-	DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error)
-	CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error)
 }
 
 // List lists all firewall.
@@ -182,7 +185,7 @@ func (f *firewall) Get(ctx context.Context, id string) (*FirewallDetail, error) 
 	return firewall, nil
 }
 
-// Remove servers from a firewall.
+// RemoveServer - Remove applied servers from a firewall.
 func (f *firewall) RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error) {
 
 	req, err := f.client.NewRequest(ctx, http.MethodDelete, serverServiceName, strings.Join([]string{firewallBasePath, id, "servers"}, "/"), rsfr)
@@ -251,7 +254,7 @@ func (f *firewall) Delete(ctx context.Context, id string) (*FirewallDeleteRespon
 	return dwr, nil
 }
 
-// Delete a rule in a firewall
+// DeleteRule - delete a rule in a firewall
 func (f *firewall) DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error) {
 	req, err := f.client.NewRequest(ctx, http.MethodDelete, serverServiceName, firewallBasePath+"/"+id, nil)
 
@@ -273,7 +276,7 @@ func (f *firewall) DeleteRule(ctx context.Context, id string) (*FirewallDeleteRe
 	return dwr, nil
 }
 
-// Create a new rule in a firewall
+// CreateRule - create a new rule in a firewall
 func (f *firewall) CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error) {
 	req, err := f.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{firewallBasePath, fwID, "rules"}, "/"), fsrcr)
 	if err != nil {
