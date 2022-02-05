@@ -23,9 +23,9 @@ type containerRegistry struct {
 var _ ContainerRegistryService = (*containerRegistry)(nil)
 
 type ContainerRegistryService interface {
-	ListRepositories(ctx context.Context, opts *ListOptions) ([]*Repository, error)
-	CreateRepository(ctx context.Context, crpl *CreateRepositoryPayload) error
-	DeleteRepository(ctx context.Context, repositoryName string) error
+	List(ctx context.Context, opts *ListOptions) ([]*Repository, error)
+	Create(ctx context.Context, crpl *CreateRepositoryPayload) error
+	Delete(ctx context.Context, repositoryName string) error
 	GetTags(ctx context.Context, repositoryName string) (*TagRepository, error)
 	EditRepo(ctx context.Context, repositoryName string, erpl *EditRepositoryPayload) error
 	DeleteTag(ctx context.Context, tagName string, repositoryName string) error
@@ -121,8 +121,8 @@ func (c *containerRegistry) itemPath(id string) string {
 	return strings.Join([]string{registryPath, id}, "/")
 }
 
-// ListRepositories - List container registry repositories
-func (c *containerRegistry) ListRepositories(ctx context.Context, opts *ListOptions) ([]*Repository, error) {
+// List - List container registry repositories
+func (c *containerRegistry) List(ctx context.Context, opts *ListOptions) ([]*Repository, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, containerRegistryName, c.resourcePath(), nil)
 	if err != nil {
 		return nil, err
@@ -141,8 +141,8 @@ func (c *containerRegistry) ListRepositories(ctx context.Context, opts *ListOpti
 	return data.Repositories, nil
 }
 
-// CreateRepository - Create a container registry repository
-func (c *containerRegistry) CreateRepository(ctx context.Context, crpl *CreateRepositoryPayload) error {
+// Create - Create a container registry repository
+func (c *containerRegistry) Create(ctx context.Context, crpl *CreateRepositoryPayload) error {
 	req, err := c.client.NewRequest(ctx, http.MethodPost, containerRegistryName, c.resourcePath(), &crpl)
 	if err != nil {
 		return err
@@ -154,8 +154,8 @@ func (c *containerRegistry) CreateRepository(ctx context.Context, crpl *CreateRe
 	return resp.Body.Close()
 }
 
-// DeleteRepository - Delete a container registry repository
-func (c *containerRegistry) DeleteRepository(ctx context.Context, repositoryName string) error {
+// Delete - Delete a container registry repository
+func (c *containerRegistry) Delete(ctx context.Context, repositoryName string) error {
 	req, err := c.client.NewRequest(ctx, http.MethodDelete, containerRegistryName, c.itemPath(repositoryName), nil)
 	if err != nil {
 		return err

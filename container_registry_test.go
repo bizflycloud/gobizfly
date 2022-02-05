@@ -34,7 +34,7 @@ func TestReposList(t *testing.T) {
 }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	repos, err := client.ContainerRegistry.ListRepositories(ctx, &ListOptions{})
+	repos, err := client.ContainerRegistry.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, repos, 1)
 	assert.Equal(t, "string", repos[0].Name)
@@ -51,7 +51,7 @@ func TestRepoCreate(t *testing.T) {
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, false, payload.Public)
 	})
-	err := client.ContainerRegistry.CreateRepository(ctx, &CreateRepositoryPayload{
+	err := client.ContainerRegistry.Create(ctx, &CreateRepositoryPayload{
 		Name:   "abc",
 		Public: false,
 	})
@@ -66,7 +66,7 @@ func TestRepoDelete(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.ContainerRegistry.DeleteRepository(ctx, "ji84wqtzr77ogo6b"))
+	require.NoError(t, client.ContainerRegistry.Delete(ctx, "ji84wqtzr77ogo6b"))
 }
 
 func TestGetRepoTags(t *testing.T) {
