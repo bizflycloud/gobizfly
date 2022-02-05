@@ -12,8 +12,8 @@ type WrappedRecordPayload struct {
 	Record interface{} `json:"record"`
 }
 
-// Addresses - contains the list of addresses in regions.
-type Addresses struct {
+// Addrs - contains the list of addresses in regions.
+type Addrs struct {
 	HN  []string `json:"HN"`
 	HCM []string `json:"HCM"`
 	SG  []string `json:"SG"`
@@ -22,8 +22,8 @@ type Addresses struct {
 
 // RoutingData - contains the routing data for version 4 and 6 addresses.
 type RoutingData struct {
-	AddrsV4 Addresses `json:"addrs_v4,omitempty"`
-	AddrsV6 Addresses `json:"addrs_v6,omitempty"`
+	AddrsV4 Addrs `json:"addrs_v4,omitempty"`
+	AddrsV6 Addrs `json:"addrs_v6,omitempty"`
 }
 
 // RoutingPolicyData - contains the routing policy data for version 4 and 6 addresses and the health check information.
