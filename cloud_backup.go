@@ -16,7 +16,7 @@ type cloudBackupService struct {
 }
 
 type CloudBackupService interface {
-	CloudBackupActivity(ctx context.Context) ([]*CloudBackupActivity, error)
+	CloudBackupListActivities(ctx context.Context) ([]*CloudBackupActivity, error)
 
 	ListTenantRecoveryPoints(ctx context.Context) ([]*CloudBackupMachineRecoveryPoint, error)
 	DeleteMultipleRecoveryPoints(ctx context.Context, payload CloudBackupDeleteMultipleRecoveryPointPayload) error

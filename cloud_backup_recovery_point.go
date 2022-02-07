@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// CloudBackupRecoveryPoint represents a Cloud Backup Recovery Point.
 type CloudBackupRecoveryPoint struct {
 	RecoveryPointType string `json:"recovery_point_type"`
 	Status            string `json:"status"`
@@ -16,6 +17,7 @@ type CloudBackupRecoveryPoint struct {
 	Id                string `json:"id"`
 }
 
+// CloudBackupFile represents a Cloud Backup File.
 type CloudBackupFile struct {
 	Id           string `json:"id"`
 	ItemName     string `json:"item_name"`
@@ -30,9 +32,12 @@ type CloudBackupFile struct {
 	Status       string `json:"status"`
 }
 
+// CloudBackupRecoveryPointActionPayload represents a Cloud Backup Recovery Point Action Payload.
 type CloudBackupRecoveryPointActionPayload struct {
 	Action string `json:"action"`
 }
+
+// CloudBackupMachineRecoveryPoint represents a Cloud Backup Recovery Point Action.
 type CloudBackupMachineRecoveryPoint struct {
 	BackupDirectory   CloudBackupDirectory `json:"backup_directory"`
 	CreatedAt         string               `json:"created_at"`
@@ -43,6 +48,7 @@ type CloudBackupMachineRecoveryPoint struct {
 	UpdatedAt         string               `json:"updated_at"`
 }
 
+// CloudBackupExtendedRecoveryPoint represents a Cloud Backup Extended Recovery Point.
 type CloudBackupExtendedRecoveryPoint struct {
 	CloudBackupMachineRecoveryPoint
 	IndexHash   string `json:"index_hash,omitempty"`
@@ -53,6 +59,7 @@ type CloudBackupExtendedRecoveryPoint struct {
 	TotalFiles  int    `json:"total_files,omitempty"`
 }
 
+// CloudBackupRecoveryPointItem represents a Cloud Backup Recovery Point Item.
 type CloudBackupRecoveryPointItem struct {
 	AccessMode  string `json:"access_mode"`
 	AccessTime  string `json:"access_time"`
@@ -74,16 +81,19 @@ type CloudBackupRecoveryPointItem struct {
 	UpdatedAt   string `json:"updated_at"`
 }
 
+// CloudBackupRestoreRecoveryPointPayload represents a Cloud Backup Restore Recovery Point Payload.
 type CloudBackupRestoreRecoveryPointPayload struct {
 	RecoveryPointId string `json:"recovery_point_id"`
 	Path            string `json:"path"`
 }
 
+// CloudBackupStateDirectoryAction represents a Cloud Backup State Directory Action.
 type CloudBackupStateDirectoryAction struct {
 	Action            string   `json:"action"`
 	BackupDirectories []string `json:"backup_directories"`
 }
 
+// CloudBackupCreateDirectoryPayload represents a Cloud Backup Create Directory Payload.
 type CloudBackupCreateDirectoryPayload struct {
 	Name        string   `json:"name"`
 	Description string   `json:"description,omitempty"`
@@ -91,31 +101,37 @@ type CloudBackupCreateDirectoryPayload struct {
 	Policies    []string `json:"policies,omitempty"`
 }
 
+// CloudBackupPatchDirectoryPayload represents a Cloud Backup Patch Directory Payload.
 type CloudBackupPatchDirectoryPayload struct {
 	Name        string   `json:"name,omitempty"`
 	Description string   `json:"description,omitempty"`
 	Policies    []string `json:"policies,omitempty"`
 }
 
+// CloudBackupDeleteDirectoryPayload represents a Cloud Backup Delete Directory Payload.
 type CloudBackupDeleteDirectoryPayload struct {
 	Keep bool `json:"keep"`
 }
 
+// CloudBackupActionDirectoryPayload represents a Cloud Backup Action Directory Payload.
 type CloudBackupActionDirectoryPayload struct {
 	Action      string `json:"action"`
 	StorageType string `json:"storage_type,omitempty"`
 	Name        string `json:"name,omitempty"`
 }
 
+// CloudBackupDeleteMultipleRecoveryPointPayload represents a Cloud Backup Delete Multiple Recovery Point Payload.
 type CloudBackupDeleteMultipleRecoveryPointPayload struct {
 	RecoveryPointIds []string `json:"recovery_point_ids"`
 }
 
+// CloudBackupDeleteMultipleDirectoriesPayload represents a Cloud Backup Delete Multiple Recovery Point Payload.
 type CloudBackupDeleteMultipleDirectoriesPayload struct {
 	BackupDirectories []string `json:"backup_directories"`
 	Keep              bool     `json:"keep"`
 }
 
+// ListTenantRecoveryPoints lists all recovery points belonging to a tenant.
 func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName, cb.recoveryPointPath(), nil)
 	if err != nil {
@@ -133,6 +149,7 @@ func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*
 	return recoveryPoints, nil
 }
 
+// DeleteMultipleRecoveryPoints deletes multiple recovery points.
 func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, payload CloudBackupDeleteMultipleRecoveryPointPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName, cb.recoveryPointPath(), payload)
 	if err != nil {
@@ -146,6 +163,7 @@ func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, 
 	return nil
 }
 
+// ListDirectoryRecoveryPoints lists all recovery points belonging to a directory.
 func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, machineId string, directoryId string) ([]*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.machineDirectoryRecoveryPointPath(machineId, directoryId), nil)
@@ -166,6 +184,7 @@ func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, m
 	return data.RecoveryPoints, nil
 }
 
+// ListRecoveryPointFiles lists all files belonging to a recovery point.
 func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recoveryPointId string) ([]*CloudBackupFile, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "files"}, "/"), nil)
@@ -184,6 +203,7 @@ func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recove
 	return files, nil
 }
 
+// RecoveryPointAction performs an action on a recovery point.
 func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryPointId string, payload *CloudBackupRecoveryPointActionPayload) (*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "action"}, "/"), payload)
@@ -202,6 +222,7 @@ func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryP
 	return recoveryPoint, nil
 }
 
+// ListMachineRecoveryPoints lists all recovery points belonging to a machine.
 func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, machineId string) ([]*CloudBackupExtendedRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemMachinePath(machineId), nil)
@@ -222,6 +243,7 @@ func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, mac
 	return recoveryPoints.RecoveryPoints, nil
 }
 
+// GetRecoveryPoint gets a recovery point.
 func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPointId string) (*CloudBackupMachineRecoveryPoint, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemRecoveryPointPath(recoveryPointId), nil)
@@ -240,6 +262,7 @@ func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPoin
 	return recoveryPoint, nil
 }
 
+// DeleteRecoveryPoint deletes a recovery point.
 func (cb *cloudBackupService) DeleteRecoveryPoint(ctx context.Context, recoveryPointId string) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName,
 		cb.itemRecoveryPointPath(recoveryPointId), nil)
@@ -253,6 +276,7 @@ func (cb *cloudBackupService) DeleteRecoveryPoint(ctx context.Context, recoveryP
 	return nil
 }
 
+// ListRecoveryPointItems lists all items belonging to a recovery point.
 func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recoveryPointId string) ([]*CloudBackupRecoveryPointItem, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "items"}, "/"), nil)
@@ -273,6 +297,7 @@ func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recove
 	return data.Items, nil
 }
 
+// RestoreRecoveryPoint restores a recovery point.
 func (cb *cloudBackupService) RestoreRecoveryPoint(ctx context.Context, recoveryPointId string, payload *CloudBackupRestoreRecoveryPointPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		strings.Join([]string{cb.itemRecoveryPointPath(recoveryPointId), "action"}, "/"), payload)

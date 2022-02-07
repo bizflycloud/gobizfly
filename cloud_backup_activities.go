@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// CloudBackupActivity represents a Cloud Backup Activity data.
 type CloudBackupActivity struct {
 	Action            string `json:"action"`
 	BackupDirectoryId string `json:"backup_directory_id"`
@@ -23,7 +24,8 @@ type CloudBackupActivity struct {
 	UserId            string `json:"user_id"`
 }
 
-func (cb *cloudBackupService) CloudBackupActivity(ctx context.Context) ([]*CloudBackupActivity, error) {
+// CloudBackupListActivities - List Cloud Backup Activities
+func (cb *cloudBackupService) CloudBackupListActivities(ctx context.Context) ([]*CloudBackupActivity, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName, cb.activityPath(), nil)
 	if err != nil {
 		return nil, err
