@@ -7,9 +7,12 @@ import (
 	"strings"
 )
 
+// CloudBackupListMachineParams - Parameters for list cloud backup machine
 type CloudBackupListMachineParams struct {
 	IncludeDeleted bool
 }
+
+// CloudBackupMachine represents cloud backup machine
 type CloudBackupMachine struct {
 	Id                 string `json:"id"`
 	CreatedAt          string `json:"created_at"`
@@ -27,6 +30,7 @@ type CloudBackupMachine struct {
 	MachineStorageSize int    `json:"machine_storage_size,omitempty"`
 }
 
+// CloudBackupCreateMachinePayload represents cloud backup machine payload
 type CloudBackupCreateMachinePayload struct {
 	Name         string `json:"name"`
 	HostName     string `json:"host_name"`
@@ -35,6 +39,7 @@ type CloudBackupCreateMachinePayload struct {
 	AgentVersion string `json:"agent_version"`
 }
 
+// CloudBackupFileContent represents cloud backup file content
 type CloudBackupFileContent struct {
 	AccessKey string `json:"access_key"`
 	ApiUrl    string `json:"api_url"`
@@ -42,6 +47,8 @@ type CloudBackupFileContent struct {
 	MachineId string `json:"machine_id"`
 	SecretKey string `json:"secret_key"`
 }
+
+// CloudBackupExtendedMachine represents cloud backup extended machine
 type CloudBackupExtendedMachine struct {
 	AccessKey    string                 `json:"access_key"`
 	AgentVersion string                 `json:"agent_version"`
@@ -59,6 +66,7 @@ type CloudBackupExtendedMachine struct {
 	FileContent  CloudBackupFileContent `json:"file_content"`
 }
 
+// CloudBackupPatchMachinePayload represents cloud backup patch machine payload
 type CloudBackupPatchMachinePayload struct {
 	Name         string `json:"name"`
 	HostName     string `json:"host_name"`
@@ -68,15 +76,18 @@ type CloudBackupPatchMachinePayload struct {
 	OsMachineID  string `json:"os_machine_id"`
 }
 
+// CloudBackupDeleteMachinePayload represents cloud backup delete machine payload
 type CloudBackupDeleteMachinePayload struct {
 	Keep         bool     `json:"keep"`
 	DirectoryIds []string `json:"directory_ids"`
 }
 
+// CloudBackupActionMachinePayload represents cloud backup action machine payload
 type CloudBackupActionMachinePayload struct {
 	Action string `json:"action"`
 }
 
+// ListTenantMachines - List cloud backup machine belonging to tenant
 func (cb *cloudBackupService) ListTenantMachines(ctx context.Context, listOption *CloudBackupListMachineParams) ([]*CloudBackupMachine, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.machinesPath(), nil)
@@ -98,6 +109,7 @@ func (cb *cloudBackupService) ListTenantMachines(ctx context.Context, listOption
 	return machines, nil
 }
 
+// CreateMachine - Create cloud backup machine
 func (cb *cloudBackupService) CreateMachine(ctx context.Context, payload *CloudBackupCreateMachinePayload) (*CloudBackupExtendedMachine, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		cb.machinesPath(), payload)
@@ -116,6 +128,7 @@ func (cb *cloudBackupService) CreateMachine(ctx context.Context, payload *CloudB
 	return machine, nil
 }
 
+// GetMachine - Get cloud backup machine
 func (cb *cloudBackupService) GetMachine(ctx context.Context, machineId string) (*CloudBackupMachine, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemMachinePath(machineId), nil)
@@ -134,6 +147,7 @@ func (cb *cloudBackupService) GetMachine(ctx context.Context, machineId string) 
 	return machine, nil
 }
 
+// PatchMachine - Patch cloud backup machine
 func (cb *cloudBackupService) PatchMachine(ctx context.Context, machineId string, payload *CloudBackupPatchMachinePayload) (*CloudBackupMachine, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
 		cb.itemMachinePath(machineId), payload)
@@ -152,6 +166,7 @@ func (cb *cloudBackupService) PatchMachine(ctx context.Context, machineId string
 	return machine, nil
 }
 
+// DeleteMachine - Delete cloud backup machine
 func (cb *cloudBackupService) DeleteMachine(ctx context.Context, machineId string, payload *CloudBackupDeleteMachinePayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName,
 		cb.itemMachinePath(machineId), payload)
@@ -165,6 +180,7 @@ func (cb *cloudBackupService) DeleteMachine(ctx context.Context, machineId strin
 	return nil
 }
 
+// ActionMachine - Action cloud backup machine
 func (cb *cloudBackupService) ActionMachine(ctx context.Context, machineId string, payload *CloudBackupActionMachinePayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		strings.Join([]string{cb.itemMachinePath(machineId), "action"}, "/"), payload)
@@ -178,6 +194,7 @@ func (cb *cloudBackupService) ActionMachine(ctx context.Context, machineId strin
 	return nil
 }
 
+// ResetMachineSecretKey - Reset cloud backup machine secret key
 func (cb *cloudBackupService) ResetMachineSecretKey(ctx context.Context, machineId string) (*CloudBackupExtendedMachine, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		strings.Join([]string{cb.itemMachinePath(machineId), "reset-secret-key"}, "/"), nil)
@@ -195,6 +212,7 @@ func (cb *cloudBackupService) ResetMachineSecretKey(ctx context.Context, machine
 	return extendedMachine, err
 }
 
+// ListTenantPolicies - List cloud backup tenant policy
 func (cb *cloudBackupService) ListTenantPolicies(ctx context.Context) ([]*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.policyPath(), nil)

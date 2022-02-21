@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// CloudBackupStorageVault represents a Cloud Backup Storage Vault.
 type CloudBackupStorageVault struct {
 	CreatedAt        string `json:"created_at"`
 	CredentialType   string `json:"credential_type"`
@@ -21,6 +22,7 @@ type CloudBackupStorageVault struct {
 	UpdatedAt        string `json:"updated_at"`
 }
 
+// CloudBackupCreateStorageVaultPayload represents the payload for creating a Cloud Backup Storage Vault.
 type CloudBackupCreateStorageVaultPayload struct {
 	AwsAccessKeyId     string `json:"aws_access_key_id"`
 	AwsSecretAccessKey string `json:"aws_secret_access_key"`
@@ -31,6 +33,7 @@ type CloudBackupCreateStorageVaultPayload struct {
 	CredentialType     string `json:"credential_type"`
 }
 
+// ListStorageVaults lists all Cloud Backup Storage Vaults.
 func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.storageVaultsPath(), nil)
@@ -51,6 +54,7 @@ func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*CloudBa
 	return data.StorageVaults, nil
 }
 
+// GetStorageVault gets a Cloud Backup Storage Vault.
 func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId string) (*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
 		cb.itemStorageVaultPath(valutId), nil)
@@ -69,6 +73,7 @@ func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId strin
 	return vault, nil
 }
 
+// CreateStorageVault creates a Cloud Backup Storage Vault.
 func (cb *cloudBackupService) CreateStorageVault(ctx context.Context, payload *CloudBackupCreateStorageVaultPayload) (*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
 		cb.storageVaultsPath(), payload)

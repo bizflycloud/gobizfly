@@ -13,13 +13,6 @@ const (
 
 var _ NetworkInterfaceService = (*networkInterfaceService)(nil)
 
-type ListNetworkInterfaceOptions struct {
-	VPCNetworkID string `json:"vpc-network-id,omitempty"`
-	Status       string `json:"status,omitempty"`
-	Detailed     string `json:"detailed,omitempty"`
-	Type         string `json:"type,omitempty"`
-}
-
 type networkInterfaceService struct {
 	client *Client
 }
@@ -33,6 +26,15 @@ type NetworkInterfaceService interface {
 	List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error)
 }
 
+// ListNetworkInterfaceOptions represents the options for listing network interfaces.
+type ListNetworkInterfaceOptions struct {
+	VPCNetworkID string `json:"vpc-network-id,omitempty"`
+	Status       string `json:"status,omitempty"`
+	Detailed     string `json:"detailed,omitempty"`
+	Type         string `json:"type,omitempty"`
+}
+
+// NetworkInterface represents a network interface's information.
 type NetworkInterface struct {
 	ID                  string    `json:"id"`
 	Name                string    `json:"name"`
@@ -62,22 +64,26 @@ type NetworkInterface struct {
 	} `json:"attached_server"`
 }
 
+// FixedIp represents a fixed IP's information.
 type FixedIp struct {
 	SubnetID  string `json:"subnet_id"`
 	IPAddress string `json:"ip_address"`
 	IPVersion int    `json:"ip_version"`
 }
 
+// UpdateNetworkInterfacePayload represents the payload for updating a network interface.
 type UpdateNetworkInterfacePayload struct {
 	Name string `json:"name"`
 }
 
+// CreateNetworkInterfacePayload represents the payload for creating a network interface.
 type CreateNetworkInterfacePayload struct {
 	AttachedServer string `json:"attached_server,omitempty"`
 	FixedIP        string `json:"fixed_ip,omitempty"`
 	Name           string `json:"name"`
 }
 
+// ActionNetworkInterfacePayload represents the payload for action on a network interface
 type ActionNetworkInterfacePayload struct {
 	Action         string   `json:"action,omitempty"`
 	ServerID       string   `json:"server_id,omitempty"`
@@ -100,6 +106,7 @@ func (n networkInterfaceService) itemPath(id string) string {
 	return strings.Join([]string{networkInterfacePath, id}, "/")
 }
 
+// Create - Create a network interface
 func (n networkInterfaceService) Create(ctx context.Context, networkID string, payload *CreateNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.createPath(networkID), payload)
 	if err != nil {
@@ -117,6 +124,7 @@ func (n networkInterfaceService) Create(ctx context.Context, networkID string, p
 	return data, nil
 }
 
+// Get - Get a network interface
 func (n networkInterfaceService) Get(ctx context.Context, networkInterfaceID string) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
@@ -134,6 +142,7 @@ func (n networkInterfaceService) Get(ctx context.Context, networkInterfaceID str
 	return data, nil
 }
 
+// Update - Update the network interface information
 func (n networkInterfaceService) Update(ctx context.Context, networkInterfaceID string, payload *UpdateNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.itemPath(networkInterfaceID), payload)
 	if err != nil {
@@ -151,6 +160,7 @@ func (n networkInterfaceService) Update(ctx context.Context, networkInterfaceID 
 	return data, nil
 }
 
+// Delete - Delete the network interface
 func (n networkInterfaceService) Delete(ctx context.Context, networkInterfaceID string) error {
 	req, err := n.client.NewRequest(ctx, http.MethodDelete, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
@@ -163,6 +173,7 @@ func (n networkInterfaceService) Delete(ctx context.Context, networkInterfaceID 
 	return resp.Body.Close()
 }
 
+// List - List network interfaces with options
 func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.resourcePath(), nil)
 	if err != nil {
@@ -198,6 +209,7 @@ func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInte
 	return data, nil
 }
 
+// Action - Execute action on a network interface
 func (n networkInterfaceService) Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.actionPath(networkInterfaceID), payload)
 	if err != nil {

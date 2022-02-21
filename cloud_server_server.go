@@ -1,5 +1,3 @@
-// This file is part of gobizfly
-
 package gobizfly
 
 import (
@@ -9,20 +7,27 @@ import (
 	"strings"
 )
 
-const (
-	serverBasePath   = "/servers"
-	flavorPath       = "/flavors"
-	osImagePath      = "/images"
-	taskPath         = "/tasks"
-	customImagesPath = "/user/images"
-	customImagePath  = "/user/image"
-)
-
-var _ ServerService = (*server)(nil)
+type server struct {
+	client *Client
+}
 
 // ServerSecurityGroup contains information of security group of a server.
 type ServerSecurityGroup struct {
 	Name string `json:"name"`
+}
+
+// ServerTaskResult represents the response of getting server task result
+type ServerTaskResult struct {
+	Action   string `json:"action"`
+	Progress int    `json:"progress"`
+	Success  bool   `json:"success"`
+	Server
+}
+
+// ServerTaskResponse represents the response of getting server task
+type ServerTaskResponse struct {
+	Ready  bool             `json:"ready"`
+	Result ServerTaskResult `json:"result"`
 }
 
 // AttachedVolume contains attached volumes of a server.
@@ -43,7 +48,7 @@ type IP struct {
 	MacAddress string `json:"0S-EXT-IPS-MAC:mac_addr"`
 }
 
-// IPAddresses contains LAN & WAN Ip address of a Cloud Server
+// IPAddress contains LAN & WAN Ip address of a Cloud Server
 type IPAddress struct {
 	LanAddresses   []IP `json:"LAN"`
 	WanV4Addresses []IP `json:"WAN_V4"`
@@ -58,6 +63,7 @@ type Flavor struct {
 	VCPU int    `json:"vcpu"`
 }
 
+// DeletedVolumes represent payload when delete server
 type DeletedVolumes struct {
 	Ids []string `json:"delete_volume"`
 }
@@ -87,6 +93,7 @@ type Server struct {
 	NetworkPlan      string                 `json:"network_plan"`
 }
 
+// CreateCustomImagePayload represents payload when create custom image
 type CreateCustomImagePayload struct {
 	Name        string `json:"name"`
 	DiskFormat  string `json:"disk_format"`
@@ -94,83 +101,16 @@ type CreateCustomImagePayload struct {
 	ImageURL    string `json:"image_url,omitempty"`
 }
 
+// Location represents a location of a server.
 type Location struct {
 	URL      string            `json:"url"`
 	Metadata map[string]string `json:"metadata,"`
 }
 
-type CustomImage struct {
-	Name            string     `json:"name"`
-	Description     string     `json:"description"`
-	DiskFormat      string     `json:"disk_format"`
-	ContainerFormat string     `json:"container_format"`
-	Visibility      string     `json:"visibility"`
-	Size            int        `json:"size"`
-	VirtualSize     int        `json:"virtual_size"`
-	Status          string     `json:"status"`
-	Checksum        string     `json:"checksum"`
-	Protected       bool       `json:"protected"`
-	MinRam          int        `json:"min_ram"`
-	MinDisk         int        `json:"min_disk"`
-	Owner           string     `json:"owner"`
-	OSHidden        bool       `json:"os_hidden"`
-	OSHashAlgo      string     `json:"os_hash_algo"`
-	OSHashValue     string     `json:"os_hash_value"`
-	ID              string     `json:"id"`
-	CreatedAt       string     `json:"created_at"`
-	UpdatedAt       string     `json:"updated_at"`
-	Locations       []Location `json:"locations"`
-	DirectURL       string     `json:"direct_url"`
-	Tags            []string   `json:"tags"`
-	File            string     `json:"file"`
-	Schema          string     `json:"schema"`
-}
-
-type CreateCustomImageResp struct {
-	Image     CustomImage `json:"image"`
-	Success   bool        `json:"success"`
-	Token     string      `json:"token,omitempty"`
-	UploadURI string      `json:"upload_uri,omitempty"`
-}
-
-type CustomImageGetResp struct {
-	Image CustomImage `json:"image"`
-	Token string      `json:"token"`
-}
-
-type server struct {
-	client *Client
-}
-
+// ServerListOptions represents the options for listing servers.
 type ServerListOptions struct {
 	detailed bool
 	fields   []string
-}
-
-// ServerService is an interface to interact with BizFly Cloud API.
-type ServerService interface {
-	List(ctx context.Context, opts *ServerListOptions) ([]*Server, error)
-	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)
-	Get(ctx context.Context, id string) (*Server, error)
-	Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error)
-	Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error)
-	Start(ctx context.Context, id string) (*Server, error)
-	Stop(ctx context.Context, id string) (*Server, error)
-	SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error)
-	HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error)
-	Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error)
-	GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error)
-	ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error)
-	ListOSImages(ctx context.Context) ([]osImageResponse, error)
-	GetTask(ctx context.Context, id string) (*ServerTaskResponse, error)
-	ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error)
-	AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
-	RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error)
-	ListCustomImages(ctx context.Context) ([]*CustomImage, error)
-	CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error)
-	DeleteCustomImage(ctx context.Context, imageID string) error
-	GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error)
-	AttachWanIps(ctx context.Context, id string, wanIps []string) error
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -240,10 +180,6 @@ type ServerCreateRequest struct {
 // itemActionPath return http path of server action
 func (s *server) itemActionPath(id string) string {
 	return strings.Join([]string{serverBasePath, id, "action"}, "/")
-}
-
-func (s *server) itemCustomImagePath(id string) string {
-	return strings.Join([]string{customImagePath, id}, "/")
 }
 
 // List lists all servers.
@@ -439,8 +375,6 @@ func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageRespo
 	return smr, nil
 }
 
-// AddVPC add VPC to the server
-
 // Rebuild rebuilds a server.
 func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error) {
 	var payload = &ServerAction{
@@ -488,75 +422,6 @@ func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse,
 	return respPayload.Console, nil
 }
 
-type serverFlavorResponse struct {
-	ID   string `json:"_id"`
-	Name string `json:"name"`
-}
-
-// ListFlavors lists server flavors
-func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, flavorPath, nil)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	var flavors []*serverFlavorResponse
-
-	if err := json.NewDecoder(resp.Body).Decode(&flavors); err != nil {
-		return nil, err
-	}
-	return flavors, nil
-}
-
-type osDistributionVersion struct {
-	Name string `json:"name"`
-	ID   string `json:"id"`
-}
-
-type osImageResponse struct {
-	OSDistribution string                  `json:"os"`
-	Version        []osDistributionVersion `json:"versions"`
-}
-
-// ListOSImage list server os images
-func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, osImagePath, nil)
-
-	if err != nil {
-		return nil, err
-	}
-	q := req.URL.Query()
-	q.Add("os_images", "True")
-	req.URL.RawQuery = q.Encode()
-
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	var respPayload struct {
-		OSImages []osImageResponse `json:"os_images"`
-	}
-	if err := json.NewDecoder(resp.Body).Decode(&respPayload); err != nil {
-		return nil, err
-	}
-	return respPayload.OSImages, nil
-}
-
-type ServerTaskResult struct {
-	Action   string `json:"action"`
-	Progress int    `json:"progress"`
-	Success  bool   `json:"success"`
-	Server
-}
-
-type ServerTaskResponse struct {
-	Ready  bool             `json:"ready"`
-	Result ServerTaskResult `json:"result"`
-}
-
 // GetTask get tasks result from Server API
 func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, taskPath+"/"+id, nil)
@@ -574,6 +439,7 @@ func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, e
 	return str, nil
 }
 
+// ChangeCategory changes category of the server
 func (s server) ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error) {
 	payload := &ServerAction{
 		Action:  "change_type",
@@ -595,6 +461,7 @@ func (s server) ChangeCategory(ctx context.Context, id string, newCategory strin
 	return svt, nil
 }
 
+// AddVPC add the VPC to the server
 func (s server) AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
 	payload := &ServerAction{
 		Action:        "add_vpc",
@@ -616,6 +483,7 @@ func (s server) AddVPC(ctx context.Context, id string, vpcs []string) (*Server, 
 	return server, nil
 }
 
+// RemoveVPC remove the VPC from the server
 func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
 	payload := &ServerAction{
 		Action:        "remove_vpc",
@@ -637,6 +505,7 @@ func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Serve
 	return server, nil
 }
 
+// AttachWanIps attach batch WAN IPs to the server
 func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) error {
 	payload := &ServerAction{
 		Action:       "attach_wan_ips",
@@ -651,70 +520,4 @@ func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) 
 		return err
 	}
 	return resp.Body.Close()
-}
-
-func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, customImagesPath, nil)
-	if err != nil {
-		return nil, err
-	}
-	var data struct {
-		Images []*CustomImage `json:"images"`
-	}
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	return data.Images, nil
-}
-
-func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{customImagePath, "upload"}, "/"), cipl)
-	if err != nil {
-		return nil, err
-	}
-	var data *CreateCustomImageResp
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	return data, nil
-}
-
-func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, s.itemCustomImagePath(imageID), nil)
-
-	if err != nil {
-		return err
-	}
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return err
-	}
-	return resp.Body.Close()
-}
-
-func (s *server) GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error) {
-	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, strings.Join([]string{customImagePath, imageID}, "/"), nil)
-	if err != nil {
-		return nil, err
-	}
-	var data *CustomImageGetResp
-	resp, err := s.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return nil, err
-	}
-	return data, nil
 }

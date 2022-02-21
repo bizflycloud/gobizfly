@@ -33,6 +33,7 @@ type CDNService interface {
 	DeleteCache(ctx context.Context, domainID string, files *Files) error
 }
 
+// Domain represents CDN domain information
 type Domain struct {
 	ID             int    `json:"id"`
 	User           int    `json:"user"`
@@ -50,6 +51,7 @@ type Domain struct {
 	Type           string `json:"type"`
 }
 
+// DomainsResp represents a list of CDN domains and pagination information
 type DomainsResp struct {
 	Domains []Domain `json:"results"`
 	Next    string   `json:"next"`
@@ -58,11 +60,13 @@ type DomainsResp struct {
 	Total   int      `json:"total"`
 }
 
+// OriginAddr represents a CDN origin address information
 type OriginAddr struct {
 	Type string `json:"type"`
 	Host string `json:"host"`
 }
 
+// ExtendedDomain represents a CDN domain information with additional information
 type ExtendedDomain struct {
 	Domain
 	Last24hUsage int          `json:"last_24h_usage"`
@@ -74,6 +78,7 @@ type ExtendedDomain struct {
 	HostID       string       `json:"host_id"`
 }
 
+// CreateDomainReq represents a request body for creating CDN domain
 type CreateDomainReq struct {
 	Domain        string `json:"domain"`
 	Email         string `json:"email,omitempty"`
@@ -82,11 +87,13 @@ type CreateDomainReq struct {
 	PageSpeed     int    `json:"pagespeed"`
 }
 
+// CreateDomainResp represents a response body when creating CDN domain
 type CreateDomainResp struct {
 	Message string `json:"message"`
 	Domain  Domain `json:"domain"`
 }
 
+// UpdateDomainReq represents a request body for updating CDN domain
 type UpdateDomainReq struct {
 	UpstreamAddrs string `json:"upstream_addrs"`
 	UpstreamProto string `json:"upstream_proto"`
@@ -94,11 +101,13 @@ type UpdateDomainReq struct {
 	SecureLink    int    `json:"secure_link"`
 }
 
+// UpdateDomainResp represents a response body when updating CDN domain
 type UpdateDomainResp struct {
 	Message string         `json:"message"`
 	Domain  ExtendedDomain `json:"domain"`
 }
 
+// CheckConnResp represents a response body when checking CDN connection
 type CheckConnResp struct {
 	Status string `json:"status"`
 }
