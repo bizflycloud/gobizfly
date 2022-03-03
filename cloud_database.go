@@ -337,11 +337,13 @@ type CloudDatabaseSecondaries struct {
 
 // CloudDatabaseNodeCreate contains detail to create database node payload.
 type CloudDatabaseNodeCreate struct {
-	ReplicaOf   string                 `json:"replica_of,omitempty" validate:"required"`
-	Replicas    *CloudDatabaseReplicas `json:"replicas,omitempty"`
-	Role        string                 `json:"role,omitempty"`
-	Secondaries *CloudDatabaseReplicas `json:"secondaries,omitempty"`
-	Suggestion  bool                   `json:"suggestion,omitempty"`
+	ReplicaOf     string                 `json:"replica_of,omitempty" validate:"required"`
+	Replicas      *CloudDatabaseReplicas `json:"replicas,omitempty"`
+	Role          string                 `json:"role,omitempty"`
+	Name          string                 `json:"name,omitempty"`
+	Configuration string                 `json:"configuration,omitempty"`
+	Secondaries   *CloudDatabaseReplicas `json:"secondaries,omitempty"`
+	Suggestion    bool                   `json:"suggestion,omitempty"`
 }
 
 // CloudDatabaseVolume contains info of volume.
@@ -415,7 +417,9 @@ type CloudDatabaseInstance struct {
 	Nodes        []CloudDatabaseNode      `json:"nodes"`
 	ProjectID    string                   `json:"project_id"`
 	PublicAccess bool                     `json:"public_access"`
+	Status       string                   `json:"status"`
 	TaskID       string                   `json:"task_id"`
+	Volume       CloudDatabaseVolume      `json:"volume"`
 }
 
 // CloudDatabase Configuration Struct
@@ -481,7 +485,8 @@ type CloudDatabaseBackupCreate struct {
 	BackupName string `json:"backup_name,omitempty" validate:"required"`
 	NodeID     string `json:"node_id,omitempty"`
 	ParentID   string `json:"parent_id,omitempty"`
-	Suggestion bool   `json:"suggestion"`
+	InstanceID string `json:"instance_id,omitempty"`
+	Suggestion bool   `json:"suggestion,omitempty"`
 }
 
 // CloudDatabaseBackupResource contains option list backup.
