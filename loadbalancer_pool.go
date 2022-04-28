@@ -20,7 +20,7 @@ type PoolService interface {
 	Delete(ctx context.Context, id string) error
 }
 
-// SessionPersistence object controls how LoadBalacner sends request to backend.
+// SessionPersistence object controls how LoadBalancer sends request to backend.
 // See https://support.bizflycloud.vn/api/loadbalancer/#post-loadbalancer-load_balancer_id-pools
 type SessionPersistence struct {
 	Type                   string  `json:"type"`
@@ -31,9 +31,8 @@ type SessionPersistence struct {
 
 // PoolCreateRequest represents create new pool request payload.
 type PoolCreateRequest struct {
-	Description        *string             `json:"description,omitempty"`
 	LBAlgorithm        string              `json:"lb_algorithm"`
-	ListenerID         *string             `json:"listener_id,omitempty"`
+	ListenerID         string              `json:"listener_id"`
 	Name               *string             `json:"name,omitempty"`
 	Protocol           string              `json:"protocol"`
 	SessionPersistence *SessionPersistence `json:"session_persistence,omitempty"`

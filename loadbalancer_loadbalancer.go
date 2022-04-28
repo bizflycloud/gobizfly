@@ -18,16 +18,49 @@ type LoadBalancerService interface {
 	Get(ctx context.Context, id string) (*LoadBalancer, error)
 	Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error)
 	Delete(ctx context.Context, req *LoadBalancerDeleteRequest) error
+	Resize(ctx context.Context, id string, newType string) error
+}
+
+type ListenerHealthMonitor struct {
+	Type           string `json:"type"`
+	URLPath        string `json:"url_path"`
+	HTTPMethod     string `json:"http_method"`
+	ExpectedCodes  string `json:"expected_codes"`
+	MaxRetries     int    `json:"max_retries"`
+	MaxRetriesDown int    `json:"max_retries_down"`
+	Delay          int    `json:"delay"`
+	Timeout        int    `json:"timeout"`
+}
+
+type LoadBalancerResizeRequest struct {
+	Action  string `json:"action"`
+	NewType string `json:"new_type"`
+}
+
+type ListenerPool struct {
+	LbAlgorithm   string                `json:"lb_algorithm"`
+	Name          string                `json:"name"`
+	Protocol      string                `json:"protocol"`
+	Members       []string              `json:"members"`
+	HealthMonitor ListenerHealthMonitor `json:"healthmonitor"`
+}
+
+type LoadBalancerListener struct {
+	Name          string       `json:"name"`
+	Protocol      string       `json:"protocol"`
+	ProtocolPort  int          `json:"protocol_port"`
+	DefaultTLSRef string       `json:"default_tls_container_ref,omitempty"`
+	DefaultPool   ListenerPool `json:"default_pool"`
 }
 
 // LoadBalancerCreateRequest represents create new load balancer request payload.
 type LoadBalancerCreateRequest struct {
-	Description  string   `json:"description,omitempty"`
-	Type         string   `json:"type"`
-	Listeners    []string `json:"listeners,omitempty"`
-	Name         string   `json:"name"`
-	NetworkType  string   `json:"network_type"`
-	VPCNetworkID string   `json:"vip_network_id"`
+	Name         string                 `json:"name"`
+	Description  string                 `json:"description,omitempty"`
+	NetworkType  string                 `json:"network_type"`
+	VPCNetworkID string                 `json:"vip_network_id"`
+	Listeners    []LoadBalancerListener `json:"listeners,omitempty"`
+	Type         string                 `json:"type"`
 }
 
 // LoadBalancerUpdateRequest represents update load balancer request payload.
@@ -184,5 +217,22 @@ func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteReque
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 
+	return resp.Body.Close()
+}
+
+func (l *loadbalancer) Resize(ctx context.Context, id string, newType string) error {
+	lrq := &LoadBalancerResizeRequest{
+		NewType: newType,
+		Action:  "resize",
+	}
+	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, l.itemPath(id)+"/action", lrq)
+	if err != nil {
+		return err
+	}
+	resp, err := l.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
 }

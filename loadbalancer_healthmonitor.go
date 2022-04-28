@@ -48,16 +48,16 @@ type HealthMonitorCreateRequest struct {
 
 // HealthMonitorUpdateRequest represent the request bodfor updating a health monitor
 type HealthMonitorUpdateRequest struct {
-	Name           string  `json:"name"`
-	TimeOut        int     `json:"timeout,omitempty"`
-	Delay          int     `json:"delay,omitempty"`
-	MaxRetries     int     `json:"max_retries,omitempty"`
-	MaxRetriesDown int     `json:"max_retries_down,omitempty"`
-	HTTPMethod     string  `json:"http_method,omitempty"`
-	HTTPVersion    float32 `json:"http_version,omitempty"`
-	URLPath        string  `json:"url_path,omitempty"`
-	ExpectedCodes  string  `json:"expected_codes,omitempty"`
-	DomainName     string  `json:"domain_name,omitempty"`
+	Name           string   `json:"name"`
+	TimeOut        *int     `json:"timeout,omitempty"`
+	Delay          *int     `json:"delay,omitempty"`
+	MaxRetries     *int     `json:"max_retries,omitempty"`
+	MaxRetriesDown *int     `json:"max_retries_down,omitempty"`
+	HTTPMethod     *string  `json:"http_method,omitempty"`
+	HTTPVersion    *float32 `json:"http_version,omitempty"`
+	URLPath        *string  `json:"url_path,omitempty"`
+	ExpectedCodes  *string  `json:"expected_codes,omitempty"`
+	DomainName     *string  `json:"domain_name,omitempty"`
 }
 
 type healthmonitor struct {

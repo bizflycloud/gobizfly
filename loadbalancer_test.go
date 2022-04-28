@@ -747,7 +747,6 @@ func TestPoolCreate(t *testing.T) {
 			Pool *PoolCreateRequest `json:"pool"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "Test Create Pool", *payload.Pool.Description)
 		assert.Equal(t, "Pool", *payload.Pool.Name)
 		assert.NotNil(t, payload.Pool.SessionPersistence)
 		assert.Equal(t, "ROUND_ROBIN", payload.Pool.LBAlgorithm)
@@ -811,10 +810,8 @@ func TestPoolCreate(t *testing.T) {
 	})
 
 	name := "Pool"
-	desc := "Test Create Pool"
 	pool, err := client.Pool.Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &PoolCreateRequest{
 		LBAlgorithm: "ROUND_ROBIN",
-		Description: &desc,
 		Name:        &name,
 		SessionPersistence: &SessionPersistence{
 			Type:                   "Test",
@@ -1094,7 +1091,6 @@ func TestHealthMonitorUpdate(t *testing.T) {
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "super-pool-health-monitor-updated", payload.HealthMonitor.Name)
-		assert.Equal(t, "HEAD", payload.HealthMonitor.HTTPMethod)
 
 		resp := `
 {
@@ -1129,9 +1125,10 @@ func TestHealthMonitorUpdate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
+	method := "HED"
 	_, err := client.HealthMonitor.Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
 		Name:       "super-pool-health-monitor-updated",
-		HTTPMethod: "HEAD",
+		HTTPMethod: &method,
 	})
 	require.NoError(t, err)
 }
