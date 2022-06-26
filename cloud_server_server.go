@@ -91,6 +91,11 @@ type Server struct {
 	IPAddresses      IPAddress              `json:"ip_addresses"`
 	RegionName       string                 `json:"region_name"`
 	NetworkPlan      string                 `json:"network_plan"`
+	Locked           bool                   `json:"locked"`
+	IsCreatedWan     string                 `json:"is_created_wan"`
+	ZoneName         string                 `json:"zone_name"`
+	BillingPlan      string                 `json:"billing_plan"`
+	IsAvailable      bool                   `json:"is_available"`
 }
 
 // CreateCustomImagePayload represents payload when create custom image
@@ -175,6 +180,9 @@ type ServerCreateRequest struct {
 	Firewalls            []string      `json:"firewalls,omitempty"`
 	NetworkPlan          string        `json:"network_plan,omitempty"`
 	VPCNetworkIds        []string      `json:"vpc_network_ids,omitempty"`
+	BillingPlan          string        `json:"billing_plan,omitempty"`
+	IPv6                 bool          `json:"ipv6,omitempty"`
+	IsCreatedWan         string        `json:"is_created_wan,omitempty"`
 }
 
 // itemActionPath return http path of server action
