@@ -36,30 +36,30 @@ type ListNetworkInterfaceOptions struct {
 
 // NetworkInterface represents a network interface's information.
 type NetworkInterface struct {
-	ID                  string    `json:"id"`
-	Name                string    `json:"name"`
-	NetworkID           string    `json:"network_id"`
-	TenantID            string    `json:"tenant_id"`
-	MacAddress          string    `json:"mac_address"`
-	AdminStateUp        bool      `json:"admin_state_up"`
-	Status              string    `json:"status"`
-	DeviceID            string    `json:"device_id"`
-	DeviceOwner         string    `json:"device_owner"`
-	FixedIps            []FixedIp `json:"fixed_ips"`
-	AllowedAddressPairs []string  `json:"allowed_address_pairs"`
-	ExtraDhcpOpts       []string  `json:"extra_dhcp_opts"`
-	SecurityGroups      []string  `json:"security_groups"`
-	Description         string    `json:"description"`
-	BindingVnicType     string    `json:"binding:vnic_type"`
-	PortSecurityEnabled bool      `json:"port_security_enabled"`
-	QosPolicyID         string    `json:"qos_policy_id"`
-	Tags                []string  `json:"tags"`
-	CreatedAt           string    `json:"created_at"`
-	UpdatedAt           string    `json:"updated_at"`
-	RevisionNumber      int       `json:"revision_number"`
-	ProjectID           string    `json:"project_id"`
-	Type                string    `json:"type"`
-	BillingType         string    `json:"billing_type"`
+	ID                  string               `json:"id"`
+	Name                string               `json:"name"`
+	NetworkID           string               `json:"network_id"`
+	TenantID            string               `json:"tenant_id"`
+	MacAddress          string               `json:"mac_address"`
+	AdminStateUp        bool                 `json:"admin_state_up"`
+	Status              string               `json:"status"`
+	DeviceID            string               `json:"device_id"`
+	DeviceOwner         string               `json:"device_owner"`
+	FixedIps            []FixedIp            `json:"fixed_ips"`
+	AllowedAddressPairs []AllowedAddressPair `json:"allowed_address_pairs"`
+	ExtraDhcpOpts       []ExtraDHCPOpt       `json:"extra_dhcp_opts"`
+	SecurityGroups      []string             `json:"security_groups"`
+	Description         string               `json:"description"`
+	BindingVnicType     string               `json:"binding:vnic_type"`
+	PortSecurityEnabled bool                 `json:"port_security_enabled"`
+	QosPolicyID         string               `json:"qos_policy_id"`
+	Tags                []string             `json:"tags"`
+	CreatedAt           string               `json:"created_at"`
+	UpdatedAt           string               `json:"updated_at"`
+	RevisionNumber      int                  `json:"revision_number"`
+	ProjectID           string               `json:"project_id"`
+	Type                string               `json:"type"`
+	BillingType         string               `json:"billing_type"`
 	AttachedServer      struct {
 	} `json:"attached_server"`
 }
@@ -69,6 +69,17 @@ type FixedIp struct {
 	SubnetID  string `json:"subnet_id"`
 	IPAddress string `json:"ip_address"`
 	IPVersion int    `json:"ip_version"`
+}
+
+type ExtraDHCPOpt struct {
+	OptName   string      `json:"opt_name"`
+	OptValue  interface{} `json:"opt_value"`
+	IPVersion int         `json:"ip_version,omitempty"`
+}
+
+type AllowedAddressPair struct {
+	IPAddress  string `json:"ip_address"`
+	MacAddress string `json:"mac_address"`
 }
 
 // UpdateNetworkInterfacePayload represents the payload for updating a network interface.

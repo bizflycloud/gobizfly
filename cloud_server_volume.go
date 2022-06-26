@@ -77,6 +77,7 @@ type Volume struct {
 	Attachments      []VolumeAttachment `json:"attachments"`
 	Category         string             `json:"category"`
 	BillingPlan      string             `json:"billing_plan"`
+	Encrypted        bool               `json:"encrypted"`
 }
 
 type volume struct {

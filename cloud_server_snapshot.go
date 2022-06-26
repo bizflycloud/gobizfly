@@ -56,6 +56,10 @@ type Snapshot struct {
 	FromVolume       Volume            `json:"volume"`
 	Category         string            `json:"category"`
 	BillingPlan      string            `json:"billing_plan"`
+	SnapshotType     string            `json:"snapshot_type"`
+	Type             string            `json:"type"`
+	ZoneName         string            `json:"zone_name"`
+	RegionName       string            `json:"region_name"`
 }
 
 type snapshot struct {
