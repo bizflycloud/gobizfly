@@ -410,6 +410,7 @@ type CloudDatabaseInstance struct {
 	CreatedAt    string                   `json:"created"`
 	Datastore    CloudDatabaseDatastore   `json:"datastore"`
 	Description  string                   `json:"description"`
+	DNS          CloudDatabaseDNS         `json:"dns"`
 	ID           string                   `json:"id"`
 	Logs         CloudDatabaseLog         `json:"logs"`
 	Message      string                   `json:"message"`
@@ -421,7 +422,6 @@ type CloudDatabaseInstance struct {
 	Status       string                   `json:"status"`
 	TaskID       string                   `json:"task_id"`
 	Volume       CloudDatabaseVolume      `json:"volume"`
-	DNS          CloudDatabaseDNS         `json:"dns"`
 }
 
 // CloudDatabase Configuration Struct
@@ -540,6 +540,10 @@ type CloudDatabaseScheduleListResourceOption struct {
 	ResourceID   string `json:"resource_id,omitempty"`
 	ResourceType string `json:"resource_type,omitempty"`
 }
+
+// CloudDatabase Suggestion
+// CloudDatabaseSuggestion contains structure of suggestion.
+type CloudDatabaseSuggestion map[string]interface{}
 
 // CloudDatabase TrustedSource Struct
 
@@ -727,6 +731,37 @@ func (ins *cloudDatabaseInstances) Create(ctx context.Context, icr *CloudDatabas
 	return instances, nil
 }
 
+// CreateSuggestion get suggestion when create a new instance
+func (ins *cloudDatabaseInstances) CreateSuggestion(ctx context.Context, icr *CloudDatabaseInstanceCreate) (*CloudDatabaseSuggestion, error) {
+	if icr.Datastore.Type == mongoDB && icr.Replicas != nil {
+		return nil, ErrMongoDBReplicas
+	}
+
+	if icr.Datastore.Type == mariaDB && icr.Secondaries != nil && icr.Secondaries.Quantity > 1 {
+		return nil, ErrMariaDBSecondariesQuantity
+	}
+
+	// set true for get suggestion
+	icr.Suggestion = true
+
+	req, err := ins.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cloudDatabaseInstancesResourcePath, &icr)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := ins.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+	return suggestions, nil
+}
+
 // Get an instances.
 func (ins *cloudDatabaseInstances) Get(ctx context.Context, instanceID string) (*CloudDatabaseInstance, error) {
 	req, err := ins.client.NewRequest(ctx, http.MethodGet, databaseServiceName, ins.resourcePath(instanceID), nil)
@@ -779,6 +814,39 @@ func (ins *cloudDatabaseInstances) Action(ctx context.Context, instanceID string
 	return dmr, nil
 }
 
+// ActionSuggestion get suggestion when action with instances.
+func (ins *cloudDatabaseInstances) ActionSuggestion(ctx context.Context, instanceID string, iar *CloudDatabaseAction) (*CloudDatabaseSuggestion, error) {
+	if iar.Action == resizeFlavor && iar.FlavorName == "" {
+		return nil, ErrRequireFlavorName
+	}
+
+	if iar.Action == resizeVolume && iar.NewSize == 0 {
+		return nil, ErrRequireNewSize
+	}
+
+	// set true for get suggestion
+	iar.Suggestion = true
+
+	req, err := ins.client.NewRequest(ctx, http.MethodPost, databaseServiceName, ins.resourceActionPath(instanceID), &iar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := ins.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
+
 // ResizeFlavor with an instances.
 func (ins *cloudDatabaseInstances) ResizeFlavor(ctx context.Context, instanceID string, flavorName string) (*CloudDatabaseMessageResponse, error) {
 	var iar = CloudDatabaseAction{Action: resizeFlavor, FlavorName: flavorName}
@@ -803,6 +871,30 @@ func (ins *cloudDatabaseInstances) ResizeFlavor(ctx context.Context, instanceID 
 	return dmr, nil
 }
 
+// ResizeFlavorSuggestion get suggestion when resize instances.
+func (ins *cloudDatabaseInstances) ResizeFlavorSuggestion(ctx context.Context, instanceID string, flavorName string) (*CloudDatabaseSuggestion, error) {
+	var iar = CloudDatabaseAction{Action: resizeFlavor, FlavorName: flavorName, Suggestion: true}
+
+	req, err := ins.client.NewRequest(ctx, http.MethodPost, databaseServiceName, ins.resourceActionPath(instanceID), &iar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := ins.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
+
 // ResizeVolume with an instances.
 func (ins *cloudDatabaseInstances) ResizeVolume(ctx context.Context, instanceID string, newSize int) (*CloudDatabaseMessageResponse, error) {
 	var iar = CloudDatabaseAction{Action: resizeVolume, NewSize: newSize}
@@ -825,6 +917,30 @@ func (ins *cloudDatabaseInstances) ResizeVolume(ctx context.Context, instanceID 
 	}
 
 	return dmr, nil
+}
+
+// ResizeVolumeSuggestion get suggestion when resize instances.
+func (ins *cloudDatabaseInstances) ResizeVolumeSuggestion(ctx context.Context, instanceID string, newSize int) (*CloudDatabaseSuggestion, error) {
+	var iar = CloudDatabaseAction{Action: resizeVolume, NewSize: newSize, Suggestion: true}
+
+	req, err := ins.client.NewRequest(ctx, http.MethodPost, databaseServiceName, ins.resourceActionPath(instanceID), &iar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := ins.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
 }
 
 // Delete an instances.
@@ -951,6 +1067,31 @@ func (no *cloudDatabaseNodes) Create(ctx context.Context, icr *CloudDatabaseNode
 	return nodes, nil
 }
 
+// CreateSuggestion get suggestion when create a new replica or secondary nodes.
+func (no *cloudDatabaseNodes) CreateSuggestion(ctx context.Context, icr *CloudDatabaseNodeCreate) (*CloudDatabaseSuggestion, error) {
+	// set true for get suggestion
+	icr.Suggestion = true
+
+	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cloudDatabaseNodesResourcePath, &icr)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := no.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
+
 // Get a node.
 func (no *cloudDatabaseNodes) Get(ctx context.Context, nodeID string) (*CloudDatabaseNode, error) {
 	req, err := no.client.NewRequest(ctx, http.MethodGet, databaseServiceName, no.resourcePath(nodeID), nil)
@@ -1003,6 +1144,39 @@ func (no *cloudDatabaseNodes) Action(ctx context.Context, nodeID string, nar *Cl
 	return dmr, nil
 }
 
+// ActionSuggestion get suggestion when action with a nodes.
+func (no *cloudDatabaseNodes) ActionSuggestion(ctx context.Context, nodeID string, nar *CloudDatabaseAction) (*CloudDatabaseSuggestion, error) {
+	if nar.Action == resizeFlavor && nar.FlavorName == "" {
+		return nil, ErrRequireFlavorName
+	}
+
+	if nar.Action == resizeVolume && nar.NewSize == 0 {
+		return nil, ErrRequireNewSize
+	}
+
+	// set true for get suggestion
+	nar.Suggestion = true
+
+	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, no.resourceActionPath(nodeID), &nar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := no.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
+
 // ResizeFlavor with an instances.
 func (no *cloudDatabaseNodes) ResizeFlavor(ctx context.Context, nodeID string, flavorName string) (*CloudDatabaseMessageResponse, error) {
 	var iar = CloudDatabaseAction{Action: resizeFlavor, FlavorName: flavorName}
@@ -1027,6 +1201,30 @@ func (no *cloudDatabaseNodes) ResizeFlavor(ctx context.Context, nodeID string, f
 	return dmr, nil
 }
 
+// ResizeFlavorSuggestion get suggestion when resize an instances.
+func (no *cloudDatabaseNodes) ResizeFlavorSuggestion(ctx context.Context, nodeID string, flavorName string) (*CloudDatabaseSuggestion, error) {
+	var iar = CloudDatabaseAction{Action: resizeFlavor, FlavorName: flavorName, Suggestion: true}
+
+	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, no.resourceActionPath(nodeID), &iar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := no.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
+}
+
 // ResizeVolume with an instances.
 func (no *cloudDatabaseNodes) ResizeVolume(ctx context.Context, nodeID string, newSize int) (*CloudDatabaseMessageResponse, error) {
 	var iar = CloudDatabaseAction{Action: resizeVolume, NewSize: newSize}
@@ -1049,6 +1247,30 @@ func (no *cloudDatabaseNodes) ResizeVolume(ctx context.Context, nodeID string, n
 	}
 
 	return dmr, nil
+}
+
+// ResizeVolumeSuggestion get suggestion when resize an instances.
+func (no *cloudDatabaseNodes) ResizeVolumeSuggestion(ctx context.Context, nodeID string, newSize int) (*CloudDatabaseSuggestion, error) {
+	var iar = CloudDatabaseAction{Action: resizeVolume, NewSize: newSize, Suggestion: true}
+
+	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, no.resourceActionPath(nodeID), &iar)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := no.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	var suggestions *CloudDatabaseSuggestion
+
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, err
+	}
+
+	return suggestions, nil
 }
 
 // Restart with an instances.
