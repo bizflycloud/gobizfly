@@ -1489,3 +1489,61 @@ func TestCustomImageDownload(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, image.Token, "gAAAAABgQY1kuIcMMK17B1nWBMd5dHTcitsChmDv1WU4xIGgHph09_Do4wDjY8V5XTyTYWgeYVaN5cNJG2In3oyvSm6uYlugYk6nxC-XiD81rp-8zxvSPTDd2jlaKfrrFgd2HJH5rfpV5iQlMMps52vGpxFrxFa-2ppK8BQbye63nKK_e4LwahE")
 }
+
+func TestListServerTypes(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(serverTypeBasePath), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `{
+    "server_types": [
+        {
+            "name": "Basic",
+            "enabled": true,
+            "compute_class": [
+                "shared_cpu"
+            ],
+            "priority": 1,
+            "id": "628d9a7044f76c849c9a4acc"
+        },
+        {
+            "name": "Premium",
+            "enabled": true,
+            "compute_class": [
+                "shared_cpu"
+            ],
+            "priority": 2,
+            "id": "628d9a7044f76c849c9a4acd"
+        },
+        {
+            "name": "Enterprise",
+            "enabled": true,
+            "compute_class": [
+                "shared_cpu"
+            ],
+            "priority": 3,
+            "id": "628d9a7044f76c849c9a4ace"
+        },
+        {
+            "name": "Dedicated",
+            "enabled": true,
+            "compute_class": [
+                "dedicated_cpu"
+            ],
+            "priority": 4,
+            "id": "628d9a7044f76c849c9a4acf"
+        }
+    ]
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	resp, err := client.Server.ListServerTypes(ctx)
+	require.NoError(t, err)
+	assert.Equal(t, len(resp), 4)
+	assert.Equal(t, resp[0].Name, "Basic")
+	assert.Equal(t, resp[0].Enabled, true)
+	assert.Equal(t, resp[0].ComputeClass, []string{"shared_cpu"})
+	assert.Equal(t, resp[0].Priority, 1)
+	assert.Equal(t, resp[0].ID, "628d9a7044f76c849c9a4acc")
+}
