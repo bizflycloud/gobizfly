@@ -608,3 +608,42 @@ func TestPatchVolume(t *testing.T) {
 	require.Equal(t, resp.Description, "test_description")
 
 }
+
+func TestListVolumeTypes(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL(volumeTypesBasePath), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, r.Method, http.MethodGet)
+		resp := `
+{
+  "volume_types": [
+    {
+      "name": "DEDICATED-HDD1",
+      "category": "dedicated",
+      "type": "DEDICATED HDD",
+      "availability_zones": [
+        "HN1",
+        "HN2"
+      ]
+    },
+    {
+      "name": "ENTERPRISE-HDD1",
+      "category": "enterprise",
+      "type": "ENTERPRISE HDD",
+      "availability_zones": [
+        "HN1",
+        "HN2"
+      ]
+    }
+  ]
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	resp, err := client.Volume.ListVolumeTypes(ctx, &ListVolumeTypesOptions{})
+	require.NoError(t, err)
+	require.Equal(t, len(resp), 2)
+	require.Equal(t, resp[0].Name, "DEDICATED-HDD1")
+	require.Equal(t, resp[0].Category, "dedicated")
+	require.Equal(t, resp[0].Type, "DEDICATED HDD")
+}
