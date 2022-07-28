@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	volumeBasePath = "/volumes"
+	volumeBasePath      = "/volumes"
+	volumeTypesBasePath = "/volume-types"
 )
 
 var _ VolumeService = (*volume)(nil)
@@ -28,6 +29,7 @@ type VolumeService interface {
 	Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error)
 	Restore(ctx context.Context, id string, snapshotID string) (*Task, error)
 	Patch(ctx context.Context, id string, req *VolumePatchRequest) (*Volume, error)
+	ListVolumeTypes(ctx context.Context, opts *ListVolumeTypesOptions) ([]*VolumeType, error)
 }
 
 // VolumeCreateRequest represents create new volume request payload.
@@ -78,6 +80,20 @@ type Volume struct {
 	Category         string             `json:"category"`
 	BillingPlan      string             `json:"billing_plan"`
 	Encrypted        bool               `json:"encrypted"`
+}
+
+// VolumeType contains volume type information.
+type VolumeType struct {
+	Name              string   `json:"name"`
+	Category          string   `json:"category"`
+	Type              string   `json:"type"`
+	AvailabilityZones []string `json:"availability_zones"`
+}
+
+// ListVolumeTypesOptions contains options for listing volume types.
+type ListVolumeTypesOptions struct {
+	Category         string `json:"category,omitempty"`
+	AvailabilityZone string `json:"availability_zone,omitempty"`
 }
 
 type volume struct {
@@ -292,6 +308,7 @@ func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Ta
 	return t, nil
 }
 
+// Patch partially updates a volume.
 func (v *volume) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPatch, serverServiceName, v.itemPath(id), bpr)
 	if err != nil {
@@ -307,4 +324,35 @@ func (v *volume) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) 
 		return nil, err
 	}
 	return volume, nil
+}
+
+// ListVolumeTypes lists volume types.
+func (v *volume) ListVolumeTypes(ctx context.Context, opts *ListVolumeTypesOptions) ([]*VolumeType, error) {
+	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeTypesBasePath, nil)
+	if err != nil {
+		return nil, err
+	}
+	// Set query parameters from options.
+	query := req.URL.Query()
+	if opts != nil {
+		if opts.Category != "" {
+			query.Set("category", opts.Category)
+		}
+		if opts.AvailabilityZone != "" {
+			query.Set("availability_zone", opts.AvailabilityZone)
+		}
+	}
+	req.URL.RawQuery = query.Encode()
+	resp, err := v.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var volumeTypesResp struct {
+		VolumeTypes []*VolumeType `json:"volume_types"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&volumeTypesResp); err != nil {
+		return nil, err
+	}
+	return volumeTypesResp.VolumeTypes, nil
 }

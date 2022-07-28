@@ -7,6 +7,10 @@ import (
 	"strings"
 )
 
+const (
+	serverTypeBasePath = "/server-types"
+)
+
 type server struct {
 	client *Client
 }
@@ -127,6 +131,15 @@ type ServerConsoleResponse struct {
 // ServerMessageResponse contains message response from Cloud Server API.
 type ServerMessageResponse struct {
 	Message string `json:"message"`
+}
+
+// ServerType represents a server type.
+type ServerType struct {
+	ID           string   `json:"id"`
+	Name         string   `json:"name"`
+	Enabled      bool     `json:"enabled"`
+	ComputeClass []string `json:"compute_class"`
+	Priority     int      `json:"priority"`
 }
 
 // ServerAction represents server action request payload.
@@ -528,4 +541,23 @@ func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) 
 		return err
 	}
 	return resp.Body.Close()
+}
+
+func (s server) ListServerTypes(ctx context.Context) ([]*ServerType, error) {
+	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverTypeBasePath, nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var serverTypes struct {
+		ServerTypes []*ServerType `json:"server_types"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&serverTypes); err != nil {
+		return nil, err
+	}
+	return serverTypes.ServerTypes, nil
 }
