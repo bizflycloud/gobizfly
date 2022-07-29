@@ -22,119 +22,36 @@ func TestVolumeList(t *testing.T) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 [
-	{
-		"status": "in-use",
-		"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
-		"billing_plan": "saving_plan",
-		"attachments": [
-			{
-				"server_id": "2b2628b1-0d11-4fd7-8d63-4ec24ff493ea",
-				"attachment_id": "9c2ba971-dd59-4527-a441-26dcd3174d68",
-				"attached_at": "2020-04-11T17:51:47.000000",
-				"volume_id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
-				"device": "/dev/vdb",
-				"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
-				"server": {
-					"OS-EXT-STS:task_state": null,
-					"addresses": {
-						"priv_sapd@vccloud.vn": [
-							{
-								"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:98:c0:3f",
-								"version": 4,
-								"addr": "10.20.165.43",
-								"OS-EXT-IPS:type": "fixed"
-							}
-						],
-						"EXT_DIRECTNET_8": [
-							{
-								"OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:17:87:67",
-								"version": 4,
-								"addr": "103.107.182.201",
-								"OS-EXT-IPS:type": "fixed"
-							}
-						]
-					},
-					"OS-EXT-STS:vm_state": "active",
-					"OS-SRV-USG:launched_at": "2020-04-11T15:42:53.000000",
-					"flavor": {
-						"name": "nix.2c_2g",
-						"ram": 2048,
-						"OS-FLV-DISABLED:disabled": false,
-						"vcpus": 2,
-						"swap": "",
-						"os-flavor-access:is_public": true,
-						"rxtx_factor": 1.0,
-						"OS-FLV-EXT-DATA:ephemeral": 0,
-						"disk": 0,
-						"id": "be7dab73-2c87-4d59-a2fd-49e4f7845310"
-					},
-					"id": "2b2628b1-0d11-4fd7-8d63-4ec24ff493ea",
-					"security_groups": [
-						{
-							"name": "default"
-						},
-						{
-							"name": "default"
-						}
-					],
-					"user_id": "55d38aecb1034c06b99c1c87fb6f0740",
-					"OS-DCF:diskConfig": "MANUAL",
-					"accessIPv4": "",
-					"accessIPv6": "",
-					"progress": 0,
-					"OS-EXT-STS:power_state": 1,
-					"OS-EXT-AZ:availability_zone": "HN1",
-					"config_drive": "",
-					"status": "ACTIVE",
-					"updated": "2020-04-11T15:42:54Z",
-					"hostId": "023ca0b3e91f594819943b6e70ff0d0436734e19df2a2147a8eb1333",
-					"OS-SRV-USG:terminated_at": null,
-					"key_name": "sapd1",
-					"name": "ceph-15",
-					"created": "2020-04-11T15:42:35Z",
-					"tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
-					"os-extended-volumes:volumes_attached": [
-						{
-							"id": "018e0772-1930-4329-a08c-b07422aa9fc1"
-						},
-						{
-							"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201"
-						},
-						{
-							"id": "af2516f4-002d-41bc-932d-4ebdc5d49107"
-						}
-					],
-					"metadata": {
-						"category": "premium",
-						"os_type": "CentOS 7.7"
-					},
-					"ipv6": false
-				}
-			}
-		],
-		"availability_zone": "HN1",
-		"bootable": false,
-		"encrypted": false,
-		"created_at": "2020-04-11T17:51:41.000000",
-		"description": null,
-		"os-vol-tenant-attr:tenant_id": "17a1c3c952c84b3e84a82ddd48364938",
-		"updated_at": "2020-04-11T17:51:47.000000",
-		"type": "HDD",
-		"name": "sapd-vol-1",
-		"replication_status": null,
-		"consistencygroup_id": null,
-		"source_volid": null,
-		"snapshot_id": null,
-		"multiattach": false,
-		"metadata": {
-			"category": "premium",
-			"attached_mode": "rw"
-		},
-		"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
-		"size": 20,
-		"attached_type": "datadisk",
-		"category": "premium"
-	}
+    {
+        "id": "79f10fea-2e48-44dc-b70d-c82051897a7d",
+        "status": "available",
+        "size": 20,
+        "availability_zone": "HN2",
+        "created_at": "2022-07-29T03:14:06.000000",
+        "updated_at": "2022-07-29T03:14:06.000000",
+        "attachments": [],
+        "name": "datadisk-0kr",
+        "description": null,
+        "volume_type": "PREMIUM-HDD1",
+        "snapshot_id": null,
+        "source_volid": null,
+        "metadata": {
+            "category": "premium",
+            "billing_plan": "saving_plan"
+        },
+        "user_id": "8fb14496e2d840248dbc8c09d8755fe4",
+        "bootable": false,
+        "encrypted": false,
+        "replication_status": null,
+        "consistencygroup_id": null,
+        "multiattach": false,
+        "os-vol-tenant-attr:tenant_id": "bc8d2790fc9a46949818b942c0a824de",
+        "type": "HDD",
+        "category": "premium",
+        "region_name": "HaNoi",
+        "attached_type": "datadisk",
+        "billing_plan": "saving_plan"
+    }
 ]
 `
 		_, _ = fmt.Fprint(w, resp)
@@ -144,8 +61,10 @@ func TestVolumeList(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, volumes, 1)
 	volume := volumes[0]
-	assert.Equal(t, "7b099bbb-21e9-48f9-8cec-4076d78fa201", volume.ID)
+	assert.Equal(t, "79f10fea-2e48-44dc-b70d-c82051897a7d", volume.ID)
 	assert.Equal(t, "saving_plan", volume.BillingPlan)
+	assert.Equal(t, "HDD", volume.Type)
+	assert.Equal(t, "PREMIUM-HDD1", volume.VolumeType)
 }
 
 func TestVolumeGet(t *testing.T) {
@@ -276,7 +195,7 @@ func TestVolumeGet(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "7b099bbb-21e9-48f9-8cec-4076d78fa201", volume.ID)
 	assert.Equal(t, "sapd-vol-1", volume.Name)
-	assert.Equal(t, "HDD", volume.VolumeType)
+	assert.Equal(t, "HDD", volume.Type)
 }
 
 func TestVolumeDelete(t *testing.T) {
