@@ -166,8 +166,9 @@ type ServerCreateResponse struct {
 
 // ServerDisk contains server's disk information.
 type ServerDisk struct {
-	Size int    `json:"size"`
-	Type string `json:"type"`
+	Size       int     `json:"size"`
+	Type       *string `json:"type,omitempty"` // Deprecated: This field will be removed in the near future
+	VolumeType *string `json:"volume_type,omitempty"`
 }
 
 // ServerOS contains OS information of server.

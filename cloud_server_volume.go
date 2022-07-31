@@ -65,7 +65,8 @@ type Volume struct {
 	Size             int                `json:"size"`
 	AttachedType     string             `json:"attached_type"`
 	Name             string             `json:"name"`
-	VolumeType       string             `json:"type"`
+	Type             string             `json:"type"`
+	VolumeType       string             `json:"volume_type"`
 	Description      string             `json:"description"`
 	SnapshotID       string             `json:"snapshot_id"`
 	Bootable         bool               `json:"bootable"`

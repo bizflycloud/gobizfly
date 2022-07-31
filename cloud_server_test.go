@@ -178,7 +178,7 @@ func TestServerCreate(t *testing.T) {
 		assert.Equal(t, "sapd123", payload[0].Name)
 		assert.Equal(t, "image", payload[0].OS.Type)
 		assert.Equal(t, "2c_2g", payload[0].FlavorName)
-		assert.Equal(t, "HDD", payload[0].RootDisk.Type)
+		assert.Equal(t, "HDD", *payload[0].RootDisk.Type)
 		assert.Equal(t, 40, payload[0].RootDisk.Size)
 		assert.Equal(t, "free_datatransfer", payload[0].NetworkPlan)
 		assert.Equal(t, []string{"123", "456", "678"}, payload[0].Firewalls)
@@ -192,12 +192,62 @@ func TestServerCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
+	volType := "HDD"
 	scr := &ServerCreateRequest{
-		Name:             "sapd123",
-		FlavorName:       "2c_2g",
-		SSHKey:           "sapd1",
-		Password:         true,
-		RootDisk:         &ServerDisk{40, "HDD"},
+		Name:       "sapd123",
+		FlavorName: "2c_2g",
+		SSHKey:     "sapd1",
+		Password:   true,
+		RootDisk: &ServerDisk{
+			Size: 40,
+			Type: &volType},
+		Type:             "premium",
+		AvailabilityZone: "HN1",
+		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
+		Firewalls:        []string{"123", "456", "678"},
+		NetworkPlan:      "free_datatransfer",
+		NetworkInterface: []string{"123", "456"},
+	}
+	task, err := client.Server.Create(ctx, scr)
+	require.NoError(t, err)
+	assert.Equal(t, "71b9caeb-1df3-4a60-8741-fdea426fed4c", task.Task[0])
+
+}
+
+func TestUpdatedServerCreate(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.CloudServerURL("/servers"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var scr *ServerCreateRequest
+		payload := []*ServerCreateRequest{scr}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "sapd123", payload[0].Name)
+		assert.Equal(t, "image", payload[0].OS.Type)
+		assert.Equal(t, "2c_2g", payload[0].FlavorName)
+		assert.Equal(t, "PREMIUM-HDD1", *payload[0].RootDisk.VolumeType)
+		assert.Equal(t, 40, payload[0].RootDisk.Size)
+		assert.Equal(t, "free_datatransfer", payload[0].NetworkPlan)
+		assert.Equal(t, []string{"123", "456", "678"}, payload[0].Firewalls)
+		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterface)
+		resp := `
+{
+	"task_id": [
+		"71b9caeb-1df3-4a60-8741-fdea426fed4c"
+	]
+}
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	volType := "PREMIUM-HDD1"
+	scr := &ServerCreateRequest{
+		Name:       "sapd123",
+		FlavorName: "2c_2g",
+		SSHKey:     "sapd1",
+		Password:   true,
+		RootDisk: &ServerDisk{
+			Size:       40,
+			VolumeType: &volType},
 		Type:             "premium",
 		AvailabilityZone: "HN1",
 		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
