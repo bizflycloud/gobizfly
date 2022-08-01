@@ -96,7 +96,7 @@ type Server struct {
 	RegionName       string                 `json:"region_name"`
 	NetworkPlan      string                 `json:"network_plan"`
 	Locked           bool                   `json:"locked"`
-	IsCreatedWan     string                 `json:"is_created_wan"`
+	IsCreatedWan     bool                   `json:"is_created_wan"`
 	ZoneName         string                 `json:"zone_name"`
 	BillingPlan      string                 `json:"billing_plan"`
 	IsAvailable      bool                   `json:"is_available"`
@@ -196,7 +196,7 @@ type ServerCreateRequest struct {
 	VPCNetworkIds        []string      `json:"vpc_network_ids,omitempty"`
 	BillingPlan          string        `json:"billing_plan,omitempty"`
 	IPv6                 bool          `json:"ipv6,omitempty"`
-	IsCreatedWan         string        `json:"is_created_wan,omitempty"`
+	IsCreatedWan         bool          `json:"is_created_wan,omitempty"`
 }
 
 // itemActionPath return http path of server action
