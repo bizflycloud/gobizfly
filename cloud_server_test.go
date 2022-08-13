@@ -1597,3 +1597,25 @@ func TestListServerTypes(t *testing.T) {
 	assert.Equal(t, resp[0].Priority, 1)
 	assert.Equal(t, resp[0].ID, "628d9a7044f76c849c9a4acc")
 }
+
+func TestServerChangeNetworkPlan(t *testing.T) {
+	setup()
+	defer teardown()
+	var svr *server
+	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+	})
+	err := client.Server.ChangeNetworkPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "free_datatransfer")
+	require.NoError(t, err)
+}
+
+func TestServerSwitchBillingPlan(t *testing.T) {
+	setup()
+	defer teardown()
+	var s *server
+	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+	})
+	err := client.Server.SwitchBillingPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "on_demand")
+	require.NoError(t, err)
+}
