@@ -144,14 +144,16 @@ type ServerType struct {
 
 // ServerAction represents server action request payload.
 type ServerAction struct {
-	Action        string   `json:"action"`
-	ImageID       string   `json:"image,omitempty"`
-	FlavorName    string   `json:"flavor_name,omitempty"`
-	ConsoleType   string   `json:"type,omitempty"`
-	FirewallIDs   []string `json:"firewall_ids,omitempty"`
-	NewType       string   `json:"new_type,omitempty"`
-	VPCNetworkIDs []string `json:"vpc_network_ids,omitempty"`
-	AttachWanIPs  []string `json:"wan_ips,omitempty"`
+	Action         string   `json:"action"`
+	ImageID        string   `json:"image,omitempty"`
+	FlavorName     string   `json:"flavor_name,omitempty"`
+	ConsoleType    string   `json:"type,omitempty"`
+	FirewallIDs    []string `json:"firewall_ids,omitempty"`
+	NewType        string   `json:"new_type,omitempty"`
+	VPCNetworkIDs  []string `json:"vpc_network_ids,omitempty"`
+	AttachWanIPs   []string `json:"wan_ips,omitempty"`
+	NewNetworkPlan string   `json:"new_network_plan,omitempty"`
+	NewBillingPlan string   `json:"billing_plan,omitempty"`
 }
 
 // ServerTask contains task information.
@@ -561,4 +563,36 @@ func (s server) ListServerTypes(ctx context.Context) ([]*ServerType, error) {
 		return nil, err
 	}
 	return serverTypes.ServerTypes, nil
+}
+
+func (s server) ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan string) error {
+	payload := &ServerAction{
+		Action:         "change_network_plan",
+		NewNetworkPlan: newNetworkPlan,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
+}
+
+func (s server) SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error {
+	payload := &ServerAction{
+		Action:         "switch_billing_plan",
+		NewBillingPlan: newBillingPlan,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }

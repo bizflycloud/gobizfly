@@ -41,5 +41,7 @@ type ServerService interface {
 	DeleteCustomImage(ctx context.Context, imageID string) error
 	GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error)
 	AttachWanIps(ctx context.Context, id string, wanIps []string) error
+	ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan string) error
+	SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error
 	ListServerTypes(ctx context.Context) ([]*ServerType, error)
 }
