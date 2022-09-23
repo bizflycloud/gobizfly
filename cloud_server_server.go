@@ -199,6 +199,7 @@ type ServerCreateRequest struct {
 	BillingPlan          string        `json:"billing_plan,omitempty"`
 	IPv6                 bool          `json:"ipv6,omitempty"`
 	IsCreatedWan         bool          `json:"is_created_wan,omitempty"`
+	UserData             string        `json:"user_data,omitempty"`
 }
 
 // itemActionPath return http path of server action
