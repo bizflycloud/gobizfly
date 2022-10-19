@@ -55,6 +55,7 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 		Password:      t.client.password,
 		AppCredID:     t.client.appCredID,
 		AppCredSecret: t.client.appCredSecret,
+		ProjectName:   t.client.projectName,
 	}
 	return t.create(ctx, tcr)
 }
