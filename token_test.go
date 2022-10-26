@@ -22,7 +22,7 @@ func TestToken(t *testing.T) {
 	}{
 		{"Auth Password", &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx"}, "auth-password-token"},
 		{"Auth Application Secret", &TokenCreateRequest{AuthMethod: "application_credential", AppCredID: "174b36fd6c9e4a1da2e7c7dbddb89c69", AppCredSecret: "foo"}, "auth-app-token"},
-		{"Auth Password with Project Name", &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx", ProjectName: "testIAM"}, "auth-password_IAM"},
+		{"Auth Password with Project Name", &TokenCreateRequest{AuthMethod: "password", Username: "foo@bizflycloud.vn", Password: "xxx", ProjectId: "testIAM"}, "auth-password_IAM"},
 	}
 
 	for _, tc := range tests {

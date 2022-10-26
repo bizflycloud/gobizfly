@@ -25,7 +25,7 @@ type TokenCreateRequest struct {
 	AuthMethod    string `json:"auth_method"`
 	Username      string `json:"username,omitempty"`
 	Password      string `json:"password,omitempty"`
-	ProjectName   string `json:"project_name,omitempty"`
+	ProjectId     string `json:"project_id,omitempty"`
 	AppCredID     string `json:"credential_id,omitempty"`
 	AppCredSecret string `json:"credential_secret,omitempty"`
 }
@@ -55,7 +55,7 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 		Password:      t.client.password,
 		AppCredID:     t.client.appCredID,
 		AppCredSecret: t.client.appCredSecret,
-		ProjectName:   t.client.projectName,
+		ProjectId:     t.client.projectID,
 	}
 	return t.create(ctx, tcr)
 }
@@ -85,7 +85,7 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 	t.client.authMethod = tcr.AuthMethod
 	t.client.username = tcr.Username
 	t.client.password = tcr.Password
-	t.client.projectName = tok.ProjectName
+	t.client.projectID = tcr.ProjectId
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
 	t.client.services = services
