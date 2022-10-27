@@ -81,13 +81,11 @@ type Client struct {
 	authType      string
 	username      string
 	password      string
-	projectName   string
 	appCredID     string
 	appCredSecret string
-	// TODO: this will be removed in near future
-	projectID  string
-	regionName string
-	services   []*Service
+	projectID     string
+	regionName    string
+	services      []*Service
 }
 
 // Option set Client specific attributes
@@ -123,20 +121,7 @@ func WithRegionName(region string) Option {
 	}
 }
 
-// WithTenantName sets the tenant name option for BizFly client.
-//
-// Deprecated: X-Tenant-Name header required will be removed in API server.
-func WithTenantName(tenant string) Option {
-	return func(c *Client) error {
-		c.projectName = tenant
-		return nil
-	}
-}
-
-// WithTenantID sets the tenant id name option for BizFly client
-//
-// Deprecated: X-Tenant-Id header required will be removed in API server.
-func WithTenantID(id string) Option {
+func WithProjectId(id string) Option {
 	return func(c *Client) error {
 		c.projectID = id
 		return nil
@@ -217,8 +202,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
-	req.Header.Add("X-Tenant-Name", c.projectName)
-	req.Header.Add("X-Tenant-Id", c.projectID)
+	req.Header.Add("X-Project-Id", c.projectID)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
