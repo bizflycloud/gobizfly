@@ -154,6 +154,7 @@ type ServerAction struct {
 	AttachWanIPs   []string `json:"wan_ips,omitempty"`
 	NewNetworkPlan string   `json:"new_network_plan,omitempty"`
 	NewBillingPlan string   `json:"billing_plan,omitempty"`
+	NewName        string   `json:"new_name,omitempty"`
 }
 
 // ServerTask contains task information.
@@ -586,6 +587,22 @@ func (s server) SwitchBillingPlan(ctx context.Context, id string, newBillingPlan
 	payload := &ServerAction{
 		Action:         "switch_billing_plan",
 		NewBillingPlan: newBillingPlan,
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
+}
+
+func (s server) Rename(ctx context.Context, id string, newName string) error {
+	payload := &ServerAction{
+		Action:  "rename",
+		NewName: newName,
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {

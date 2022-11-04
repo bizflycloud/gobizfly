@@ -1619,3 +1619,14 @@ func TestServerSwitchBillingPlan(t *testing.T) {
 	err := client.Server.SwitchBillingPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "on_demand")
 	require.NoError(t, err)
 }
+
+func TestServerChangeBackupPlan(t *testing.T) {
+	setup()
+	defer teardown()
+	var s *server
+	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+	})
+	err := client.Server.Rename(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "backup")
+	require.NoError(t, err)
+}

@@ -44,4 +44,5 @@ type ServerService interface {
 	ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan string) error
 	SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error
 	ListServerTypes(ctx context.Context) ([]*ServerType, error)
+	Rename(ctx context.Context, id string, newName string) error
 }
