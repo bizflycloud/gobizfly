@@ -586,22 +586,38 @@ func TestServerFlavorList(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		resp := `
 [
-    {
-        "_id": "5d7f58903c4c0127da9896ae",
-        "name": "1c_1g"
-    },
-    {
-        "_id": "5d7f58903c4c0127da9896b5",
-        "name": "2c_4g"
-    }
-]
+  {
+    "id": "00e88d8e-a4c2-44a8-a423-2568b78e9702",
+    "name": "nix.3c_6g",
+    "ram": 6144,
+    "vcpus": 3,
+    "disk": 0,
+    "category": "premium"
+  },
+  {
+    "id": "01a4b88f-1f22-45ce-9860-10af95cec50e",
+    "name": "nix.24c_64g",
+    "ram": 65536,
+    "vcpus": 24,
+    "disk": 0,
+    "category": "premium"
+  },
+  {
+    "id": "03b5dfc8-eb4b-4b69-a217-d276db142d0d",
+    "name": "2c_4g_basic",
+    "ram": 4096,
+    "vcpus": 2,
+    "disk": 0,
+    "category": "basic"
+  }]
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
 
 	flavors, err := client.Server.ListFlavors(ctx)
 	require.NoError(t, err)
-	assert.Equal(t, "1c_1g", flavors[0].Name)
+	assert.Equal(t, 3, len(flavors))
+	assert.Equal(t, "00e88d8e-a4c2-44a8-a423-2568b78e9702", flavors[0].ID)
 }
 
 func TestOSImageList(t *testing.T) {
