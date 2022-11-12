@@ -8,8 +8,12 @@ import (
 
 // serverFlavorResponse is the response from the server flavor API.
 type serverFlavorResponse struct {
-	ID   string `json:"_id"`
-	Name string `json:"name"`
+	ID       string `json:"id"`
+	Name     string `json:"name"` // Deprecated: Will be removed in the future.
+	VCPUs    int    `json:"vcpus"`
+	RAM      int    `json:"ram"`
+	Disk     int    `json:"disk"`
+	Category string `json:"category"`
 }
 
 // ListFlavors lists server flavors
