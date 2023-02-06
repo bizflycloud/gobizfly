@@ -117,9 +117,13 @@ type Location struct {
 }
 
 // ServerListOptions represents the options for listing servers.
+// Name is the filter of server name.
+// Status is the filter of server status.
+// IP is the filter of server IP (Both IPv4 and IPv6).
 type ServerListOptions struct {
-	detailed bool
-	fields   []string
+	Name   string `url:"name,omitempty"`
+	Status string `url:"status,omitempty"`
+	IP     string `url:"ip,omitempty"`
 }
 
 // ServerConsoleResponse contains information of server console url.
@@ -216,11 +220,16 @@ func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, 
 		return nil, err
 	}
 	params := req.URL.Query()
-	if opts.detailed {
-		params.Add("detailed", "True")
-	}
-	if len(opts.fields) != 0 {
-		params.Add("fields", strings.Join(opts.fields, ","))
+	if opts != nil {
+		if opts.Name != "" {
+			params.Add("name", opts.Name)
+		}
+		if opts.Status != "" {
+			params.Add("status", opts.Status)
+		}
+		if opts.IP != "" {
+			params.Add("ip", opts.IP)
+		}
 	}
 	req.URL.RawQuery = params.Encode()
 
