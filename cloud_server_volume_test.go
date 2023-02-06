@@ -20,6 +20,7 @@ func TestVolumeList(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(testlib.CloudServerURL(volumeBasePath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, "bootable=false&name=datadisk-0kr", r.URL.RawQuery)
 		resp := `
 [
     {
@@ -57,7 +58,11 @@ func TestVolumeList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	volumes, err := client.Volume.List(ctx, &ListOptions{})
+	isBootable := false
+	volumes, err := client.Volume.List(ctx, &VolumeListOptions{
+		Name:     "datadisk-0kr",
+		Bootable: &isBootable,
+	})
 	require.NoError(t, err)
 	assert.Len(t, volumes, 1)
 	volume := volumes[0]
