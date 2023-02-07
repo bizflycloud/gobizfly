@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ var _ VolumeService = (*volume)(nil)
 
 // VolumeService is an interface to interact with BizFly API Volume endpoint.
 type VolumeService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*Volume, error)
+	List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, error)
 	Create(ctx context.Context, req *VolumeCreateRequest) (*Volume, error)
 	Get(ctx context.Context, id string) (*Volume, error)
 	Delete(ctx context.Context, id string) error
@@ -30,6 +31,24 @@ type VolumeService interface {
 	Restore(ctx context.Context, id string, snapshotID string) (*Task, error)
 	Patch(ctx context.Context, id string, req *VolumePatchRequest) (*Volume, error)
 	ListVolumeTypes(ctx context.Context, opts *ListVolumeTypesOptions) ([]*VolumeType, error)
+}
+
+// VolumeListOptions represents options to list volumes.
+// Name is the filter to list volumes by name.
+// Size is the filter to list volumes by size.
+// Status is the filter to list volumes by status.
+// AvailabilityZone is the filter to list volumes by availability zone.
+// Category is the filter to list volumes by category.
+// BillingPlan is the filter to list volumes by billing plan.
+// Bootable is the filter to list volumes by bootable.
+type VolumeListOptions struct {
+	Name             string `json:"name"`
+	Size             int    `json:"size"`
+	Status           string `json:"status"`
+	AvailabilityZone string `json:"availability_zone"`
+	Category         string `json:"category"`
+	BillingPlan      string `json:"billing_plan"`
+	Bootable         *bool  `json:"bootable"`
 }
 
 // VolumeCreateRequest represents create new volume request payload.
@@ -102,11 +121,36 @@ type volume struct {
 }
 
 // List lists all volumes of users.
-func (v *volume) List(ctx context.Context, opts *ListOptions) ([]*Volume, error) {
+func (v *volume) List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeBasePath, nil)
 	if err != nil {
 		return nil, err
 	}
+	q := req.URL.Query()
+	if opts != nil {
+		if opts.Name != "" {
+			q.Add("name", opts.Name)
+		}
+		if opts.Size != 0 {
+			q.Add("size", strconv.Itoa(opts.Size))
+		}
+		if opts.Status != "" {
+			q.Add("status", opts.Status)
+		}
+		if opts.AvailabilityZone != "" {
+			q.Add("availability_zone", opts.AvailabilityZone)
+		}
+		if opts.Category != "" {
+			q.Add("category", opts.Category)
+		}
+		if opts.BillingPlan != "" {
+			q.Add("billing_plan", opts.BillingPlan)
+		}
+		if opts.Bootable != nil {
+			q.Add("bootable", strconv.FormatBool(*opts.Bootable))
+		}
+	}
+	req.URL.RawQuery = q.Encode()
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err

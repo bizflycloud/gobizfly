@@ -15,11 +15,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestServerGet(t *testing.T) {
+func TestServerList(t *testing.T) {
 	setup()
 	defer teardown()
 	mux.HandleFunc(testlib.CloudServerURL("/servers"), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, "name=meeting-now-1", r.URL.RawQuery)
 		resp := `
 [
 	{
@@ -155,7 +156,9 @@ func TestServerGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	servers, err := client.Server.List(ctx, &ServerListOptions{})
+	servers, err := client.Server.List(ctx, &ServerListOptions{
+		Name: "meeting-now-1",
+	})
 	require.NoError(t, err)
 	server := servers[0]
 	assert.Equal(t, "c0f541d1-385a-4b0f-8c9a-5bd583475477", server.ID)
