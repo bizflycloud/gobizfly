@@ -5,6 +5,7 @@ package gobizfly
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -408,6 +409,14 @@ func TestPatchVolume(t *testing.T) {
 	var v volume
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPatch, r.Method)
+		// get the request body
+		body, err := ioutil.ReadAll(r.Body)
+		require.NoError(t, err)
+		// unmarshal the request body
+		var reqBody VolumePatchRequest
+		err = json.Unmarshal(body, &reqBody)
+		require.NoError(t, err)
+		require.Equal(t, "test_rename", reqBody.Name)
 		resp := `
 {
 	"status": "in-use",
@@ -525,6 +534,7 @@ func TestPatchVolume(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 	patchRequest := &VolumePatchRequest{
+		Name:        "test_rename",
 		Description: "test_description",
 	}
 	resp, err := client.Volume.Patch(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", patchRequest)
