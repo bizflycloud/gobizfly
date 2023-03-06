@@ -75,7 +75,7 @@ func TestUserGet(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(testlib.AccountURL(usersInfoPath), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
-		resp := `{
+		resp := `{"data" :{
     "service": null,
     "url_type": "service",
     "origin": null,
@@ -256,6 +256,7 @@ func TestUserGet(t *testing.T) {
     "has_expired_invoice": false,
     "negative_balance": false,
     "promotion": []
+}
 }
 `
 		_, _ = fmt.Fprint(writer, resp)
