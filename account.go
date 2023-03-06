@@ -49,6 +49,12 @@ type Regions struct {
 	HCM Region `json:"HCM"`
 }
 
+type UserRegion struct {
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	ShortName string `json:"short_name"`
+}
+
 type User struct {
 	Service           string             `json:"service"`
 	URLType           string             `json:"url_type"`
@@ -85,6 +91,7 @@ type User struct {
 	HasExpiredInvoice bool               `json:"has_expired_invoice"`
 	NegativeBalance   bool               `json:"negative_balance"`
 	Promotion         []string           `json:"promotion"`
+	UserRegions       []UserRegion       `json:"user_regions"`
 }
 
 type IAM struct {
@@ -160,9 +167,11 @@ func (a accountService) GetUserInfo(ctx context.Context) (*User, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var user *User
-	if err := json.NewDecoder(resp.Body).Decode(&user); err != nil {
+	var data struct {
+		User *User `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return user, nil
+	return data.User, nil
 }
