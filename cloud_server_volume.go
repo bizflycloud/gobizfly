@@ -65,6 +65,7 @@ type VolumeCreateRequest struct {
 }
 
 type VolumePatchRequest struct {
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
