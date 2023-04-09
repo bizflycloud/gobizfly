@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 const (
@@ -32,6 +33,7 @@ const (
 	cdnName                 = "cdn"
 	dnsName                 = "dns"
 	databaseServiceName     = "cloud_database"
+	iamServiceName          = "iam"
 )
 
 var (
@@ -64,6 +66,7 @@ type Client struct {
 	NetworkInterface      NetworkInterfaceService
 	WanIP                 WanIPService
 	CloudDatabase         CloudDatabaseService
+	IAM                   IAMService
 
 	Snapshot SnapshotService
 
@@ -172,6 +175,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.NetworkInterface = &networkInterfaceService{client: c}
 	c.WanIP = &wanIPService{client: c}
 	c.CloudDatabase = &cloudDatabaseService{client: c}
+	c.IAM = &iamService{client: c}
 	return c, nil
 }
 
@@ -180,7 +184,10 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 	if serviceName == authServiceName {
 		// create a copy of apiURL
 		apiURL := *c.apiURL
-		apiURL.Path = path.Join(c.apiURL.Path, "/api")
+		// if apiUrl doesn't end with /api, append it
+		if !strings.HasSuffix(apiURL.Path, "/api") {
+			apiURL.Path = path.Join(c.apiURL.Path, "/api")
+		}
 		return apiURL.String()
 	}
 	for _, service := range c.services {
