@@ -32,7 +32,7 @@ type SessionPersistence struct {
 // PoolCreateRequest represents create new pool request payload.
 type PoolCreateRequest struct {
 	LBAlgorithm        string              `json:"lb_algorithm"`
-	ListenerID         string              `json:"listener_id"`
+	ListenerID         string              `json:"listener_id,omitempty"`
 	Name               *string             `json:"name,omitempty"`
 	Protocol           string              `json:"protocol"`
 	SessionPersistence *SessionPersistence `json:"session_persistence,omitempty"`
