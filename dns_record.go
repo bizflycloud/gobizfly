@@ -12,44 +12,20 @@ type WrappedRecordPayload struct {
 	Record interface{} `json:"record"`
 }
 
-// Addrs - contains the list of addresses in regions.
-type Addrs struct {
-	HN  []string `json:"HN"`
-	HCM []string `json:"HCM"`
-	SG  []string `json:"SG"`
-	USA []string `json:"USA"`
+// MXData - contains the data for an MX record.
+type MXData struct {
+	Value    string `json:"value"`
+	Priority int    `json:"priority"`
 }
 
-// RoutingData - contains the routing data for version 4 and 6 addresses.
-type RoutingData struct {
-	AddrsV4 Addrs `json:"addrs_v4,omitempty"`
-	AddrsV6 Addrs `json:"addrs_v6,omitempty"`
-}
-
-// RoutingPolicyData - contains the routing policy data for version 4 and 6 addresses and the health check information.
-type RoutingPolicyData struct {
-	RoutingData RoutingData `json:"routing_data,omitempty"`
-	HealthCheck HealthCheck `json:"healthcheck,omitempty"`
-}
-
-// HealthCheck - contains the health check information.
-type HealthCheck struct {
-	TCPConnect TCPHealthCheck  `json:"tcp_connect,omitempty"`
-	HTTPStatus HTTPHealthCheck `json:"http_status,omitempty"`
-}
-
-// TCPHealthCheck - contains the TCP health check information.
-type TCPHealthCheck struct {
-	TCPPort int `json:"tcp_port,omitempty"`
-}
-
-// HTTPHealthCheck - contains the HTTP health check information.
-type HTTPHealthCheck struct {
-	HTTPPort int    `json:"http_port,omitempty"`
-	URLPath  string `json:"url_path,omitempty"`
-	VHost    string `json:"vhost,omitempty"`
-	OkCodes  []int  `json:"ok_codes,omitempty"`
-	Interval int    `json:"interval,omitempty"`
+// SRVData - contains the data for an SRV record.
+type SRVData struct {
+	Port     int    `json:"port"`
+	Priority int    `json:"priority"`
+	Protocol string `json:"protocol"`
+	Service  string `json:"service"`
+	Target   string `json:"target"`
+	Weight   int    `json:"weight"`
 }
 
 // BaseCreateRecordPayload - contains the base payload for creating a record.
@@ -65,58 +41,54 @@ type CreateNormalRecordPayload struct {
 	Data []string `json:"data"`
 }
 
-// CreatePolicyRecordPayload - contains the payload for creating a policy record.
-type CreatePolicyRecordPayload struct {
-	BaseCreateRecordPayload
-	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data"`
-}
-
 // CreateMXRecordPayload - contains the payload for creating an MX record.
 type CreateMXRecordPayload struct {
 	BaseCreateRecordPayload
 	Data []MXData `json:"data"`
 }
 
-// MXData - contains the data for an MX record.
-type MXData struct {
-	Value    string `json:"value"`
-	Priority int    `json:"priority"`
-}
-
-// RecordData - contains the data for a record.
-type RecordData struct {
-	Value    string `json:"value"`
-	Priority int    `json:"priority"`
+// CreateSRVRecordPayload - contains the payload for creating an SRV record.
+type CreateSRVRecordPayload struct {
+	BaseCreateRecordPayload
+	Data []SRVData `json:"data"`
 }
 
 // UpdateRecordPayload - contains the payload for updating a record.
-type UpdateRecordPayload struct {
-	Name              string            `json:"name,omitempty"`
-	Type              string            `json:"type,omitempty"`
-	TTL               int               `json:"ttl,omitempty"`
-	Data              []MXData          `json:"data,omitempty"`
-	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data,omitempty"`
+type BaseUpdateRecordPayload struct {
+	Name string   `json:"name,omitempty"`
+	Type string   `json:"type,omitempty"`
+	TTL  int      `json:"ttl,omitempty"`
+	Data []MXData `json:"data,omitempty"`
+}
+type UpdateNormalRecordPayload struct {
+	BaseUpdateRecordPayload
+	Data []string `json:"data"`
+}
+
+// CreateMXRecordPayload - contains the payload for creating an MX record.
+type UpdateMXRecordPayload struct {
+	BaseUpdateRecordPayload
+	Data []MXData `json:"data"`
+}
+
+// UpdateSRVRecordPayload - contains the payload for creating an SRV record.
+type UpdateSRVRecordPayload struct {
+	BaseUpdateRecordPayload
+	Data []SRVData `json:"data"`
 }
 
 // Record - contains the information of a record.
 type Record struct {
-	ID                string            `json:"id"`
-	Name              string            `json:"name"`
-	Delete            int               `json:"deleted"`
-	CreatedAt         string            `json:"created_at"`
-	UpdatedAt         string            `json:"updated_at"`
-	TenantID          string            `json:"tenant_id"`
-	ZoneID            string            `json:"zone_id"`
-	Type              string            `json:"type"`
-	TTL               int               `json:"ttl"`
-	Data              []interface{}     `json:"data"`
-	RoutingPolicyData RoutingPolicyData `json:"routing_policy_data"`
-}
-
-// ExtendedRecord - contains the extended information of a record.
-type ExtendedRecord struct {
-	Record
-	Data []RecordData `json:"data"`
+	ID        string        `json:"id"`
+	Name      string        `json:"name"`
+	Delete    int           `json:"deleted"`
+	CreatedAt string        `json:"created_at"`
+	UpdatedAt string        `json:"updated_at"`
+	TenantID  string        `json:"tenant_id"`
+	ZoneID    string        `json:"zone_id"`
+	Type      string        `json:"type"`
+	TTL       int           `json:"ttl"`
+	Data      []interface{} `json:"data"`
 }
 
 // Records - contains the list of records.
@@ -168,7 +140,7 @@ func (d *dnsService) GetRecord(ctx context.Context, recordID string) (*Record, e
 }
 
 // UpdateRecord - Update a DNS record
-func (d *dnsService) UpdateRecord(ctx context.Context, recordID string, urpl *UpdateRecordPayload) (*ExtendedRecord, error) {
+func (d *dnsService) UpdateRecord(ctx context.Context, recordID string, urpl interface{}) (*Record, error) {
 	req, err := d.client.NewRequest(ctx, http.MethodPut, dnsName, d.recordItemPath(recordID), urpl)
 	if err != nil {
 		return nil, err
@@ -178,7 +150,7 @@ func (d *dnsService) UpdateRecord(ctx context.Context, recordID string, urpl *Up
 		return nil, err
 	}
 	defer resp.Body.Close()
-	var data *ExtendedRecord
+	var data *Record
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
