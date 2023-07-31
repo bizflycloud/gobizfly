@@ -81,7 +81,7 @@ func TestCreateZone(t *testing.T) {
             "id": "47b9147c-7332-4dd8-b56e-56c3a30d6bd5",
             "name": "ddddafs.com",
             "type": "NS",
-            "ttl": "3600",
+            "ttl": 3600,
             "data": [
                 "ns4.bizflycloud.vn.",
                 "ns5.bizflycloud.vn.",
@@ -93,7 +93,7 @@ func TestCreateZone(t *testing.T) {
             "id": "30ac3108-ac5e-43e8-9eea-1743d6770aa5",
             "name": "ddddafs.com",
             "type": "SOA",
-            "ttl": "3600",
+            "ttl": 3600,
             "data": [
                 "ns4.bizflycloud.vn."
             ],
@@ -249,7 +249,7 @@ func TestUpdateRecord(t *testing.T) {
 	var d dnsService
 	mux.HandleFunc(testlib.DNSURL(d.recordItemPath("0ed9f98b-7991-4d49-929f-801f246d21f3")), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPut, r.Method)
-		var payload *UpdateRecordPayload
+		var payload *UpdateMXRecordPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		resp := `{
   "id": "0ed9f98b-7991-4d49-929f-801f246d21f3",
@@ -275,10 +275,12 @@ func TestUpdateRecord(t *testing.T) {
 }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	payload := UpdateRecordPayload{
-		Name: "mx",
-		Type: "MX",
-		TTL:  300,
+	payload := UpdateMXRecordPayload{
+		BaseUpdateRecordPayload: BaseUpdateRecordPayload{
+			Name: "mx",
+			Type: "MX",
+			TTL:  300,
+		},
 		Data: []MXData{
 			MXData{
 				Value:    "imap1.vccloud.vn",
@@ -289,7 +291,6 @@ func TestUpdateRecord(t *testing.T) {
 				Priority: 2,
 			},
 		},
-		RoutingPolicyData: RoutingPolicyData{},
 	}
 	zone, err := client.DNS.UpdateRecord(ctx, "0ed9f98b-7991-4d49-929f-801f246d21f3", &payload)
 	require.NoError(t, err)
