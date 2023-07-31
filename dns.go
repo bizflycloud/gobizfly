@@ -26,7 +26,7 @@ type DNSService interface {
 	DeleteZone(ctx context.Context, zoneID string) error
 	CreateRecord(ctx context.Context, zoneID string, crpl interface{}) (*Record, error)
 	GetRecord(ctx context.Context, recordID string) (*Record, error)
-	UpdateRecord(ctx context.Context, recordID string, urpl *UpdateRecordPayload) (*ExtendedRecord, error)
+	UpdateRecord(ctx context.Context, recordID string, urpl interface{}) (*Record, error)
 	DeleteRecord(ctx context.Context, recordID string) error
 }
 
