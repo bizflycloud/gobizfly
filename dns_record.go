@@ -53,12 +53,12 @@ type CreateSRVRecordPayload struct {
 	Data []SRVData `json:"data"`
 }
 
-// UpdateRecordPayload - contains the payload for updating a record.
+// BaseUpdateRecordPayload - contains the payload for updating a record.
 type BaseUpdateRecordPayload struct {
-	Name string   `json:"name,omitempty"`
-	Type string   `json:"type,omitempty"`
-	TTL  int      `json:"ttl,omitempty"`
-	Data []MXData `json:"data,omitempty"`
+	ID   string `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
+	Type string `json:"type,omitempty"`
+	TTL  int    `json:"ttl,omitempty"`
 }
 type UpdateNormalRecordPayload struct {
 	BaseUpdateRecordPayload
@@ -141,7 +141,10 @@ func (d *dnsService) GetRecord(ctx context.Context, recordID string) (*Record, e
 
 // UpdateRecord - Update a DNS record
 func (d *dnsService) UpdateRecord(ctx context.Context, recordID string, urpl interface{}) (*Record, error) {
-	req, err := d.client.NewRequest(ctx, http.MethodPut, dnsName, d.recordItemPath(recordID), urpl)
+	payload := WrappedRecordPayload{
+		Record: urpl,
+	}
+	req, err := d.client.NewRequest(ctx, http.MethodPut, dnsName, d.recordItemPath(recordID), &payload)
 	if err != nil {
 		return nil, err
 	}
