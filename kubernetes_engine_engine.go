@@ -25,7 +25,7 @@ type clusterCertificate struct {
 
 type clusterReserved struct {
 	SystemReserved			clusterSystemReserved  `json:"system_reserved" yaml:"system_reserved"`
-	KubeReserved 			clusterKubeReserved    	`json:"kube_reserved" yaml:"kube_reserved"`
+	KubeReserved 			clusterKubeReserved    `json:"kube_reserved" yaml:"kube_reserved"`
 }
 
 type clusterSystemReserved struct {
