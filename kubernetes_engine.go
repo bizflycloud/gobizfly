@@ -15,6 +15,7 @@ const (
 	clusterPath = "/_"
 	kubeConfig  = "kubeconfig"
 	k8sVersion  = "/k8s_versions"
+	adminWorkerConfig = "/admin/worker_config"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -22,6 +23,7 @@ var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
 type kubernetesEngineService struct {
 	client *Client
 }
+
 
 type KubernetesEngineService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Cluster, error)
@@ -36,6 +38,7 @@ type KubernetesEngineService interface {
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
+	GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API

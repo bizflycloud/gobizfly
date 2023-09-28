@@ -12,6 +12,7 @@ import (
 // WorkerPool represents worker pool information
 type WorkerPool struct {
 	Name              string   `json:"name" yaml:"name"`
+	ProvisionType	  string   `json:"provision_type" yaml:"provision_type"`
 	Version           string   `json:"version,omitempty" yaml:"version,omitempty"`
 	Flavor            string   `json:"flavor" yaml:"flavor"`
 	ProfileType       string   `json:"profile_type" yaml:"profile_type"`
