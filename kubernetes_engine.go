@@ -16,6 +16,7 @@ const (
 	kubeConfig  = "kubeconfig"
 	k8sVersion  = "/k8s_versions"
 	adminWorkerConfig = "/admin/worker_config"
+	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -39,6 +40,7 @@ type KubernetesEngineService interface {
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
 	GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
+	AddClusterEverywhere(ctx context.Context, id string, cjer *clusterJoinEverywhereRequest) (*clusterJoinEverywhereResponse, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
