@@ -9,6 +9,18 @@ import (
 	"net/http"
 )
 
+// EverywhereNode represents a Kubernetes everywhere node
+type EverywhereNode struct {
+	ID              string            `json:"id" yaml:"id"`
+	Shoot           string            `json:"shoot" yaml:"shoot"`
+	PoolID          string 			  `json:"pool_id" yaml:"pool_id"`
+	NodeName     	string            `json:"node_name" yaml:"node_name"`
+	PublicIP      	string            `json:"public_ip" yaml:"public_ip"`
+	UUID            string            `json:"uuid" yaml:"uuid"`
+	CreatedAt       string            `json:"created_at" yaml:"created_at"`
+	UpdatedAt       string            `json:"updated_at" yaml:"updated_at"`
+}
+
 // ClusterCreateRequest represents the request body for creating a Kubernetes cluster
 type ClusterCreateRequest struct {
 	Name         string       `json:"name" yaml:"name"`
@@ -140,4 +152,22 @@ func (c *kubernetesEngineService) Delete(ctx context.Context, id string) error {
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error) {
+	var everywhereNode *EverywhereNode
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.EverywherePath(id), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if err := json.NewDecoder(resp.Body).Decode(&everywhereNode); err != nil {
+		return nil, err
+	}
+	return everywhereNode, nil
 }

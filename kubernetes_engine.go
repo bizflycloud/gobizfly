@@ -15,8 +15,9 @@ const (
 	clusterPath = "/_"
 	kubeConfig  = "kubeconfig"
 	k8sVersion  = "/k8s_versions"
-	adminWorkerConfig = "/worker_config"
+	workerConfig = "/worker_config"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
+	nodeEverywhere = "_/node_everywhere"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -41,6 +42,7 @@ type KubernetesEngineService interface {
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
 	GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *clusterJoinEverywhereRequest) (*clusterJoinEverywhereResponse, error)
+	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -55,6 +57,10 @@ func (c *kubernetesEngineService) resourcePath() string {
 
 func (c *kubernetesEngineService) itemPath(id string) string {
 	return strings.Join([]string{clusterPath, id}, "/")
+}
+
+func (c *kubernetesEngineService) EverywherePath(id string) string {
+	return strings.Join([]string{nodeEverywhere, id}, "/")
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster
@@ -101,19 +107,19 @@ type WorkerConfig struct {
 	Everywhere       	bool        `json:"everywhere" yaml:"everywhere"`
 	Nvidiadevice		bool		`json:"nvidiadevice" yaml:"nvidiadevice"`
 	CniVersion         string       `json:"CNI_VERSION" yaml:"CNI_VERSION"`
-	RUNC_VERSION        string      `json:"RUNC_VERSION" yaml:"RUNC_VERSION"`
-	CONTAINERD_VERSION  string      `json:"CONTAINERD_VERSION" yaml:"CONTAINERD_VERSION"`
-	KUBE_VERSION    	string      `json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
+	RuncVersion        string      	`json:"RUNC_VERSION" yaml:"RUNC_VERSION"`
+	ContainerdVersion  string     	`json:"CONTAINERD_VERSION" yaml:"CONTAINERD_VERSION"`
+	KubeVersion    		string   	   	`json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
 
 }
 
 type WorkerConfigs struct {
-	WorkerConfigs_ []WorkerConfig `json:"worker_configs" yaml:"worker_configs"`
+	WorkerConfigs []WorkerConfig `json:"worker_configs" yaml:"worker_configs"`
 }
 
 func (c *kubernetesEngineService) GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error) {
 	var workerConfigs *WorkerConfigs
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, adminWorkerConfig, nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, workerConfig, nil)
 	if err != nil {
 		return nil, err
 	}
