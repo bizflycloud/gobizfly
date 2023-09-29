@@ -40,7 +40,7 @@ type KubernetesEngineService interface {
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
-	GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
+	GetWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *clusterJoinEverywhereRequest) (*clusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 }
@@ -109,20 +109,53 @@ type WorkerConfig struct {
 	CniVersion         string       `json:"CNI_VERSION" yaml:"CNI_VERSION"`
 	RuncVersion        string      	`json:"RUNC_VERSION" yaml:"RUNC_VERSION"`
 	ContainerdVersion  string     	`json:"CONTAINERD_VERSION" yaml:"CONTAINERD_VERSION"`
-	KubeVersion    		string   	   	`json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
+	KubeVersion    		string   	`json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
 
 }
 
 type WorkerConfigs struct {
 	WorkerConfigs []WorkerConfig `json:"worker_configs" yaml:"worker_configs"`
+	Page		  int			 `json:"page" yaml:"page"`
+	Limit		  int			 `json:"limit" yaml:"limit"`
+	Total		  int			 `json:"total" yaml:"total"`
 }
 
-func (c *kubernetesEngineService) GetAdminWorkerConfig(ctx context.Context) (*WorkerConfigs, error) {
+type WorkerConfigsListOptions struct {
+	Page   		string  	`url:"page,omitempty"`
+	Limit 		string  	`url:"limit,omitempty"`
+	Total     	string  	`url:"total,omitempty"`
+	Everywhere	string 		`url:"everywhere,omitempty"`
+	Version		string 		`url:"version,omitempty"`
+
+}
+
+func (c *kubernetesEngineService) GetWorkerConfig(ctx context.Context, wclo *WorkerConfigsListOptions) (*WorkerConfigs, error) {
 	var workerConfigs *WorkerConfigs
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, workerConfig, nil)
 	if err != nil {
 		return nil, err
 	}
+
+	params := req.URL.Query()
+	if wclo != nil {
+		if wclo.Page != "" {
+			params.Add("page", wclo.Page)
+		}
+		if wclo.Limit != "" {
+			params.Add("limit", wclo.Limit)
+		}
+		if wclo.Total != "" {
+			params.Add("total", wclo.Total)
+		}
+		if wclo.Everywhere != "" {
+			params.Add("everywhere", wclo.Everywhere)
+		}
+		if wclo.Version != "" {
+			params.Add("version", wclo.Version)
+		}
+	}
+	req.URL.RawQuery = params.Encode()
+
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
