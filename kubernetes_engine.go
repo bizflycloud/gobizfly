@@ -39,7 +39,7 @@ type KubernetesEngineService interface {
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
-	GetWorkerConfig(ctx context.Context, wclo *WorkerConfigsListOptions) (*WorkerConfigs, error)
+	GetWorkerConfig(ctx context.Context) (*WorkerConfigs, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *clusterJoinEverywhereRequest) (*clusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 }
@@ -101,29 +101,31 @@ func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context) (*Ku
 }
 
 type WorkerConfig struct {
-	ID                string `json:"id" yaml:"id"`
-	Version           string `json:"version" yaml:"version"`
-	Everywhere        bool   `json:"everywhere" yaml:"everywhere"`
-	Nvidiadevice      bool   `json:"nvidiadevice" yaml:"nvidiadevice"`
-	CniVersion        string `json:"CNI_VERSION" yaml:"CNI_VERSION"`
-	RuncVersion       string `json:"RUNC_VERSION" yaml:"RUNC_VERSION"`
-	ContainerdVersion string `json:"CONTAINERD_VERSION" yaml:"CONTAINERD_VERSION"`
-	KubeVersion       string `json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
+	ID               	string		`json:"id" yaml:"id"`
+	Version          	string 		`json:"version" yaml:"version"`
+	Everywhere       	bool        `json:"everywhere" yaml:"everywhere"`
+	Nvidiadevice		bool		`json:"nvidiadevice" yaml:"nvidiadevice"`
+	CniVersion         string       `json:"CNI_VERSION" yaml:"CNI_VERSION"`
+	RuncVersion        string      	`json:"RUNC_VERSION" yaml:"RUNC_VERSION"`
+	ContainerdVersion  string     	`json:"CONTAINERD_VERSION" yaml:"CONTAINERD_VERSION"`
+	KubeVersion    		string   	`json:"KUBE_VERSION" yaml:"KUBE_VERSION"`
+
 }
 
 type WorkerConfigs struct {
 	WorkerConfigs []WorkerConfig `json:"worker_configs" yaml:"worker_configs"`
-	Page          int            `json:"page" yaml:"page"`
-	Limit         int            `json:"limit" yaml:"limit"`
-	Total         int            `json:"total" yaml:"total"`
+	Page		  int			 `json:"page" yaml:"page"`
+	Limit		  int			 `json:"limit" yaml:"limit"`
+	Total		  int			 `json:"total" yaml:"total"`
 }
 
 type WorkerConfigsListOptions struct {
-	Page       string `url:"page,omitempty"`
-	Limit      string `url:"limit,omitempty"`
-	Total      string `url:"total,omitempty"`
-	Everywhere string `url:"everywhere,omitempty"`
-	Version    string `url:"version,omitempty"`
+	Page   		string  	`url:"page,omitempty"`
+	Limit 		string  	`url:"limit,omitempty"`
+	Total     	string  	`url:"total,omitempty"`
+	Everywhere	string 		`url:"everywhere,omitempty"`
+	Version		string 		`url:"version,omitempty"`
+
 }
 
 func (c *kubernetesEngineService) GetWorkerConfig(ctx context.Context, wclo *WorkerConfigsListOptions) (*WorkerConfigs, error) {
