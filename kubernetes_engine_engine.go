@@ -52,7 +52,7 @@ type ClusterJoinEverywhereResponse struct {
 
 func (c *kubernetesEngineService) AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error) {
 	var joinEverywhereResponse ClusterJoinEverywhereResponse
-	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, clusterJoinEverywhere, &cjer)
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, clusterJoinEverywhere+"/"+id, &cjer)
 	if err != nil {
 		return nil, err
 	}
