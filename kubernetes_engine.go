@@ -15,8 +15,8 @@ const (
 	clusterPath = "/_"
 	kubeConfig  = "kubeconfig"
 	k8sVersion  = "/k8s_versions"
-	ClusterInfo = "/engine/cluster_info"
-	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
+	clusterInfo = "engine/cluster_info"
+	clusterJoinEverywhere = "engine/cluster_join_everywhere"
 	nodeEverywhere = "_/node_everywhere"
 )
 
@@ -41,7 +41,7 @@ type KubernetesEngineService interface {
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
-	AddClusterEverywhere(ctx context.Context, id string, cjer *clusterJoinEverywhereRequest) (*clusterJoinEverywhereResponse, error)
+	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 }
 
