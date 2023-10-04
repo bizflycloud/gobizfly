@@ -31,7 +31,7 @@ type WorkerPool struct {
 type Taint struct {
 	Effect		string	`json:"effect" yaml:"effect"`
 	Key			string	`json:"key" yaml:"labels,omitempty"`
-	Value		string	`json:"labels,omitempty" yaml:"labels,omitempty"`
+	Value		string	`json:"value,omitempty" yaml:"value,omitempty"`
 }
 
 // ExtendedWorkerPool represents worker pool information with addition fields
