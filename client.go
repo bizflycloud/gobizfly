@@ -210,6 +210,7 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
 	serviceUrl := c.GetServiceUrl(serviceName)
 	url := serviceUrl + urlStr
+	fmt.Println("Request url: " + url)
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
