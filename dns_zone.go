@@ -42,7 +42,7 @@ type WrappedZonePayload struct {
 // ExtendedZone - contains the information of a zone and embedded record sets
 type ExtendedZone struct {
 	Zone
-	RecordsSet []RecordSet `json:"record_set"`
+	RecordsSet []Record `json:"record_set"`
 }
 
 // ListZoneResp - contains the response of list zones and metadata
