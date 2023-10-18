@@ -210,6 +210,7 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
 	serviceUrl := c.GetServiceUrl(serviceName)
 	url := serviceUrl + urlStr
+	fmt.Println("Calling: ", url)
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
@@ -252,9 +253,11 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		return
 	}
 
+	fmt.Println("First Response status_code: ", resp.StatusCode)
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)
+		fmt.Println("refresh: ", tok)
 		if tokErr != nil {
 			buf, _ := ioutil.ReadAll(resp.Body)
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
