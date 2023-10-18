@@ -255,6 +255,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	}
 
 	fmt.Println("First Response status_code: ", resp.StatusCode)
+	fmt.Println("Verify status unauthorized: ", resp.StatusCode == http.StatusUnauthorized)
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)
