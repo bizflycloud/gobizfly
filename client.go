@@ -249,6 +249,7 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
 
 	resp, err = c.do(ctx, req)
+	fmt.Println("Any errors?: ", err)
 	if err != nil {
 		return
 	}
