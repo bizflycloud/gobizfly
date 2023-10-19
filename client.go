@@ -248,7 +248,7 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
 	resp, err = c.do(ctx, req)
-	fmt.Println("Status code: ", resp.StatusCode)
+	fmt.Println("Do status code: ", resp.StatusCode)
 	body, _ := io.ReadAll(resp.Body)
 	fmt.Println("First call body: ", string(body))
 
@@ -262,8 +262,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 
 		// Retry the request
 		resp, err = c.do(ctx, req)
-		body, _ := io.ReadAll(resp.Body)
-		fmt.Println(retries, " call body: ", string(body))
+		fmt.Println(retries, " shoudRetry status code: ", resp.StatusCode)
 
 		retries++
 	}
