@@ -266,10 +266,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	err = retry(3, 2*time.Second,
 		func() error {
 			resp, err = c.do(ctx, req)
-			fmt.Println("Status code: ", resp.StatusCode)
 			if err != nil {
 				return err
 			}
+			fmt.Println("Status code: ", resp.StatusCode)
 			if resp.StatusCode == http.StatusUnauthorized {
 				return fmt.Errorf("Unauthorized")
 			}
