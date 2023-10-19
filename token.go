@@ -19,6 +19,7 @@ var _ TokenService = (*token)(nil)
 type TokenService interface {
 	Create(ctx context.Context, request *TokenCreateRequest) (*Token, error)
 	Refresh(ctx context.Context) (*Token, error)
+	Init(ctx context.Context, request *TokenCreateRequest) (*Token, error)
 }
 
 // TokenCreateRequest represents create new token request payload.
