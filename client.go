@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -249,8 +248,6 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
 	resp, err = c.do(ctx, req)
 	fmt.Println("Do status code: ", resp.StatusCode)
-	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("First call body: ", string(body))
 
 	retries := 0
 	for shouldRetry(err, resp) && retries < RetryCount {
@@ -262,7 +259,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 
 		// Retry the request
 		resp, err = c.do(ctx, req)
-		fmt.Println(retries, " shoudRetry status code: ", resp.StatusCode)
 
 		retries++
 	}
