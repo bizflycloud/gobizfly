@@ -226,8 +226,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Project-Id", c.projectID)
-	req.Header.Add("Authorization", "Basic " + c.basicAuth)
-
+	req.Header.Add("Authorization", "Basic "+c.basicAuth)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
@@ -241,42 +240,31 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	return req, nil
 }
 
-func retry(attempts int, sleep time.Duration, f func() error) (err error) {
-	for i := 0; i < attempts; i++ {
-		fmt.Println("This is attempt number", i)
-		if i > 0 {
-			fmt.Println("retrying after error:", err)
-			time.Sleep(sleep)
-			sleep *= 2
-		}
-		err = f()
-		if err != nil {
-			return nil
-		}
-	}
-	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
-}
-
 func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
-	err = retry(3, 2*time.Second,
-		func() error {
-			resp, err = c.do(ctx, req)
-			if err != nil {
-				return err
-			}
-			fmt.Println("Status code: ", resp.StatusCode)
-			if resp.StatusCode == http.StatusUnauthorized {
-				return fmt.Errorf("Unauthorized")
-			}
-			return nil
-		},
-  )
-  return resp, nil
+	resp, err = c.do(ctx, req)
+	fmt.Println("Status code: ", resp.StatusCode)
+
+	retries := 0
+	for shouldRetry(err, resp) && retries < RetryCount {
+		// Wait for the specified backoff period
+		time.Sleep(backoff(retries))
+
+		// We're going to retry, consume any response to reuse the connection.
+		drainBody(resp)
+
+		// Retry the request
+		resp, err = c.do(ctx, req)
+
+		retries++
+	}
+
+	// Return the response
+	return resp, err
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
