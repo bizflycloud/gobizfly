@@ -18,6 +18,7 @@ var _ TokenService = (*token)(nil)
 type TokenService interface {
 	Create(ctx context.Context, request *TokenCreateRequest) (*Token, error)
 	Refresh(ctx context.Context) (*Token, error)
+	Init(ctx context.Context, request *TokenCreateRequest) (*Token, error)
 }
 
 // TokenCreateRequest represents create new token request payload.
@@ -47,6 +48,10 @@ func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 	return t.create(ctx, tcr)
 }
 
+func (t *token) Init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+	return t.init(ctx, tcr)
+}
+
 // Refresh retrieves new token base on underlying client information.
 func (t *token) Refresh(ctx context.Context) (*Token, error) {
 	tcr := &TokenCreateRequest{
@@ -67,6 +72,39 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 	resp, err := t.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	tok := &Token{}
+	if err := json.NewDecoder(resp.Body).Decode(tok); err != nil {
+		return nil, err
+	}
+	// Get new services catalog after create token
+	services, err := t.client.Service.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	t.client.authMethod = tcr.AuthMethod
+	t.client.username = tcr.Username
+	t.client.password = tcr.Password
+	t.client.projectID = tcr.ProjectID
+	t.client.appCredID = tcr.AppCredID
+	t.client.appCredSecret = tcr.AppCredSecret
+	t.client.services = services
+
+	return tok, nil
+}
+
+func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+
+	req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := t.client.DoInit(ctx, req)
 	if err != nil {
 		return nil, err
 	}
