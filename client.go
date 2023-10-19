@@ -249,17 +249,13 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
 
 	resp, err = c.do(ctx, req)
-	fmt.Println("Any errors?: ", err)
 	if err != nil {
 		return
 	}
 
-	fmt.Println("First Response status_code: ", resp.StatusCode)
-	fmt.Println("Verify status unauthorized: ", resp.StatusCode == http.StatusUnauthorized)
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)
-		fmt.Println("refresh: ", tok)
 		if tokErr != nil {
 			buf, _ := ioutil.ReadAll(resp.Body)
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
@@ -273,6 +269,24 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
 		err = errorFromStatus(resp.StatusCode, string(buf))
+
+	}
+	return
+}
+
+func (c *Client) DoInitToken(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
+
+	resp, err = c.do(ctx, req)
+	if err != nil {
+		return
+	}
+
+	// If 401, get new token and retry one time.
+	if resp.StatusCode >= http.StatusBadRequest {
+		defer resp.Body.Close()
+		buf, _ := ioutil.ReadAll(resp.Body)
+		err = errorFromStatus(resp.StatusCode, string(buf))
+
 	}
 	return
 }

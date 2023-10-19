@@ -43,6 +43,9 @@ type token struct {
 	client *Client
 }
 
+func (t *token) Init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+	return t.init(ctx, tcr)
+}
 // Create creates new token base on the information in TokenCreateRequest.
 func (t *token) Create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	return t.create(ctx, tcr)
@@ -68,6 +71,41 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 	resp, err := t.client.Do(ctx, req)
+	body, _ := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var tok *Token
+	err = json.Unmarshal(body, &tok)
+	if err != nil {
+		return nil, err
+	}
+	// Get new services catalog after create token
+	services, err := t.client.Service.List(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	t.client.authMethod = tcr.AuthMethod
+	t.client.username = tcr.Username
+	t.client.password = tcr.Password
+	t.client.projectID = tcr.ProjectID
+	t.client.appCredID = tcr.AppCredID
+	t.client.appCredSecret = tcr.AppCredSecret
+	t.client.services = services
+
+	return tok, nil
+}
+
+func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+
+	req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := t.client.DoInitToken(ctx, req)
 	body, _ := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
