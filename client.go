@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 )
 
 const (
@@ -241,39 +242,41 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	return req, nil
 }
 
+func retry(attempts int, sleep time.Duration, f func() error) (err error) {
+	for i := 0; i < attempts; i++ {
+		fmt.Println("This is attempt number", i)
+		if i > 0 {
+			fmt.Println("retrying after error:", err)
+			time.Sleep(sleep)
+			sleep *= 2
+		}
+		err = f()
+		if err != nil {
+			return nil
+		}
+	}
+	return fmt.Errorf("after %d attempts, last error: %s", attempts, err)
+}
+
 func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	return c.httpClient.Do(req)
 }
 
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
-
-	resp, err = c.do(ctx, req)
-	fmt.Println("Any errors?: ", err)
-	if err != nil {
-		return
-	}
-
-	fmt.Println("First Response status_code: ", resp.StatusCode)
-	// If 401, get new token and retry one time.
-	if resp.StatusCode == http.StatusUnauthorized {
-		fmt.Println("refresh?")
-		tok, tokErr := c.Token.Refresh(ctx)
-		if tokErr != nil {
-			buf, _ := ioutil.ReadAll(resp.Body)
-			err = fmt.Errorf("%s : %w", string(buf), tokErr)
-			return
-		}
-		c.SetKeystoneToken(tok)
-		req.Header.Set("X-Auth-Token", c.keystoneToken)
-		resp, err = c.do(ctx, req)
-	}
-	if resp.StatusCode >= http.StatusBadRequest {
-		defer resp.Body.Close()
-		buf, _ := ioutil.ReadAll(resp.Body)
-		err = errorFromStatus(resp.StatusCode, string(buf))
-	}
-	return
+	err = retry(3, 2*time.Second,
+		func() error {
+			resp, err = c.do(ctx, req)
+			if err != nil {
+				return err
+			}
+			if resp.StatusCode == http.StatusUnauthorized {
+				return fmt.Errorf("Unauthorized")
+			}
+			return nil
+		},
+  )
+  return resp, nil
 }
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
