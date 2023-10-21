@@ -244,6 +244,22 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 	return c.httpClient.Do(req)
 }
 
+func (c *Client) DoInit(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
+
+	resp, err = c.do(ctx, req)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		defer resp.Body.Close()
+		buf, _ := ioutil.ReadAll(resp.Body)
+		err = errorFromStatus(resp.StatusCode, string(buf))
+
+	}
+	return
+}
+
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
 
