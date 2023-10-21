@@ -89,6 +89,7 @@ type Client struct {
 	appCredSecret string
 	projectID     string
 	regionName    string
+	basicAuth     string
 	services      []*Service
 }
 
@@ -128,6 +129,13 @@ func WithRegionName(region string) Option {
 func WithProjectId(id string) Option {
 	return func(c *Client) error {
 		c.projectID = id
+		return nil
+	}
+}
+
+func WithBasicAuth(basicAuth string) Option {
+	return func(c *Client) error {
+		c.basicAuth = basicAuth
 		return nil
 	}
 }
@@ -217,6 +225,8 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Project-Id", c.projectID)
+	req.Header.Add("Authorization", "Basic " + c.basicAuth)
+
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
@@ -258,7 +268,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		defer resp.Body.Close()
 		buf, _ := ioutil.ReadAll(resp.Body)
 		err = errorFromStatus(resp.StatusCode, string(buf))
-
 	}
 	return
 }

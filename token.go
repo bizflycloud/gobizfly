@@ -6,6 +6,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"io"
 )
 
 const (
@@ -33,7 +34,7 @@ type TokenCreateRequest struct {
 // Token contains token information.
 type Token struct {
 	KeystoneToken string `json:"token"`
-	ExpiresAt     string `json:"expires_at"`
+	ExpiresAt     string `json:"expire_at"`
 	ProjectName   string `json:"project_name"`
 	ProjectId     string `json:"project_id"`
 }
@@ -67,13 +68,15 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		return nil, err
 	}
 	resp, err := t.client.Do(ctx, req)
+	body, _ := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	tok := &Token{}
-	if err := json.NewDecoder(resp.Body).Decode(tok); err != nil {
+	var tok *Token
+	err = json.Unmarshal(body, &tok)
+	if err != nil {
 		return nil, err
 	}
 	// Get new services catalog after create token

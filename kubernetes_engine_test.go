@@ -430,3 +430,107 @@ users:
     client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRREgvWnVaY3VnaGRZZEIKc1ZqMjJJU0NBVkxVd1JZR3l5UElYalQwZERwUFFKYnBHN3NzaFV5R2Y4bGkvU2JlTDk3dnpWcy96RVE4WmwwaApFYlJBRzlVL21qY1JFbFFHVzhSK2JnRm43dXhmUnNqZkVOUnlvVTFmUkpJWW5LL0wwanJOUSt1NmpSRkQ2U2F5CjdDM0ZyaWRVNUJJTXdLcDRQamYyQlB1aFoxdjNlYXpSZngrNjUvLzIxdFZ2M0lLbTQ0UXFweGN0a2tKREpqYjgKYlRYeC91ajZVdGIvSXBqUHNBTjliR1FKU3FydVFyQjVtMjZjVUdUc040dk1ZMFFXRlJrcHhrbVoxdCtCMFhzdgpQZklldDRJOFRTa08wa09sTUlRZDJNbmtGeGdGc2FYMDdHbVdyb29JUjcxb3VGOUE1Q3AzY1lybWxGcjRsWWM1CkkrQlV0VE96QWdNQkFBRUNnZ0VBVjhFRGhzaXg3UVNhTGd3NHdrL3RqUEl4dTJOaVcrYkZNOFdLclAxWEhMRjEKeHFIQmR0NmkzcDJ4NjNxemxHa2pCTXh5VHNNOTZkYnM1SGJWUmhBd2VYRWMycVBWTk5rTmxvQ0VvMnRtVXNSSApuZ0hQaHVFYWgwUWFheXhOd3p6alNuQ1VQazVxRmdkM1VLbHJ5RU1MeFNjeWVHQU9MU2IzL1Q3Z2YwbFFSSDFiCjFLZ3g3TVQyUURQeEdLclJkSStpbHprendHRzZLQzdIdGJnRDBkRjdHbVo4cW51TW5IVHdYb0JmaWZNdG1wcUUKNjVXVkl0Y05FMllHZHNWakxoSU9nMkt2TmhyaktiVm1rdUUydHNhbml2QlVDbkUyVE50YmwrNjcwSWZPSEJXbQpYVkoyQVB3a2twVHVvVlBYOHpwL3dxa25ZQXluS2NkeXg5cG5VR2loMlFLQmdRRHFIVWEwcjBEc3Y1UXFrS3NTClA4Z3ovUW9SRmZFblExdm1YcVlFakp4dVIyRm1ZOXVUSlFSVzU1aXlaajdBYmxiSGpoWlllclVSR0JtVTBpWUcKMmp1Wmt1V1ZFd210Mll5KzRLbmZLT2JWaU5NbFJPUUFTUGkraU5XZWVDc01lVFVjY05ScXFPck1wT3krZVVRZwptNkNDdDZyNzZSclRUK2xIWWVhdm5yMG4xUUtCZ1FEYXI3S21HQkF6WXdvbEZaOHZIcVJqT3VmNitpaXB2eGI5Cmh4L2ZKbmhsckZDTTJETzRxL0tYS2FaaHBkNzluVmVXQVJGTVhBNktUQW1VZWdnRnU4ZmQ2LzFmc005ZlpES0oKZVJhVmFiRUlqckduVXVwTGlDVHVSNzlZblpjNExTZTQyNmc1M2JzQWRhZGlNVDd4NCt3MzJPaEF3ODVmN0xLbgphanJ0ZVd6NVp3S0JnSGRzZmIvMzBsK3lqb3QwQnNBbFp5UVdCVWVYOE04OWppaWl5WDl5bHUydVhlSVVPRk1FClJBVnMyTGpRYlZ4T0xOaFpBODhZc1RyS0YycVNGTEhVS3lqNUJVSVpWd3VtK1NQNWlNMzhtRnYvRXU1bENRV1kKTThOR0crcGRsR0FsaUZFOHdTNnpnaXJvU3BnVFZneG9OdVhYZVZKTm85QjlhQnR3dG5PSnZ5WU5Bb0dCQUp3bgphNHk0a0JEeGZwUCtmWDE3QnUwb2FlL0g0M05hVlFOU0Vvc1lnRTR4bmc4RWJ1SkdQZUo4eGliaDkzbm5lVnhPCmhOaWV2MjgzWG52Y0s1QlVoeUpMV2RDVGczQmRMczBGWHYvdnlZOFB2WUY2Ym56aXlXUXdiVXpNc3VkVkx4RU0KSUhLNWhzZU1PNnFjK1pKbUt3Mng0QjRtODEyQnVneGJpWnA2NHpxdkFvR0JBTXVrcjVSSFdsL1YzNGY0Sk40aQpnaW5ZZVBJbG1XRDBDb2ZHSVUyTU1SNWhrbE9EZ2lnbzlOTzhjQTlUTVRsRDVDSitETG80TkZSSXFkTjhrb1UzCkJsWWdqdjY5dlVMak53TzdLVGdmT09YUUF6YUI3L2ZuR1llbnZzd0xzQnBRbWlqOFZuWDhzSklUbndXOU51cm4KVkRUTE1seDk3T3VqUEV5NVZQY2xoSk1TCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
 `)
 }
+
+func TestGetClusterInfo(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.K8sURL(clusterInfo+"/"+"6515297b220963774dd304b0"), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "shoot_uid": "n5s4coxhy30zwa0r",
+    "pool_name": "pool-zd5n544x",
+    "k8s_version": "v1.25.10",
+    "worker_config": {
+        "id": "65026d77ae05b43e97caf9a6",
+        "version": "v1.25.10",
+        "everywhere": true,
+        "nvidiadevice": false,
+        "CNI_VERSION": "v1.1.1",
+        "RUNC_VERSION": "v1.1.4",
+        "CONTAINERD_VERSION": "1.6.10",
+        "KUBE_VERSION": "v1.25.10"
+    }
+}
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	cluster, err := client.KubernetesEngine.GetClusterInfo(ctx, "6515297b220963774dd304b0")
+	require.NoError(t, err)
+	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.ShootUid)
+	assert.Equal(t, "v1.25.10", cluster.K8sVersion)
+}
+
+func TestAddClusterEverywhere(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.K8sURL(clusterJoinEverywhere+"/"+"n5s4coxhy30zwa0r"), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var payload *ClusterJoinEverywhereRequest
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3", payload.Hostname)
+
+		resp := `
+{
+    "apiserver": "https://n5s4coxhy30zwa0r.api.hn.bke-staging.bfcplatform.vn",
+    "cluster_dns": "10.93.0.10",
+    "cluster_cidr": "10.200.0.0/16",
+    "cloud_provider": "external",
+    "certificate": {
+        "ca.pem": "-----BEGIN CERTIFICATE-----\nCACert\n-----END CERTIFICATE-----",
+        "client-key.pem": "-----BEGIN PRIVATE KEY-----\nClientKey\n-----END PRIVATE KEY-----\n",
+        "client.pem": "-----BEGIN CERTIFICATE-----\nClient\n-----END CERTIFICATE-----\n"
+    },
+    "max_pods": 110,
+    "uuid": "fd4c01a4-9e35-48d8-a45a-7b724cf008ad",
+    "reserved": {
+        "system_reserved": {
+            "cpu": "20m",
+            "memory": "100Mi"
+        },
+        "kube_reserved": {
+            "cpu": "50m",
+            "memory": "394Mi"
+        }
+    }
+}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+
+	cluster, err := client.KubernetesEngine.AddClusterEverywhere(ctx, "n5s4coxhy30zwa0r", &ClusterJoinEverywhereRequest{
+		Hostname:     "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3",
+		IPAddresses:  []string{"45.124.95.244"},
+	 	Capacity: 		EverywhereNodeCapacity{
+			Cores:		2,
+			MemoryKB:	2024868,
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "https://n5s4coxhy30zwa0r.api.hn.bke-staging.bfcplatform.vn", cluster.APIServer)
+}
+
+func TestGetNodeEverywhereByUUID(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.K8sURL(nodeEverywhere+"/"+"eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd"), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+    "id": "651d3eced6ff4acf9de8b97d",
+    "shoot": "n5s4coxhy30zwa0r",
+    "pool_id": "6515297b220963774dd304b0",
+    "node_name": "pool-zd5n544x-n5s4coxhy30zwa0r-go-test-3",
+    "public_ip": "139.59.102.178",
+    "uuid": "eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd",
+    "created_at": "2023-10-04T10:30:38.229000",
+    "updated_at": "2023-10-04T10:30:38.229000"
+}
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	cluster, err := client.KubernetesEngine.GetEverywhere(ctx, "eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd")
+	require.NoError(t, err)
+	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.Shoot)
+	assert.Equal(t, "6515297b220963774dd304b0", cluster.PoolID)
+}
+

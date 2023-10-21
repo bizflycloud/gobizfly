@@ -12,6 +12,7 @@ import (
 // WorkerPool represents worker pool information
 type WorkerPool struct {
 	Name              string   `json:"name" yaml:"name"`
+	ProvisionType	  string   `json:"provision_type" yaml:"provision_type"`
 	Version           string   `json:"version,omitempty" yaml:"version,omitempty"`
 	Flavor            string   `json:"flavor" yaml:"flavor"`
 	ProfileType       string   `json:"profile_type" yaml:"profile_type"`
@@ -23,6 +24,14 @@ type WorkerPool struct {
 	MinSize           int      `json:"min_size,omitempty" yaml:"min_size,omitempty"`
 	MaxSize           int      `json:"max_size,omitempty" yaml:"max_size,omitempty"`
 	Tags              []string `json:"tags,omitempty" yaml:"tags,omitempty"`
+	Taints			  []Taint  `json:"taints,omitempty" yaml:"taints,omitempty"`
+	Labels			  map[string]string	`json:"labels,omitempty" yaml:"labels,omitempty"`
+}
+
+type Taint struct {
+	Effect		string	`json:"effect" yaml:"effect"`
+	Key			string	`json:"key" yaml:"labels,omitempty"`
+	Value		string	`json:"value,omitempty" yaml:"value,omitempty"`
 }
 
 // ExtendedWorkerPool represents worker pool information with addition fields
@@ -68,6 +77,8 @@ type UpdateWorkerPoolRequest struct {
 	MinSize           int    `json:"min_size,omitempty" yaml:"min_size,omitempty"`
 	MaxSize           int    `json:"max_size,omitempty" yaml:"max_size,omitempty"`
 	UpdateStrategy    string `json:"update_strategy,omitempty" yaml:"update_strategy,omitempty"`
+	Taints			  []Taint  `json:"taints,omitempty" yaml:"taints,omitempty"`
+	Labels			  map[string]string	`json:"labels,omitempty" yaml:"labels,omitempty"`
 }
 
 // AddWorkerPools represents the request body to add worker pools into cluster

@@ -13,6 +13,14 @@ type Meta struct {
 	Page       int `json:"page"`
 }
 
+// RecordSet - contains the information of a record set
+type RecordSet struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	TTL  string `json:"ttl"`
+}
+
 // Zone - contains the information of a zone
 type Zone struct {
 	ID         string   `json:"id"`

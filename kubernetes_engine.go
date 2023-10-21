@@ -12,9 +12,12 @@ import (
 )
 
 const (
-	clusterPath = "/_"
-	kubeConfig  = "kubeconfig"
-	k8sVersion  = "/k8s_versions"
+	clusterPath           = "/_"
+	kubeConfig            = "kubeconfig"
+	k8sVersion            = "/k8s_versions"
+	clusterInfo          = "engine/cluster_info"
+	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
+	nodeEverywhere        = "_/node_everywhere"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -22,6 +25,7 @@ var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
 type kubernetesEngineService struct {
 	client *Client
 }
+
 
 type KubernetesEngineService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Cluster, error)
@@ -36,6 +40,9 @@ type KubernetesEngineService interface {
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
+	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
+	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
+	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -50,6 +57,10 @@ func (c *kubernetesEngineService) resourcePath() string {
 
 func (c *kubernetesEngineService) itemPath(id string) string {
 	return strings.Join([]string{clusterPath, id}, "/")
+}
+
+func (c *kubernetesEngineService) EverywherePath(id string) string {
+	return strings.Join([]string{nodeEverywhere, id}, "/")
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster

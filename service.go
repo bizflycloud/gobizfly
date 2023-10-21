@@ -46,6 +46,10 @@ func (s *service) List(ctx context.Context) ([]*Service, error) {
 	buf := new(bytes.Buffer)
 
 	req, err := http.NewRequest("GET", u.String(), buf)
+
+	if s.client.basicAuth != "" {
+		req.Header.Set("Authorization", "Basic " + s.client.basicAuth)
+	}
 	if err != nil {
 		return nil, err
 	}
