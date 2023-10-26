@@ -611,10 +611,10 @@ func (ins *cloudDatabaseInstances) ChangePasswordUsers(ctx context.Context, inst
 
 	resp, err := ins.client.Do(ctx, req)
 
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
@@ -628,10 +628,10 @@ func (ins *cloudDatabaseInstances) DeleteUsers(ctx context.Context, instanceID s
 
 	resp, err := ins.client.Do(ctx, req)
 
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
