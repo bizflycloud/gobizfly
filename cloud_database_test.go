@@ -638,7 +638,7 @@ func Test_CloudDatabaseInstance_ResizeFlavor(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.CloudDatabase.Instances().ResizeFlavor(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", "1c_2g")
+	_, err := client.CloudDatabase.Instances().ResizeFlavor(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", CloudDatabaseDatastore{}, "instanceType", "1c_2g")
 	require.NoError(t, err)
 }
 
@@ -652,7 +652,7 @@ func Test_CloudDatabaseInstance_ResizeVolume(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.CloudDatabase.Instances().ResizeVolume(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", 20)
+	_, err := client.CloudDatabase.Instances().ResizeVolume(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", CloudDatabaseDatastore{}, "instanceType", 20)
 	require.NoError(t, err)
 }
 
@@ -1491,16 +1491,16 @@ func Test_CloudDatabaseBackup_Create(t *testing.T) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload *CloudDatabaseBackupCreate
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "backup_name", payload.BackupName)
+		assert.Equal(t, "backup_name", payload.Name)
 		assert.Equal(t, "edf80901-1168-4f7d-9c47-5b44ad62befa", payload.ParentID)
 		assert.Equal(t, "e5454cb9-b23c-431f-84a7-12e3e0dec691", payload.NodeID)
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 	bkr := &CloudDatabaseBackupCreate{
-		BackupName: "backup_name",
-		ParentID:   "edf80901-1168-4f7d-9c47-5b44ad62befa",
-		NodeID:     "e5454cb9-b23c-431f-84a7-12e3e0dec691",
+		Name:     "backup_name",
+		ParentID: "edf80901-1168-4f7d-9c47-5b44ad62befa",
+		NodeID:   "e5454cb9-b23c-431f-84a7-12e3e0dec691",
 	}
 	_, err := client.CloudDatabase.Backups().Create(ctx, "instances", "e5454cb9-b23c-431f-84a7-12e3e0dec691", bkr)
 	require.NoError(t, err)
@@ -1687,17 +1687,14 @@ func Test_CloudDatabaseBackupSchedule_Create(t *testing.T) {
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "schedule_name", payload.Name)
 		assert.Equal(t, 3, payload.LimitBackup)
-		assert.Equal(t, "monthly", payload.Type)
-		assert.Equal(t, []int{20, 50}, payload.Minute)
+		assert.Equal(t, "20,50 * * * *", payload.CronExpression)
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 	bkr := &CloudDatabaseBackupScheduleCreate{
-		Name:        "schedule_name",
-		LimitBackup: 3,
-		Type:        "monthly",
-		Minute:      []int{20, 50},
-		Hour:        []int{7, 19},
+		Name:           "schedule_name",
+		LimitBackup:    3,
+		CronExpression: "20,50 * * * *",
 	}
 	_, err := client.CloudDatabase.BackupSchedules().Create(ctx, "2b138c69-be63-49f5-8b66-0180b7590af3", bkr)
 	require.NoError(t, err)
