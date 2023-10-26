@@ -536,10 +536,10 @@ func (ins *cloudDatabaseInstances) CreateDatabases(ctx context.Context, instance
 
 	resp, err := ins.client.Do(ctx, req)
 
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
@@ -553,10 +553,10 @@ func (ins *cloudDatabaseInstances) DeleteDatabases(ctx context.Context, instance
 
 	resp, err := ins.client.Do(ctx, req)
 
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
@@ -594,10 +594,10 @@ func (ins *cloudDatabaseInstances) CreateUsers(ctx context.Context, instanceID s
 
 	resp, err := ins.client.Do(ctx, req)
 
-	defer resp.Body.Close()
 	if err != nil {
 		return err
 	}
+	defer resp.Body.Close()
 
 	return nil
 }
