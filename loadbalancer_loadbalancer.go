@@ -11,7 +11,7 @@ import (
 
 var _ LoadBalancerService = (*loadbalancer)(nil)
 
-// LoadBalancerService is an interface to interact with BizFly API Load Balancers endpoint.
+// LoadBalancerService is an interface to interact with Bizfly API Load Balancers endpoint.
 type LoadBalancerService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error)
 	Create(ctx context.Context, req *LoadBalancerCreateRequest) (*LoadBalancer, error)

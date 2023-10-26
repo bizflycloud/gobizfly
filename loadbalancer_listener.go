@@ -11,7 +11,7 @@ import (
 
 var _ ListenerService = (*listener)(nil)
 
-// ListenerService is an interface to interact with BizFly API Listeners endpoint.
+// ListenerService is an interface to interact with Bizfly API Listeners endpoint.
 type ListenerService interface {
 	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Listener, error)
 	Create(ctx context.Context, loadBalancerID string, req *ListenerCreateRequest) (*Listener, error)

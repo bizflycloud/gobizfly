@@ -17,7 +17,7 @@ const (
 
 var _ ServerService = (*server)(nil)
 
-// ServerService is an interface to interact with BizFly Cloud API.
+// ServerService is an interface to interact with Bizfly Cloud API.
 type ServerService interface {
 	List(ctx context.Context, opts *ServerListOptions) ([]*Server, error)
 	Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error)

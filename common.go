@@ -10,6 +10,13 @@ func SliceContains(slice interface{}, val interface{}) (int, bool) {
 			return 1, true
 		}
 		return -1, false
+	case []interface{}:
+		for i, item := range v {
+			if item == val {
+				return i, true
+			}
+		}
+		return -1, false
 	default:
 		for i, item := range v.([]string) {
 			if item == val {

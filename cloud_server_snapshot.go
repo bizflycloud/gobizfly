@@ -23,7 +23,7 @@ type ListSnasphotsOptions struct {
 	VolumeId string `json:"volume_id,omitempty"`
 }
 
-// SnapshotService is an interface to interact with BizFly API Snapshot endpoint.
+// SnapshotService is an interface to interact with Bizfly API Snapshot endpoint.
 type SnapshotService interface {
 	List(ctx context.Context, opts *ListSnasphotsOptions) ([]*Snapshot, error)
 	Create(ctx context.Context, scr *SnapshotCreateRequest) (*Snapshot, error)

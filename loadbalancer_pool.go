@@ -11,7 +11,7 @@ import (
 
 var _ PoolService = (*pool)(nil)
 
-// PoolService is an interface to interact with BizFly API Pools endpoint.
+// PoolService is an interface to interact with Bizfly API Pools endpoint.
 type PoolService interface {
 	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Pool, error)
 	Create(ctx context.Context, loadBalancerID string, req *PoolCreateRequest) (*Pool, error)

@@ -66,7 +66,7 @@ type healthmonitor struct {
 
 var _ HealthMonitorService = (*healthmonitor)(nil)
 
-// HealthMonitorService is an interface to interact with BizFly API Health Monitor endpoint.
+// HealthMonitorService is an interface to interact with Bizfly API Health Monitor endpoint.
 type HealthMonitorService interface {
 	Get(ctx context.Context, healthMonitorID string) (*HealthMonitor, error)
 	Delete(ctx context.Context, healthMonitorID string) error

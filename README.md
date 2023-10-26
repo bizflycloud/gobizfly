@@ -1,6 +1,6 @@
 # Gobizfly
 
-Gobizfly is a Go client library for accessing BizFly API
+Gobizfly is a Go client library for accessing Bizfly API
 
 You can view the client API docs here: https://pkg.go.dev/github.com/bizflycloud/gobizfly
 
@@ -13,7 +13,7 @@ go get github.com/bizflycloud/gobizfly@vX
 ```go
 import "github.com/bizflycloud/gobizfly"
 ```
-Create a new BizFly Cloud client, then use the exposed services to access different part of the BizFly API 
+Create a new Bizfly Cloud client, then use the exposed services to access different part of the Bizfly API 
 
 # Authentication
 Currently, token is the only method of authenticating with the API. You can generate token via username/password or application credential

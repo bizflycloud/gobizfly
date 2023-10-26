@@ -5,8 +5,8 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"io"
+	"net/http"
 )
 
 const (
@@ -15,7 +15,7 @@ const (
 
 var _ TokenService = (*token)(nil)
 
-// TokenService is an interface to interact with BizFly API token endpoint.
+// TokenService is an interface to interact with Bizfly API token endpoint.
 type TokenService interface {
 	Create(ctx context.Context, request *TokenCreateRequest) (*Token, error)
 	Refresh(ctx context.Context) (*Token, error)
@@ -24,20 +24,20 @@ type TokenService interface {
 
 // TokenCreateRequest represents create new token request payload.
 type TokenCreateRequest struct {
-	AuthMethod    string `json:"auth_method"`
-	Username      string `json:"username,omitempty"`
-	Password  string `json:"password,omitempty"`
-	ProjectID string `json:"project_id,omitempty"`
-	AppCredID string `json:"credential_id,omitempty"`
+	AppCredID     string `json:"credential_id,omitempty"`
 	AppCredSecret string `json:"credential_secret,omitempty"`
+	AuthMethod    string `json:"auth_method"`
+	Password      string `json:"password,omitempty"`
+	ProjectID     string `json:"project_id,omitempty"`
+	Username      string `json:"username,omitempty"`
 }
 
 // Token contains token information.
 type Token struct {
-	KeystoneToken string `json:"token"`
 	ExpiresAt     string `json:"expire_at"`
+	KeystoneToken string `json:"token"`
+	ProjectID     string `json:"project_id"`
 	ProjectName   string `json:"project_name"`
-	ProjectId     string `json:"project_id"`
 }
 
 type token struct {
