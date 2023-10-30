@@ -16,24 +16,24 @@ import (
 )
 
 const (
-	defaultAuthType         = "token"
-	version                 = "0.0.1"
-	ua                      = "bizfly-client-go/" + version
-	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
-	mediaType               = "application/json; charset=utf-8"
 	accountName             = "bizfly_account"
-	loadBalancerServiceName = "load_balancer"
-	serverServiceName       = "cloud_server"
-	cloudBackupServiceName  = "cloud-backup"
-	autoScalingServiceName  = "auto_scaling"
-	cloudwatcherServiceName = "alert"
 	authServiceName         = "auth"
-	kubernetesServiceName   = "kubernetes_engine"
-	containerRegistryName   = "container_registry"
+	autoScalingServiceName  = "auto_scaling"
 	cdnName                 = "cdn"
-	dnsName                 = "dns"
+	cloudBackupServiceName  = "cloud-backup"
+	cloudwatcherServiceName = "alert"
+	containerRegistryName   = "container_registry"
 	databaseServiceName     = "cloud_database"
+	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
+	defaultAuthType         = "token"
+	dnsName                 = "dns"
 	iamServiceName          = "iam"
+	kubernetesServiceName   = "kubernetes_engine"
+	loadBalancerServiceName = "load_balancer"
+	mediaType               = "application/json; charset=utf-8"
+	serverServiceName       = "cloud_server"
+	ua                      = "bizfly-client-go/" + version
+	version                 = "0.0.1"
 )
 
 var (
@@ -45,58 +45,54 @@ var (
 	ErrCommon = errors.New("Error")
 )
 
-// Client represents BizFly API client.
+// Client represents Bizfly API client.
 type Client struct {
-	AutoScaling           AutoScalingService
-	CloudBackup           CloudBackupService
-	CloudWatcher          CloudWatcherService
-	Token                 TokenService
-	LoadBalancer          LoadBalancerService
-	Listener              ListenerService
-	Pool                  PoolService
-	Member                MemberService
-	HealthMonitor         HealthMonitorService
-	KubernetesEngine      KubernetesEngineService
-	ScheduledVolumeBackup ScheduledVolumeBackup
-	ContainerRegistry     ContainerRegistryService
-	CDN                   CDNService
-	DNS                   DNSService
 	Account               AccountService
-	VPC                   VPCService
-	NetworkInterface      NetworkInterfaceService
-	WanIP                 WanIPService
+	apiURL                *url.URL
+	appCredID             string
+	appCredSecret         string
+	authMethod            string
+	authType              string
+	AutoScaling           AutoScalingService
+	basicAuth             string
+	CDN                   CDNService
+	CloudBackup           CloudBackupService
 	CloudDatabase         CloudDatabaseService
+	CloudWatcher          CloudWatcherService
+	ContainerRegistry     ContainerRegistryService
+	DNS                   DNSService
+	Firewall              FirewallService
+	HealthMonitor         HealthMonitorService
+	httpClient            *http.Client
 	IAM                   IAMService
-
-	Snapshot SnapshotService
-
-	Volume VolumeService
-	Server ServerService
-
-	Service  ServiceInterface
-	Firewall FirewallService
-	SSHKey   SSHKeyService
-
-	httpClient    *http.Client
-	apiURL        *url.URL
-	userAgent     string
-	keystoneToken string
-	authMethod    string
-	authType      string
-	username      string
-	password      string
-	appCredID     string
-	appCredSecret string
-	projectID     string
-	regionName    string
-	basicAuth     string
-	services      []*Service
+	keystoneToken         string
+	KubernetesEngine      KubernetesEngineService
+	Listener              ListenerService
+	LoadBalancer          LoadBalancerService
+	Member                MemberService
+	NetworkInterface      NetworkInterfaceService
+	password              string
+	Pool                  PoolService
+	projectID             string
+	regionName            string
+	ScheduledVolumeBackup ScheduledVolumeBackup
+	Server                ServerService
+	Service               ServiceInterface
+	services              []*Service
+	Snapshot              SnapshotService
+	SSHKey                SSHKeyService
+	Token                 TokenService
+	userAgent             string
+	username              string
+	Volume                VolumeService
+	VPC                   VPCService
+	WanIP                 WanIPService
 }
 
 // Option set Client specific attributes
 type Option func(c *Client) error
 
-// WithAPIUrl sets the API url option for BizFly client.
+// WithAPIUrl sets the API url option for Bizfly client.
 func WithAPIUrl(u string) Option {
 	return func(c *Client) error {
 		var err error
@@ -105,7 +101,7 @@ func WithAPIUrl(u string) Option {
 	}
 }
 
-// WithHTTPClient sets the client option for BizFly client.
+// WithHTTPClient sets the client option for Bizfly client.
 func WithHTTPClient(client *http.Client) Option {
 	return func(c *Client) error {
 		if client == nil {
@@ -118,7 +114,7 @@ func WithHTTPClient(client *http.Client) Option {
 	}
 }
 
-// WithRegionName sets the client region for BizFly client.
+// WithRegionName sets the client region for Bizfly client.
 func WithRegionName(region string) Option {
 	return func(c *Client) error {
 		c.regionName = region
@@ -140,7 +136,7 @@ func WithBasicAuth(basicAuth string) Option {
 	}
 }
 
-// NewClient creates new BizFly client.
+// NewClient creates new Bizfly client.
 func NewClient(options ...Option) (*Client, error) {
 	c := &Client{
 		httpClient: http.DefaultClient,
@@ -225,8 +221,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
 	req.Header.Add("X-Project-Id", c.projectID)
-	req.Header.Add("Authorization", "Basic " + c.basicAuth)
-
+	req.Header.Add("Authorization", "Basic "+c.basicAuth)
 
 	if c.authType == "" {
 		c.authType = defaultAuthType
@@ -291,7 +286,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
 func (c *Client) SetKeystoneToken(token *Token) {
 	c.keystoneToken = token.KeystoneToken
-	c.projectID = token.ProjectId
+	c.projectID = token.ProjectID
 }
 
 // ListOptions specifies the optional parameters for List method.

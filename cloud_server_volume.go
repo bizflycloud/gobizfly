@@ -19,7 +19,7 @@ const (
 
 var _ VolumeService = (*volume)(nil)
 
-// VolumeService is an interface to interact with BizFly API Volume endpoint.
+// VolumeService is an interface to interact with Bizfly API Volume endpoint.
 type VolumeService interface {
 	List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, error)
 	Create(ctx context.Context, req *VolumeCreateRequest) (*Volume, error)

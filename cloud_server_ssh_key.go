@@ -18,7 +18,7 @@ type sshkey struct {
 	client *Client
 }
 
-// SSHKeyService is an interface to interact with BizFly API SSH Key
+// SSHKeyService is an interface to interact with Bizfly API SSH Key
 type SSHKeyService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error)
 	Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyCreateResponse, error)

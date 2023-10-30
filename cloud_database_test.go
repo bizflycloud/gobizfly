@@ -1,4 +1,4 @@
-// This file is part of goBizFly
+// This file is part of gobizfly
 
 package gobizfly
 
@@ -421,7 +421,7 @@ func Test_CloudDatabaseInstance_ListSchedules(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBSchedules, err := client.CloudDatabase.Instances().ListSchedules(ctx, "a24509d4-cec1-4055-a476-676009140a3d", &CloudDatabaseListOption{})
+	DBSchedules, err := client.CloudDatabase.Instances().ListBackupSchedules(ctx, "a24509d4-cec1-4055-a476-676009140a3d", &CloudDatabaseListOption{})
 	require.NoError(t, err)
 	DBSchedule := DBSchedules[0]
 	assert.Equal(t, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce", DBSchedule.ID)
@@ -638,7 +638,7 @@ func Test_CloudDatabaseInstance_ResizeFlavor(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.CloudDatabase.Instances().ResizeFlavor(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", "1c_2g")
+	_, err := client.CloudDatabase.Instances().ResizeFlavor(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", CloudDatabaseDatastore{}, "instanceType", "1c_2g")
 	require.NoError(t, err)
 }
 
@@ -652,7 +652,7 @@ func Test_CloudDatabaseInstance_ResizeVolume(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.CloudDatabase.Instances().ResizeVolume(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", 20)
+	_, err := client.CloudDatabase.Instances().ResizeVolume(ctx, "9c727335-4b53-44c3-866b-60ae502b0a3f", CloudDatabaseDatastore{}, "instanceType", 20)
 	require.NoError(t, err)
 }
 
@@ -975,7 +975,7 @@ func Test_CloudDatabaseNode_ListSchedules(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBSchedules, err := client.CloudDatabase.Nodes().ListSchedules(ctx, "a24509d4-cec1-4055-a476-676009140a3d", &CloudDatabaseListOption{})
+	DBSchedules, err := client.CloudDatabase.Nodes().ListBackupSchedules(ctx, "a24509d4-cec1-4055-a476-676009140a3d", &CloudDatabaseListOption{})
 	require.NoError(t, err)
 	DBSchedule := DBSchedules[0]
 	assert.Equal(t, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce", DBSchedule.ID)
@@ -1046,7 +1046,7 @@ func Test_CloudDatabaseNode_Create(t *testing.T) {
 	dbr := &CloudDatabaseNodeCreate{
 		ReplicaOf: "33a7577b-1955-492f-b02b-165a5f264f39",
 		Role:      "secondary",
-		Secondaries: &CloudDatabaseReplicas{
+		Secondaries: &CloudDatabaseReplicaNodeCreate{
 			Configurations: CloudDatabaseReplicasConfiguration{
 				AvailabilityZone: "HN1",
 				Region:           "HaNoi",
@@ -1269,18 +1269,18 @@ func Test_CloudDatabaseConfiguration_Create(t *testing.T) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload *CloudDatabaseConfigurationCreate
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "test_cfg", payload.ConfigurationName)
+		assert.Equal(t, "test_cfg", payload.Name)
 		assert.Equal(t, "MariaDB", payload.Datastore.Type)
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 	dcr := &CloudDatabaseConfigurationCreate{
-		ConfigurationName: "test_cfg",
+		Name: "test_cfg",
 		Datastore: CloudDatabaseDatastore{
 			Type:      "MariaDB",
 			VersionID: "ee988cc3-bb30-4aaf-9837-e90a34f60d37",
 		},
-		ConfigurationParameters: map[string]interface{}{
+		Parameters: map[string]interface{}{
 			"character_set_server": "armscii8",
 			"max_connections":      200,
 		},
@@ -1299,7 +1299,7 @@ func Test_CloudDatabaseConfiguration_Update(t *testing.T) {
 	})
 
 	_, err := client.CloudDatabase.Configurations().Update(ctx, "3b2de5a3-bcd1-4972-a34c-dc48sdsd", &CloudDatabaseConfigurationUpdate{
-		ConfigurationParameters: map[string]interface{}{
+		Parameters: map[string]interface{}{
 			"character_set_server": "armscii8",
 			"max_connections":      100,
 		},
@@ -1491,16 +1491,16 @@ func Test_CloudDatabaseBackup_Create(t *testing.T) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload *CloudDatabaseBackupCreate
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "backup_name", payload.BackupName)
+		assert.Equal(t, "backup_name", payload.Name)
 		assert.Equal(t, "edf80901-1168-4f7d-9c47-5b44ad62befa", payload.ParentID)
 		assert.Equal(t, "e5454cb9-b23c-431f-84a7-12e3e0dec691", payload.NodeID)
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 	bkr := &CloudDatabaseBackupCreate{
-		BackupName: "backup_name",
-		ParentID:   "edf80901-1168-4f7d-9c47-5b44ad62befa",
-		NodeID:     "e5454cb9-b23c-431f-84a7-12e3e0dec691",
+		Name:     "backup_name",
+		ParentID: "edf80901-1168-4f7d-9c47-5b44ad62befa",
+		NodeID:   "e5454cb9-b23c-431f-84a7-12e3e0dec691",
 	}
 	_, err := client.CloudDatabase.Backups().Create(ctx, "instances", "e5454cb9-b23c-431f-84a7-12e3e0dec691", bkr)
 	require.NoError(t, err)
@@ -1520,10 +1520,10 @@ func Test_CloudDatabaseBackup_Delete(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func Test_CloudDatabaseSchedule_List(t *testing.T) {
+func Test_CloudDatabaseBackupSchedule_List(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.DatabaseURL(cloudDatabaseSchedulesResourcePath), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.DatabaseURL(cloudDatabaseBackupSchedulesResourcePath), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -1561,7 +1561,7 @@ func Test_CloudDatabaseSchedule_List(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBSchedules, err := client.CloudDatabase.Schedules().List(ctx, &CloudDatabaseScheduleListResourceOption{
+	DBSchedules, err := client.CloudDatabase.BackupSchedules().List(ctx, &CloudDatabaseBackupScheduleListResourceOption{
 		ResourceType: "instances",
 		ResourceID:   "ef317a9f-c705-4ea2-8fcb-c18450effb6c",
 		All:          true,
@@ -1574,10 +1574,10 @@ func Test_CloudDatabaseSchedule_List(t *testing.T) {
 	assert.Equal(t, "a24509d4-cec1-4055-a476-676009140a3d", DBSchedule.InstanceID)
 }
 
-func Test_CloudDatabaseSchedule_ListBackups(t *testing.T) {
+func Test_CloudDatabaseBackupSchedule_ListBackups(t *testing.T) {
 	setup()
 	defer teardown()
-	var sc *cloudDatabaseSchedules
+	var sc *cloudDatabaseBackupSchedules
 	mux.HandleFunc(testlib.DatabaseURL(sc.resourceBackupPath("ef317a9f-c705-4ea2-8fcb-c18450effb6c")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -1640,7 +1640,7 @@ func Test_CloudDatabaseSchedule_ListBackups(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBBackups, err := client.CloudDatabase.Schedules().ListBackups(ctx, "ef317a9f-c705-4ea2-8fcb-c18450effb6c", &CloudDatabaseListOption{})
+	DBBackups, err := client.CloudDatabase.BackupSchedules().ListBackups(ctx, "ef317a9f-c705-4ea2-8fcb-c18450effb6c", &CloudDatabaseListOption{})
 	require.NoError(t, err)
 	DBBackup := DBBackups[0]
 	assert.Equal(t, "7393cf38-5eb6-45e7-9ea9-f52dd3497cab", DBBackup.ID)
@@ -1649,10 +1649,10 @@ func Test_CloudDatabaseSchedule_ListBackups(t *testing.T) {
 	assert.Equal(t, "b746214aafba4923a5fbf9478ea64474", DBBackup.ProjectID)
 }
 
-func Test_CloudDatabaseSchedule_Get(t *testing.T) {
+func Test_CloudDatabaseBackupSchedule_Get(t *testing.T) {
 	setup()
 	defer teardown()
-	var sc cloudDatabaseSchedules
+	var sc cloudDatabaseBackupSchedules
 	mux.HandleFunc(testlib.DatabaseURL(sc.resourcePath("6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -1669,7 +1669,7 @@ func Test_CloudDatabaseSchedule_Get(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBSchedule, err := client.CloudDatabase.Schedules().Get(ctx, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")
+	DBSchedule, err := client.CloudDatabase.BackupSchedules().Get(ctx, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")
 	require.NoError(t, err)
 	assert.Equal(t, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce", DBSchedule.ID)
 	assert.Equal(t, "schedule_name_2", DBSchedule.Name)
@@ -1677,43 +1677,40 @@ func Test_CloudDatabaseSchedule_Get(t *testing.T) {
 	assert.Equal(t, "a24509d4-cec1-4055-a476-676009140a3d", DBSchedule.InstanceID)
 }
 
-func Test_CloudDatabaseSchedule_Create(t *testing.T) {
+func Test_CloudDatabaseBackupSchedule_Create(t *testing.T) {
 	setup()
 	defer teardown()
-	var sc cloudDatabaseSchedules
+	var sc cloudDatabaseBackupSchedules
 	mux.HandleFunc(testlib.DatabaseURL(sc.resourceCreatePath("nodes", "2b138c69-be63-49f5-8b66-0180b7590af3")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
-		var payload *CloudDatabaseScheduleCreate
+		var payload *CloudDatabaseBackupScheduleCreate
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "schedule_name", payload.ScheduleName)
+		assert.Equal(t, "schedule_name", payload.Name)
 		assert.Equal(t, 3, payload.LimitBackup)
-		assert.Equal(t, "monthly", payload.ScheduleType)
-		assert.Equal(t, []int{20, 50}, payload.Minute)
+		assert.Equal(t, "20,50 * * * *", payload.CronExpression)
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	bkr := &CloudDatabaseScheduleCreate{
-		ScheduleName: "schedule_name",
-		LimitBackup:  3,
-		ScheduleType: "monthly",
-		Minute:       []int{20, 50},
-		Hour:         []int{7, 19},
+	bkr := &CloudDatabaseBackupScheduleCreate{
+		Name:           "schedule_name",
+		LimitBackup:    3,
+		CronExpression: "20,50 * * * *",
 	}
-	_, err := client.CloudDatabase.Schedules().Create(ctx, "2b138c69-be63-49f5-8b66-0180b7590af3", bkr)
+	_, err := client.CloudDatabase.BackupSchedules().Create(ctx, "2b138c69-be63-49f5-8b66-0180b7590af3", bkr)
 	require.NoError(t, err)
 }
 
-func Test_CloudDatabaseSchedule_Delete(t *testing.T) {
+func Test_CloudDatabaseBackupSchedule_Delete(t *testing.T) {
 	setup()
 	defer teardown()
-	var sc cloudDatabaseSchedules
+	var sc cloudDatabaseBackupSchedules
 	mux.HandleFunc(testlib.DatabaseURL(sc.resourcePath("2b138c69-be63-49f5-8b66-0180b7590af3")), func(w http.ResponseWriter, r *http.Request) {
 
 		resp := `{"Result": "ok"}`
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	_, err := client.CloudDatabase.Schedules().Delete(ctx, "2b138c69-be63-49f5-8b66-0180b7590af3", &CloudDatabaseScheduleDelete{PurgeBackup: true})
+	_, err := client.CloudDatabase.BackupSchedules().Delete(ctx, "2b138c69-be63-49f5-8b66-0180b7590af3", &CloudDatabaseBackupScheduleDelete{PurgeBackup: true})
 	require.NoError(t, err)
 }
 
@@ -1784,7 +1781,7 @@ func Test_CloudDatabaseAutoscaling_Delete(t *testing.T) {
 func Test_CloudDatabaseTrustedSource_Get(t *testing.T) {
 	setup()
 	defer teardown()
-	var sc cloudDatabaseSchedules
+	var sc cloudDatabaseBackupSchedules
 	mux.HandleFunc(testlib.DatabaseURL(sc.resourcePath("6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -1801,7 +1798,7 @@ func Test_CloudDatabaseTrustedSource_Get(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	DBSchedule, err := client.CloudDatabase.Schedules().Get(ctx, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")
+	DBSchedule, err := client.CloudDatabase.BackupSchedules().Get(ctx, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce")
 	require.NoError(t, err)
 	assert.Equal(t, "6ed3d8bd-c358-48f6-8890-20ed4e1fbfce", DBSchedule.ID)
 	assert.Equal(t, "schedule_name_2", DBSchedule.Name)
@@ -1922,5 +1919,5 @@ func Test_CloudDatabaseEngineParameters_Get(t *testing.T) {
 
 	DBEngineParameters, err := client.CloudDatabase.EngineParameters().Get(ctx, "MongoDB", "ee988cc3-bb30-4aaf-9837-e90a34f60d37")
 	require.NoError(t, err)
-	assert.Equal(t, 2, len(DBEngineParameters.ConfigurationParameters))
+	assert.Equal(t, 2, len(DBEngineParameters.Parameters))
 }

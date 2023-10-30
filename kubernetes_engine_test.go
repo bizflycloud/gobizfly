@@ -135,7 +135,7 @@ func TestClusterCreate(t *testing.T) {
     "version": {
       "id": "5f6425f3d0d3befd40e7a31f",
       "name": "v1.18.6-bke-5f6425f3",
-      "description": "Kubernetes v1.18.6 on BizFly Cloud",
+      "description": "Kubernetes v1.18.6 on Bizfly Cloud",
       "kubernetes_version": "v1.18.6"
     },
     "private_network_id": "727caa8c-1ed1-4302-b659-5a92864dcdef",
@@ -498,11 +498,11 @@ func TestAddClusterEverywhere(t *testing.T) {
 	})
 
 	cluster, err := client.KubernetesEngine.AddClusterEverywhere(ctx, "n5s4coxhy30zwa0r", &ClusterJoinEverywhereRequest{
-		Hostname:     "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3",
-		IPAddresses:  []string{"45.124.95.244"},
-	 	Capacity: 		EverywhereNodeCapacity{
-			Cores:		2,
-			MemoryKB:	2024868,
+		Hostname:    "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3",
+		IPAddresses: []string{"45.124.95.244"},
+		Capacity: EverywhereNodeCapacity{
+			Cores:    2,
+			MemoryKB: 2024868,
 		},
 	})
 	require.NoError(t, err)
@@ -533,4 +533,3 @@ func TestGetNodeEverywhereByUUID(t *testing.T) {
 	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.Shoot)
 	assert.Equal(t, "6515297b220963774dd304b0", cluster.PoolID)
 }
-
