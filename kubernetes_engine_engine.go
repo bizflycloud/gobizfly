@@ -8,9 +8,11 @@ import (
 )
 
 type ClusterJoinEverywhereRequest struct {
+	PoolID			string								   `json:"pool_id" yaml:"pool_id"`
+	PrivateIP   string								   `json:"private_ip" yaml:"private_ip"`
 	Hostname    string                   `json:"hostname" yaml:"hostname"`
 	IPAddresses []string                 `json:"ip_addresses" yaml:"ip_addresses"`
-	Capacity    EverywhereNodeCapacity `json:"capacity" yaml:"capacity"`
+	Capacity    EverywhereNodeCapacity   `json:"capacity" yaml:"capacity"`
 }
 
 type EverywhereNodeCapacity struct {
