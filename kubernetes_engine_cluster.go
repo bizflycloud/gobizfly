@@ -13,9 +13,10 @@ import (
 type EverywhereNode struct {
 	ID              string            `json:"id" yaml:"id"`
 	Shoot           string            `json:"shoot" yaml:"shoot"`
-	PoolID          string 			  `json:"pool_id" yaml:"pool_id"`
-	NodeName     	string            `json:"node_name" yaml:"node_name"`
+	PoolID          string 			      `json:"pool_id" yaml:"pool_id"`
+	NodeName     	  string            `json:"node_name" yaml:"node_name"`
 	PublicIP      	string            `json:"public_ip" yaml:"public_ip"`
+	PrivateIP      	string            `json:"private_ip" yaml:"private_ip"`
 	UUID            string            `json:"uuid" yaml:"uuid"`
 	CreatedAt       string            `json:"created_at" yaml:"created_at"`
 	UpdatedAt       string            `json:"updated_at" yaml:"updated_at"`
