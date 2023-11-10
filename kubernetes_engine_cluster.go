@@ -20,6 +20,7 @@ type EverywhereNode struct {
 	UUID            string            `json:"uuid" yaml:"uuid"`
 	CreatedAt       string            `json:"created_at" yaml:"created_at"`
 	UpdatedAt       string            `json:"updated_at" yaml:"updated_at"`
+	Deleted         bool              `json:"deleted" yaml:"deleted"`
 }
 
 // ClusterCreateRequest represents the request body for creating a Kubernetes cluster
