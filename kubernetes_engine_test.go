@@ -406,7 +406,7 @@ users:
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.KubernetesEngine.GetKubeConfig(ctx, "xfbxsws38dcs8o94")
+	resp, err := client.KubernetesEngine.GetKubeConfig(ctx, "xfbxsws38dcs8o94", &GetKubeConfigOptions{})
 	require.NoError(t, err)
 	require.Equal(t, resp, `
 apiVersion: v1
