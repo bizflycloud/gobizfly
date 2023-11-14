@@ -38,7 +38,7 @@ type KubernetesEngineService interface {
 	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
-	GetKubeConfig(ctx context.Context, clusterUID string) (string, error)
+	GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
@@ -63,12 +63,24 @@ func (c *kubernetesEngineService) EverywherePath(id string) string {
 	return strings.Join([]string{nodeEverywhere, id}, "/")
 }
 
+type GetKubeConfigOptions struct {
+	ExpiteTime  string `json:"expire_time,omitempty"`
+}
+
 // GetKubeConfig - Get Kubernetes config from the given cluster
-func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string) (string, error) {
+func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(clusterUID), kubeConfig}, "/"), nil)
 	if err != nil {
 		return "", err
 	}
+	params := req.URL.Query()
+	if opts != nil {
+		if opts.ExpiteTime != "" {
+			params.Add("expire_time", opts.ExpiteTime)
+		}
+	}
+	req.URL.RawQuery = params.Encode()
+
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
 		return "", nil
