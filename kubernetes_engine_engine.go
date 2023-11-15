@@ -13,6 +13,11 @@ type ClusterJoinEverywhereRequest struct {
 	Hostname    string                   `json:"hostname" yaml:"hostname"`
 	IPAddresses []string                 `json:"ip_addresses" yaml:"ip_addresses"`
 	Capacity    EverywhereNodeCapacity   `json:"capacity" yaml:"capacity"`
+	Annotation  *EverywhereAnnotation 	  `json:"annotation,omitempty" yaml:"annotation"`
+}
+
+type EverywhereAnnotation struct {
+	ForceEndpoint string `json:"kilo.squat.ai/force-endpoint" yaml:"kilo.squat.ai/force-endpoint"`
 }
 
 type EverywhereNodeCapacity struct {
