@@ -17,6 +17,7 @@ type EverywhereNode struct {
 	NodeName     	  string            `json:"node_name" yaml:"node_name"`
 	PublicIP      	string            `json:"public_ip" yaml:"public_ip"`
 	PrivateIP      	string            `json:"private_ip" yaml:"private_ip"`
+	Region 				  string            `json:"region" yaml:"region"`
 	UUID            string            `json:"uuid" yaml:"uuid"`
 	CreatedAt       string            `json:"created_at" yaml:"created_at"`
 	UpdatedAt       string            `json:"updated_at" yaml:"updated_at"`
