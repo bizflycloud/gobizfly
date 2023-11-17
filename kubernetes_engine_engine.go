@@ -8,12 +8,13 @@ import (
 )
 
 type ClusterJoinEverywhereRequest struct {
-	PoolID			string								   `json:"pool_id" yaml:"pool_id"`
-	PublicIP    string								   `json:"public_ip" yaml:"public_ip"`
-	Hostname    string                   `json:"hostname" yaml:"hostname"`
-	IPAddresses []string                 `json:"ip_addresses" yaml:"ip_addresses"`
-	Capacity    EverywhereNodeCapacity   `json:"capacity" yaml:"capacity"`
-	Annotation  *EverywhereAnnotation 	  `json:"annotation,omitempty" yaml:"annotation"`
+	PoolID							string								   `json:"pool_id" yaml:"pool_id"`
+	PublicIP    				string								   `json:"public_ip" yaml:"public_ip"`
+	Hostname    				string                   `json:"hostname" yaml:"hostname"`
+	HasWanInterface     bool 								     `json:"has_wan_interface" yaml:"has_wan_interface"`
+	IPAddresses 				[]string                 `json:"ip_addresses" yaml:"ip_addresses"`
+	Capacity    				EverywhereNodeCapacity   `json:"capacity" yaml:"capacity"`
+	Annotation  				*EverywhereAnnotation 	 `json:"annotation,omitempty" yaml:"annotation"`
 }
 
 type EverywhereAnnotation struct {
