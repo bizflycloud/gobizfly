@@ -11,14 +11,17 @@ import (
 
 // EverywhereNode represents a Kubernetes everywhere node
 type EverywhereNode struct {
-	ID              string            `json:"id" yaml:"id"`
-	Shoot           string            `json:"shoot" yaml:"shoot"`
-	PoolID          string 			  `json:"pool_id" yaml:"pool_id"`
-	NodeName     	string            `json:"node_name" yaml:"node_name"`
-	PublicIP      	string            `json:"public_ip" yaml:"public_ip"`
-	UUID            string            `json:"uuid" yaml:"uuid"`
-	CreatedAt       string            `json:"created_at" yaml:"created_at"`
-	UpdatedAt       string            `json:"updated_at" yaml:"updated_at"`
+	ID        string `json:"id" yaml:"id"`
+	Shoot     string `json:"shoot" yaml:"shoot"`
+	PoolID    string `json:"pool_id" yaml:"pool_id"`
+	NodeName  string `json:"node_name" yaml:"node_name"`
+	PublicIP  string `json:"public_ip" yaml:"public_ip"`
+	PrivateIP string `json:"private_ip" yaml:"private_ip"`
+	Region    string `json:"region" yaml:"region"`
+	UUID      string `json:"uuid" yaml:"uuid"`
+	CreatedAt string `json:"created_at" yaml:"created_at"`
+	UpdatedAt string `json:"updated_at" yaml:"updated_at"`
+	Deleted   bool   `json:"deleted" yaml:"deleted"`
 }
 
 // ClusterCreateRequest represents the request body for creating a Kubernetes cluster
@@ -58,7 +61,7 @@ type Cluster struct {
 	CreatedAt        string            `json:"created_at" yaml:"created_at"`
 	CreatedBy        string            `json:"created_by" yaml:"created_by"`
 	WorkerPoolsCount int               `json:"worker_pools_count" yaml:"worker_pools_count"`
-	ProvisionType	 string			   `json:"provision_type" yaml:"provision_type"`
+	ProvisionType    string            `json:"provision_type" yaml:"provision_type"`
 }
 
 // ExtendedCluster represents a Kubernetes cluster with additional worker pools' information
