@@ -96,7 +96,7 @@ type Server struct {
 	RegionName       string                 `json:"region_name"`
 	NetworkPlan      string                 `json:"network_plan"`
 	Locked           bool                   `json:"locked"`
-	IsCreatedWan     bool                   `json:"is_created_wan"`
+	IsCreatedWan     *bool                  `json:"is_created_wan"`
 	ZoneName         string                 `json:"zone_name"`
 	BillingPlan      string                 `json:"billing_plan"`
 	IsAvailable      bool                   `json:"is_available"`
@@ -186,25 +186,24 @@ type ServerOS struct {
 
 // ServerCreateRequest represents create a new server payload.
 type ServerCreateRequest struct {
-	Name                 string        `json:"name"`
-	FlavorName           string        `json:"flavor"`
-	SSHKey               string        `json:"sshkey,omitempty"`
-	Password             bool          `json:"password"`
-	RootDisk             *ServerDisk   `json:"rootdisk"`
-	DataDisks            []*ServerDisk `json:"datadisks,omitempty"`
-	Type                 string        `json:"type"`
-	AvailabilityZone     string        `json:"availability_zone"`
-	OS                   *ServerOS     `json:"os"`
-	Quantity             int           `json:"quantity,omitempty"`
-	NetworkInterface     []string      `json:"network_interfaces,omitempty"`
-	WanNetworkInterfaces []string      `json:"wan_network_interfaces,omitempty"`
-	Firewalls            []string      `json:"firewalls,omitempty"`
-	NetworkPlan          string        `json:"network_plan,omitempty"`
-	VPCNetworkIds        []string      `json:"vpc_network_ids,omitempty"`
-	BillingPlan          string        `json:"billing_plan,omitempty"`
-	IPv6                 bool          `json:"ipv6,omitempty"`
-	IsCreatedWan         bool          `json:"is_created_wan"`
-	UserData             string        `json:"user_data,omitempty"`
+	Name              string        `json:"name"`
+	FlavorName        string        `json:"flavor"`
+	SSHKey            string        `json:"sshkey,omitempty"`
+	Password          bool          `json:"password"`
+	RootDisk          *ServerDisk   `json:"rootdisk"`
+	DataDisks         []*ServerDisk `json:"datadisks,omitempty"`
+	Type              string        `json:"type"`
+	AvailabilityZone  string        `json:"availability_zone"`
+	OS                *ServerOS     `json:"os"`
+	Quantity          int           `json:"quantity,omitempty"`
+	NetworkInterfaces []string      `json:"network_interfaces,omitempty"`
+	Firewalls         []string      `json:"firewalls,omitempty"`
+	NetworkPlan       string        `json:"network_plan,omitempty"`
+	VPCNetworkIds     []string      `json:"vpc_network_ids,omitempty"`
+	BillingPlan       string        `json:"billing_plan,omitempty"`
+	IPv6              bool          `json:"ipv6,omitempty"`
+	IsCreatedWan      *bool         `json:"is_created_wan,omitempty"`
+	UserData          string        `json:"user_data,omitempty"`
 }
 
 // itemActionPath return http path of server action
@@ -288,10 +287,10 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 
 // Delete deletes a server.
 func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
-	deletedVolumes := &DeletedVolumes{
+	deleteOpts := &DeletedVolumes{
 		Ids: deletedRootDisk,
 	}
-	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deletedVolumes)
+	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deleteOpts)
 	if err != nil {
 		return nil, err
 	}

@@ -33,6 +33,7 @@ type CustomImage struct {
 	Tags            []string   `json:"tags"`
 	File            string     `json:"file"`
 	Schema          string     `json:"schema"`
+	BillingPlan     string     `json:"billing_plan"`
 }
 
 // CreateCustomImageResp represents the request body when creating custom image
