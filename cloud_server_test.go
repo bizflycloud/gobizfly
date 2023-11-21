@@ -185,7 +185,7 @@ func TestServerCreate(t *testing.T) {
 		assert.Equal(t, 40, payload[0].RootDisk.Size)
 		assert.Equal(t, "free_datatransfer", payload[0].NetworkPlan)
 		assert.Equal(t, []string{"123", "456", "678"}, payload[0].Firewalls)
-		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterface)
+		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterfaces)
 		resp := `
 {
 	"task_id": [
@@ -204,12 +204,12 @@ func TestServerCreate(t *testing.T) {
 		RootDisk: &ServerDisk{
 			Size: 40,
 			Type: &volType},
-		Type:             "premium",
-		AvailabilityZone: "HN1",
-		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
-		Firewalls:        []string{"123", "456", "678"},
-		NetworkPlan:      "free_datatransfer",
-		NetworkInterface: []string{"123", "456"},
+		Type:              "premium",
+		AvailabilityZone:  "HN1",
+		OS:                &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
+		Firewalls:         []string{"123", "456", "678"},
+		NetworkPlan:       "free_datatransfer",
+		NetworkInterfaces: []string{"123", "456"},
 	}
 	task, err := client.Server.Create(ctx, scr)
 	require.NoError(t, err)
@@ -232,7 +232,7 @@ func TestUpdatedServerCreate(t *testing.T) {
 		assert.Equal(t, 40, payload[0].RootDisk.Size)
 		assert.Equal(t, "free_datatransfer", payload[0].NetworkPlan)
 		assert.Equal(t, []string{"123", "456", "678"}, payload[0].Firewalls)
-		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterface)
+		assert.Equal(t, []string{"123", "456"}, payload[0].NetworkInterfaces)
 		resp := `
 {
 	"task_id": [
@@ -251,12 +251,12 @@ func TestUpdatedServerCreate(t *testing.T) {
 		RootDisk: &ServerDisk{
 			Size:       40,
 			VolumeType: &volType},
-		Type:             "premium",
-		AvailabilityZone: "HN1",
-		OS:               &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
-		Firewalls:        []string{"123", "456", "678"},
-		NetworkPlan:      "free_datatransfer",
-		NetworkInterface: []string{"123", "456"},
+		Type:              "premium",
+		AvailabilityZone:  "HN1",
+		OS:                &ServerOS{"cbf5f34b-751b-42a5-830f-6b2324f61d5a", "image"},
+		Firewalls:         []string{"123", "456", "678"},
+		NetworkPlan:       "free_datatransfer",
+		NetworkInterfaces: []string{"123", "456"},
 	}
 	task, err := client.Server.Create(ctx, scr)
 	require.NoError(t, err)

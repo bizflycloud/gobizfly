@@ -62,6 +62,8 @@ type NetworkInterface struct {
 	BillingType         string               `json:"billing_type"`
 	AttachedServer      struct {
 	} `json:"attached_server"`
+	IPVersion int    `json:"ip_version"`
+	IPAddress string `json:"ip_address"`
 }
 
 // FixedIp represents a fixed IP's information.
