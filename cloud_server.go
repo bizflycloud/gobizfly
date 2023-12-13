@@ -45,4 +45,5 @@ type ServerService interface {
 	SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error
 	ListServerTypes(ctx context.Context) ([]*ServerType, error)
 	Rename(ctx context.Context, id string, newName string) error
+	EnableIpv6(ctx context.Context, id string) error
 }
