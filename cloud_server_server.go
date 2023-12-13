@@ -622,3 +622,18 @@ func (s server) Rename(ctx context.Context, id string, newName string) error {
 	}
 	return resp.Body.Close()
 }
+
+func (s server) EnableIpv6(ctx context.Context, id string) error {
+	payload := &ServerAction{
+		Action: "enable_ipv6",
+	}
+	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := s.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
+}
