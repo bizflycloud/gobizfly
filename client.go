@@ -207,6 +207,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	serviceUrl := c.GetServiceUrl(serviceName)
 	url := serviceUrl + urlStr
 	buf := new(bytes.Buffer)
+	fmt.Println("url: ", url)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
 			return nil, err
