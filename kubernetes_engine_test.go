@@ -434,7 +434,7 @@ users:
 func TestGetClusterInfo(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.K8sURL(clusterInfo+"/"+"6515297b220963774dd304b0"), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.K8sURL("/"+clusterInfo+"/"+"6515297b220963774dd304b0"), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
