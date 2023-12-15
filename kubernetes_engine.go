@@ -15,9 +15,9 @@ const (
 	clusterPath           = "/_"
 	kubeConfig            = "kubeconfig"
 	k8sVersion            = "/k8s_versions"
-	clusterInfo          = "engine/cluster_info"
+	clusterInfo          = "/engine/cluster_info"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
-	nodeEverywhere        = "_/node_everywhere"
+	nodeEverywhere        = "/_/node_everywhere"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)

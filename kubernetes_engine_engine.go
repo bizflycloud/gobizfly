@@ -101,7 +101,7 @@ type ClusterInfoResponse struct {
 
 func (c *kubernetesEngineService) GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error) {
 	var clusterInfoResponse ClusterInfoResponse
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, "/"+clusterInfo+"/"+pool_id, nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, clusterInfo+"/"+pool_id, nil)
 	if err != nil {
 		return nil, err
 	}
