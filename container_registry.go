@@ -114,7 +114,7 @@ type TokenResp struct {
 }
 
 func (c *containerRegistry) resourcePath() string {
-	return registryPath
+	return registryPath + "/"
 }
 
 func (c *containerRegistry) itemPath(id string) string {
