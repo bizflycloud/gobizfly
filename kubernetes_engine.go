@@ -15,7 +15,7 @@ const (
 	clusterPath           = "/_"
 	kubeConfig            = "kubeconfig"
 	k8sVersion            = "/k8s_versions"
-	clusterInfo          = "/engine/cluster_info"
+	clusterInfo           = "/engine/cluster_info"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
 	nodeEverywhere        = "/_/node_everywhere"
 )
@@ -26,6 +26,14 @@ type kubernetesEngineService struct {
 	client *Client
 }
 
+type KubernetesEngineError struct {
+	status int
+	msg    string
+}
+
+func (r *KubernetesEngineError) Error() string {
+	return r.msg
+}
 
 type KubernetesEngineService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Cluster, error)
@@ -41,8 +49,18 @@ type KubernetesEngineService interface {
 	GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error)
 	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
-	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
+	AddClusterEverywhere(
+		ctx context.Context,
+		id string,
+		cjer *ClusterJoinEverywhereRequest,
+	) (*ClusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
+}
+
+type KubernetesErrorResponse struct {
+	Code      string `json:"code"    yaml:"id"`
+	Message   string `json:"shoot"   yaml:"shoot"`
+	RequestId string `json:"pool_id" yaml:"pool_id"`
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -64,12 +82,22 @@ func (c *kubernetesEngineService) EverywherePath(id string) string {
 }
 
 type GetKubeConfigOptions struct {
-	ExpiteTime  string `json:"expire_time,omitempty"`
+	ExpiteTime string `json:"expire_time,omitempty"`
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster
-func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(clusterUID), kubeConfig}, "/"), nil)
+func (c *kubernetesEngineService) GetKubeConfig(
+	ctx context.Context,
+	clusterUID string,
+	opts *GetKubeConfigOptions,
+) (string, error) {
+	req, err := c.client.NewRequest(
+		ctx,
+		http.MethodGet,
+		kubernetesServiceName,
+		strings.Join([]string{c.itemPath(clusterUID), kubeConfig}, "/"),
+		nil,
+	)
 	if err != nil {
 		return "", err
 	}

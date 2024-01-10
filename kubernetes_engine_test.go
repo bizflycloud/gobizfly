@@ -293,18 +293,24 @@ func TestRecycleNode(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPut, r.Method)
-	})
+	mux.HandleFunc(
+		testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodPut, r.Method)
+		},
+	)
 }
 
 func TestDeleteClusterWorkerPool(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodDelete, r.Method)
-	})
+	mux.HandleFunc(
+		testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "ji84wqtzr77ogo6b"}, "/")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodDelete, r.Method)
+		},
+	)
 	err := client.KubernetesEngine.DeleteClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "ji84wqtzr77ogo6b")
 	require.NoError(t, err)
 }
@@ -313,9 +319,11 @@ func TestGetClusterWorkerPool(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
-		resp := `
+	mux.HandleFunc(
+		testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
+			resp := `
 {
   "id": "5f959e0ac0b18944d0a4f13a",
   "name": "pool-curdcqn2",
@@ -342,8 +350,9 @@ func TestGetClusterWorkerPool(t *testing.T) {
   "nodes": []
 }
 `
-		_, _ = fmt.Fprint(w, resp)
-	})
+			_, _ = fmt.Fprint(w, resp)
+		},
+	)
 	workerpool, err := client.KubernetesEngine.GetClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a")
 	require.NoError(t, err)
 	assert.Equal(t, "pool-curdcqn2", workerpool.Name)
@@ -353,10 +362,23 @@ func TestDeleteClusterWorkerNode(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodDelete, r.Method)
-	})
-	err := client.KubernetesEngine.DeleteClusterWorkerPoolNode(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a")
+	mux.HandleFunc(
+		testlib.K8sURL(
+			strings.Join(
+				[]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a"},
+				"/",
+			),
+		),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodDelete, r.Method)
+		},
+	)
+	err := client.KubernetesEngine.DeleteClusterWorkerPoolNode(
+		ctx,
+		"ji84wqtzr77ogo6b",
+		"5f959e0ac0b18944d0a4f13a",
+		"5f959e0ac0b18944d0a4f13a",
+	)
 	require.NoError(t, err)
 }
 
@@ -364,16 +386,24 @@ func TestUpdateClusterWorkerPool(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPatch, r.Method)
-	})
+	mux.HandleFunc(
+		testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a"}, "/")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodPatch, r.Method)
+		},
+	)
 
-	err := client.KubernetesEngine.UpdateClusterWorkerPool(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a", &UpdateWorkerPoolRequest{
-		DesiredSize:       1,
-		EnableAutoScaling: true,
-		MinSize:           4,
-		MaxSize:           5,
-	})
+	err := client.KubernetesEngine.UpdateClusterWorkerPool(
+		ctx,
+		"ji84wqtzr77ogo6b",
+		"5f959e0ac0b18944d0a4f13a",
+		&UpdateWorkerPoolRequest{
+			DesiredSize:       1,
+			EnableAutoScaling: true,
+			MinSize:           4,
+			MaxSize:           5,
+		},
+	)
 	require.NoError(t, err)
 }
 
@@ -381,9 +411,11 @@ func TestGetKubeConfig(t *testing.T) {
 	setup()
 	defer teardown()
 	var c kubernetesEngineService
-	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("xfbxsws38dcs8o94"), "kubeconfig"}, "/")), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
-		resp := `
+	mux.HandleFunc(
+		testlib.K8sURL(strings.Join([]string{c.itemPath("xfbxsws38dcs8o94"), "kubeconfig"}, "/")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
+			resp := `
 apiVersion: v1
 clusters:
 - cluster:
@@ -404,8 +436,9 @@ users:
     client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR0ekNDQXArZ0F3SUJBZ0lRTmRlQWhsRUpRcWVIWmNJbHRENFcxakFOQmdrcWhraUc5dzBCQVFzRkFEQjQKTVFzd0NRWURWUVFHRXdKV1RqRU9NQXdHQTFVRUNBd0ZTR0Z1YjJreERqQU1CZ05WQkFjTUJVaGhibTlwTVJRdwpFZ1lEVlFRS0RBdENhWHBHYkhsRGJHOTFaREVlTUJ3R0ExVUVDd3dWUW1sNlJteDVRMnh2ZFdSTGRXSmxjbTVsCmRHVnpNUk13RVFZRFZRUUREQXBMZFdKbGNtNWxkR1Z6TUI0WERUSXhNRE14TWpBek1EZ3hNbG9YRFRJeE1ETXgKT1RBek1EZ3hNbG93ZGpFTE1Ba0dBMVVFQmhNQ1ZrNHhEakFNQmdOVkJBZ01CVWhoYm05cE1RNHdEQVlEVlFRSApEQVZJWVc1dmFURVhNQlVHQTFVRUNnd09jM2x6ZEdWdE9tMWhjM1JsY25NeEhqQWNCZ05WQkFzTUZVSnBla1pzCmVVTnNiM1ZrUzNWaVpYSnVaWFJsY3pFT01Bd0dBMVVFQXd3RllXUnRhVzR3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURIL1p1WmN1Z2hkWWRCc1ZqMjJJU0NBVkxVd1JZR3l5UElYalQwZERwUApRSmJwRzdzc2hVeUdmOGxpL1NiZUw5N3Z6VnMvekVROFpsMGhFYlJBRzlVL21qY1JFbFFHVzhSK2JnRm43dXhmClJzamZFTlJ5b1UxZlJKSVluSy9MMGpyTlErdTZqUkZENlNheTdDM0ZyaWRVNUJJTXdLcDRQamYyQlB1aFoxdjMKZWF6UmZ4KzY1Ly8yMXRWdjNJS200NFFxcHhjdGtrSkRKamI4YlRYeC91ajZVdGIvSXBqUHNBTjliR1FKU3FydQpRckI1bTI2Y1VHVHNONHZNWTBRV0ZSa3B4a21aMXQrQjBYc3ZQZklldDRJOFRTa08wa09sTUlRZDJNbmtGeGdGCnNhWDA3R21Xcm9vSVI3MW91RjlBNUNwM2NZcm1sRnI0bFljNUkrQlV0VE96QWdNQkFBR2pQekE5TUE0R0ExVWQKRHdFQi93UUVBd0lGb0RBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXdEQVlEVlIwVApBUUgvQkFJd0FEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFETnpzWVdFV00xbFgzUUNUNndORG5yVmdzUW9XCi9Va01KaXZOTmdGUWI0L3g1c0lWckZPQUN4cEdOdktwOTFmamN3Y3ZVSWxlYXNZeHFKdWQ0Vkw3bCt6Q203SVQKM21WajdrWGhxaUtsVGlxQnoxVG1jZFNsN1o0RE5mUGFWVDNxYVAwc0FyaGtFaU4rWVlheUZ0MjNtdGlZU0FkTAppV3hQUVJmK3pJbzl6dUoxTUZCc05JeDB6emJMSkM3Y2FOenM0Q2RTMWRSTEI3OEFsRTRtOCtWaGFLS0Y2SUthCjUyb0Z4ZmZjbzh5ZVhYcW0xTHVEeUN1L05Yd0RCRVUrV2wwKzV6TzUyWTBPRjZGQ2QwRWlQZ0hSUzAxejVQMC8KZTdCZTAwcjZSUUpKTkI0UjF6N1VoK0hlOUVRbTQvVTBsOUZxK3RxUFV4QXdtQlcxN0QvRXFFbEk0UT09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
     client-key-data: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRREgvWnVaY3VnaGRZZEIKc1ZqMjJJU0NBVkxVd1JZR3l5UElYalQwZERwUFFKYnBHN3NzaFV5R2Y4bGkvU2JlTDk3dnpWcy96RVE4WmwwaApFYlJBRzlVL21qY1JFbFFHVzhSK2JnRm43dXhmUnNqZkVOUnlvVTFmUkpJWW5LL0wwanJOUSt1NmpSRkQ2U2F5CjdDM0ZyaWRVNUJJTXdLcDRQamYyQlB1aFoxdjNlYXpSZngrNjUvLzIxdFZ2M0lLbTQ0UXFweGN0a2tKREpqYjgKYlRYeC91ajZVdGIvSXBqUHNBTjliR1FKU3FydVFyQjVtMjZjVUdUc040dk1ZMFFXRlJrcHhrbVoxdCtCMFhzdgpQZklldDRJOFRTa08wa09sTUlRZDJNbmtGeGdGc2FYMDdHbVdyb29JUjcxb3VGOUE1Q3AzY1lybWxGcjRsWWM1CkkrQlV0VE96QWdNQkFBRUNnZ0VBVjhFRGhzaXg3UVNhTGd3NHdrL3RqUEl4dTJOaVcrYkZNOFdLclAxWEhMRjEKeHFIQmR0NmkzcDJ4NjNxemxHa2pCTXh5VHNNOTZkYnM1SGJWUmhBd2VYRWMycVBWTk5rTmxvQ0VvMnRtVXNSSApuZ0hQaHVFYWgwUWFheXhOd3p6alNuQ1VQazVxRmdkM1VLbHJ5RU1MeFNjeWVHQU9MU2IzL1Q3Z2YwbFFSSDFiCjFLZ3g3TVQyUURQeEdLclJkSStpbHprendHRzZLQzdIdGJnRDBkRjdHbVo4cW51TW5IVHdYb0JmaWZNdG1wcUUKNjVXVkl0Y05FMllHZHNWakxoSU9nMkt2TmhyaktiVm1rdUUydHNhbml2QlVDbkUyVE50YmwrNjcwSWZPSEJXbQpYVkoyQVB3a2twVHVvVlBYOHpwL3dxa25ZQXluS2NkeXg5cG5VR2loMlFLQmdRRHFIVWEwcjBEc3Y1UXFrS3NTClA4Z3ovUW9SRmZFblExdm1YcVlFakp4dVIyRm1ZOXVUSlFSVzU1aXlaajdBYmxiSGpoWlllclVSR0JtVTBpWUcKMmp1Wmt1V1ZFd210Mll5KzRLbmZLT2JWaU5NbFJPUUFTUGkraU5XZWVDc01lVFVjY05ScXFPck1wT3krZVVRZwptNkNDdDZyNzZSclRUK2xIWWVhdm5yMG4xUUtCZ1FEYXI3S21HQkF6WXdvbEZaOHZIcVJqT3VmNitpaXB2eGI5Cmh4L2ZKbmhsckZDTTJETzRxL0tYS2FaaHBkNzluVmVXQVJGTVhBNktUQW1VZWdnRnU4ZmQ2LzFmc005ZlpES0oKZVJhVmFiRUlqckduVXVwTGlDVHVSNzlZblpjNExTZTQyNmc1M2JzQWRhZGlNVDd4NCt3MzJPaEF3ODVmN0xLbgphanJ0ZVd6NVp3S0JnSGRzZmIvMzBsK3lqb3QwQnNBbFp5UVdCVWVYOE04OWppaWl5WDl5bHUydVhlSVVPRk1FClJBVnMyTGpRYlZ4T0xOaFpBODhZc1RyS0YycVNGTEhVS3lqNUJVSVpWd3VtK1NQNWlNMzhtRnYvRXU1bENRV1kKTThOR0crcGRsR0FsaUZFOHdTNnpnaXJvU3BnVFZneG9OdVhYZVZKTm85QjlhQnR3dG5PSnZ5WU5Bb0dCQUp3bgphNHk0a0JEeGZwUCtmWDE3QnUwb2FlL0g0M05hVlFOU0Vvc1lnRTR4bmc4RWJ1SkdQZUo4eGliaDkzbm5lVnhPCmhOaWV2MjgzWG52Y0s1QlVoeUpMV2RDVGczQmRMczBGWHYvdnlZOFB2WUY2Ym56aXlXUXdiVXpNc3VkVkx4RU0KSUhLNWhzZU1PNnFjK1pKbUt3Mng0QjRtODEyQnVneGJpWnA2NHpxdkFvR0JBTXVrcjVSSFdsL1YzNGY0Sk40aQpnaW5ZZVBJbG1XRDBDb2ZHSVUyTU1SNWhrbE9EZ2lnbzlOTzhjQTlUTVRsRDVDSitETG80TkZSSXFkTjhrb1UzCkJsWWdqdjY5dlVMak53TzdLVGdmT09YUUF6YUI3L2ZuR1llbnZzd0xzQnBRbWlqOFZuWDhzSklUbndXOU51cm4KVkRUTE1seDk3T3VqUEV5NVZQY2xoSk1TCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
 `
-		_, _ = fmt.Fprint(w, resp)
-	})
+			_, _ = fmt.Fprint(w, resp)
+		},
+	)
 	resp, err := client.KubernetesEngine.GetKubeConfig(ctx, "xfbxsws38dcs8o94", &GetKubeConfigOptions{})
 	require.NoError(t, err)
 	require.Equal(t, resp, `
@@ -434,9 +467,11 @@ users:
 func TestGetClusterInfo(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.K8sURL(clusterInfo+"/"+"6515297b220963774dd304b0"), func(writer http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
-		resp := `
+	mux.HandleFunc(
+		testlib.K8sURL(clusterInfo+"/"+"6515297b220963774dd304b0"),
+		func(writer http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
+			resp := `
 {
     "shoot_uid": "n5s4coxhy30zwa0r",
     "pool_name": "pool-zd5n544x",
@@ -453,9 +488,11 @@ func TestGetClusterInfo(t *testing.T) {
     }
 }
 `
-		_, _ = fmt.Fprint(writer, resp)
-	})
+			_, _ = fmt.Fprint(writer, resp)
+		},
+	)
 	cluster, err := client.KubernetesEngine.GetClusterInfo(ctx, "6515297b220963774dd304b0")
+	fmt.Println(err)
 	require.NoError(t, err)
 	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.ShootUid)
 	assert.Equal(t, "v1.25.10", cluster.K8sVersion)
@@ -464,13 +501,15 @@ func TestGetClusterInfo(t *testing.T) {
 func TestAddClusterEverywhere(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.K8sURL(clusterJoinEverywhere+"/"+"n5s4coxhy30zwa0r"), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPost, r.Method)
-		var payload *ClusterJoinEverywhereRequest
-		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3", payload.Hostname)
+	mux.HandleFunc(
+		testlib.K8sURL(clusterJoinEverywhere+"/"+"n5s4coxhy30zwa0r"),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodPost, r.Method)
+			var payload *ClusterJoinEverywhereRequest
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+			assert.Equal(t, "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3", payload.Hostname)
 
-		resp := `
+			resp := `
 {
     "apiserver": "https://n5s4coxhy30zwa0r.api.hn.bke-staging.bfcplatform.vn",
     "cluster_dns": "10.93.0.10",
@@ -494,8 +533,9 @@ func TestAddClusterEverywhere(t *testing.T) {
         }
     }
 }`
-		_, _ = fmt.Fprint(w, resp)
-	})
+			_, _ = fmt.Fprint(w, resp)
+		},
+	)
 
 	cluster, err := client.KubernetesEngine.AddClusterEverywhere(ctx, "n5s4coxhy30zwa0r", &ClusterJoinEverywhereRequest{
 		Hostname:    "pool-zd5n544x-n5s4coxhy30zwa0r-go-test3",
@@ -512,9 +552,11 @@ func TestAddClusterEverywhere(t *testing.T) {
 func TestGetNodeEverywhereByUUID(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(testlib.K8sURL(nodeEverywhere+"/"+"eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd"), func(writer http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
-		resp := `
+	mux.HandleFunc(
+		testlib.K8sURL(nodeEverywhere+"/"+"eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd"),
+		func(writer http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodGet, r.Method)
+			resp := `
 {
     "id": "651d3eced6ff4acf9de8b97d",
     "shoot": "n5s4coxhy30zwa0r",
@@ -526,8 +568,9 @@ func TestGetNodeEverywhereByUUID(t *testing.T) {
     "updated_at": "2023-10-04T10:30:38.229000"
 }
 `
-		_, _ = fmt.Fprint(writer, resp)
-	})
+			_, _ = fmt.Fprint(writer, resp)
+		},
+	)
 	cluster, err := client.KubernetesEngine.GetEverywhere(ctx, "eecae8cd-e6e7-4ad9-b72e-89ac6a40dcbd")
 	require.NoError(t, err)
 	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.Shoot)
