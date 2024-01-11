@@ -79,28 +79,40 @@ type VolumeAttachment struct {
 	ID           string `json:"id"`
 }
 
+type VolumeImageMetadata struct {
+	ContainerFormat string `json:"container_format"`
+	DiskFormat      string `json:"disk_format"`
+	ImageID         string `json:"image_id"`
+	ImageName       string `json:"image_name"`
+	ImageType       string `json:"image_type"`
+	MinDisk         string `json:"min_disk"`
+	MinRam          string `json:"min_ram"`
+	Size            string `json:"size"`
+}
+
 // Volume contains volume information.
 type Volume struct {
-	ID               string             `json:"id"`
-	Size             int                `json:"size"`
-	AttachedType     string             `json:"attached_type"`
-	Name             string             `json:"name"`
-	Type             string             `json:"type"`
-	VolumeType       string             `json:"volume_type"`
-	Description      string             `json:"description"`
-	SnapshotID       string             `json:"snapshot_id"`
-	Bootable         bool               `json:"bootable"`
-	AvailabilityZone string             `json:"availability_zone"`
-	Status           string             `json:"status"`
-	UserID           string             `json:"user_id"`
-	ProjectID        string             `json:"os-vol-tenant-attr:tenant_id"`
-	CreatedAt        string             `json:"created_at"`
-	UpdatedAt        string             `json:"updated_at"`
-	Metadata         map[string]string  `json:"metadata"`
-	Attachments      []VolumeAttachment `json:"attachments"`
-	Category         string             `json:"category"`
-	BillingPlan      string             `json:"billing_plan"`
-	Encrypted        bool               `json:"encrypted"`
+	ID               string              `json:"id"`
+	Size             int                 `json:"size"`
+	AttachedType     string              `json:"attached_type"`
+	Name             string              `json:"name"`
+	Type             string              `json:"type"`
+	VolumeType       string              `json:"volume_type"`
+	Description      string              `json:"description"`
+	SnapshotID       string              `json:"snapshot_id"`
+	Bootable         bool                `json:"bootable"`
+	AvailabilityZone string              `json:"availability_zone"`
+	Status           string              `json:"status"`
+	UserID           string              `json:"user_id"`
+	ProjectID        string              `json:"os-vol-tenant-attr:tenant_id"`
+	CreatedAt        string              `json:"created_at"`
+	UpdatedAt        string              `json:"updated_at"`
+	Metadata         map[string]string   `json:"metadata"`
+	Attachments      []VolumeAttachment  `json:"attachments"`
+	Category         string              `json:"category"`
+	BillingPlan      string              `json:"billing_plan"`
+	Encrypted        bool                `json:"encrypted"`
+	ImageMetadata    VolumeImageMetadata `json:"volume_image_metadata"`
 }
 
 // VolumeType contains volume type information.
