@@ -52,7 +52,17 @@ func TestVolumeList(t *testing.T) {
         "category": "premium",
         "region_name": "HaNoi",
         "attached_type": "datadisk",
-        "billing_plan": "saving_plan"
+        "billing_plan": "saving_plan",
+		"volume_image_metadata": {
+			"container_format": "bare",
+			"disk_format": "raw",
+			"image_id": "d646476d-850c-423e-b02c-6b86aeda3717",
+			"image_name": "Ubuntu 20.04",
+			"image_type": "image",
+			"min_disk": "0",
+			"min_ram": "0",
+			"size": "5368709120"
+		}
     }
 ]
 `
@@ -71,6 +81,14 @@ func TestVolumeList(t *testing.T) {
 	assert.Equal(t, "saving_plan", volume.BillingPlan)
 	assert.Equal(t, "HDD", volume.Type)
 	assert.Equal(t, "PREMIUM-HDD1", volume.VolumeType)
+	assert.Equal(t, "bare", volume.ImageMetadata.ContainerFormat)
+	assert.Equal(t, "raw", volume.ImageMetadata.DiskFormat)
+	assert.Equal(t, "d646476d-850c-423e-b02c-6b86aeda3717", volume.ImageMetadata.ImageID)
+	assert.Equal(t, "Ubuntu 20.04", volume.ImageMetadata.ImageName)
+	assert.Equal(t, "image", volume.ImageMetadata.ImageType)
+	assert.Equal(t, "0", volume.ImageMetadata.MinDisk)
+	assert.Equal(t, "0", volume.ImageMetadata.MinRam)
+	assert.Equal(t, "5368709120", volume.ImageMetadata.Size)
 }
 
 func TestVolumeGet(t *testing.T) {
@@ -191,7 +209,17 @@ func TestVolumeGet(t *testing.T) {
 	"id": "7b099bbb-21e9-48f9-8cec-4076d78fa201",
 	"size": 20,
 	"attached_type": "datadisk",
-	"category": "premium"
+	"category": "premium",
+	"volume_image_metadata": {
+		"container_format": "bare",
+		"disk_format": "raw",
+		"image_id": "d646476d-850c-423e-b02c-6b86aeda3717",
+		"image_name": "Ubuntu 20.04",
+		"image_type": "image",
+		"min_disk": "0",
+		"min_ram": "0",
+		"size": "5368709120"
+	}
 }		
 `
 		_, _ = fmt.Fprint(w, resp)
@@ -202,6 +230,14 @@ func TestVolumeGet(t *testing.T) {
 	assert.Equal(t, "7b099bbb-21e9-48f9-8cec-4076d78fa201", volume.ID)
 	assert.Equal(t, "sapd-vol-1", volume.Name)
 	assert.Equal(t, "HDD", volume.Type)
+	assert.Equal(t, "bare", volume.ImageMetadata.ContainerFormat)
+	assert.Equal(t, "raw", volume.ImageMetadata.DiskFormat)
+	assert.Equal(t, "d646476d-850c-423e-b02c-6b86aeda3717", volume.ImageMetadata.ImageID)
+	assert.Equal(t, "Ubuntu 20.04", volume.ImageMetadata.ImageName)
+	assert.Equal(t, "image", volume.ImageMetadata.ImageType)
+	assert.Equal(t, "0", volume.ImageMetadata.MinDisk)
+	assert.Equal(t, "0", volume.ImageMetadata.MinRam)
+	assert.Equal(t, "5368709120", volume.ImageMetadata.Size)
 }
 
 func TestVolumeDelete(t *testing.T) {
