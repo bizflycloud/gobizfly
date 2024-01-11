@@ -58,9 +58,9 @@ type KubernetesEngineService interface {
 }
 
 type KubernetesErrorResponse struct {
-	Code      string `json:"code"    yaml:"id"`
-	Message   string `json:"shoot"   yaml:"shoot"`
-	RequestId string `json:"pool_id" yaml:"pool_id"`
+	Code      string `json:"code"       yaml:"code"`
+	Message   string `json:"message"    yaml:"message"`
+	RequestId string `json:"request-id" yaml:"request-id"`
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
