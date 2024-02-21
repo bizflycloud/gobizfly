@@ -62,6 +62,7 @@ type Cluster struct {
 	CreatedBy        string            `json:"created_by"         yaml:"created_by"`
 	WorkerPoolsCount int               `json:"worker_pools_count" yaml:"worker_pools_count"`
 	ProvisionType    string            `json:"provision_type"     yaml:"provision_type"`
+	BCRIntegrated    bool              `json:"bcr_integrated"     yaml:"bcr_integrated"`
 }
 
 // ExtendedCluster represents a Kubernetes cluster with additional worker pools' information
