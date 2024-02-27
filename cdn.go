@@ -30,7 +30,7 @@ type CDNService interface {
 	List(ctx context.Context, opts *ListOptions) (*DomainsResp, error)
 	Get(ctx context.Context, domainID string) (*Domain, error)
 	Create(ctx context.Context, cdrq *CreateDomainPayload) (*CreateDomainResponse, error)
-	Update(ctx context.Context, domainID string, udrq *UpdateDomainReq) (*UpdateDomainResp, error)
+	Update(ctx context.Context, domainID string, udrq *UpdateDomainPayload) (*UpdateDomainResp, error)
 	Delete(ctx context.Context, domainID string) error
 	DeleteCache(ctx context.Context, domainID string, files *Files) error
 }
@@ -96,6 +96,10 @@ type UpdateDomainReq struct {
 	UpstreamProto string `json:"upstream_proto"`
 	PageSpeed     int    `json:"pagespeed"`
 	SecureLink    int    `json:"secure_link"`
+}
+
+type UpdateDomainPayload struct {
+	Origin *Origin `json:"origin"`
 }
 
 // UpdateDomainResp represents a response body when updating CDN domain
@@ -182,7 +186,7 @@ func (c *cdnService) Create(ctx context.Context, cdrq *CreateDomainPayload) (*Cr
 	return data, nil
 }
 
-func (c *cdnService) Update(ctx context.Context, domainID string, udrq *UpdateDomainReq) (*UpdateDomainResp, error) {
+func (c *cdnService) Update(ctx context.Context, domainID string, udrq *UpdateDomainPayload) (*UpdateDomainResp, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodPut, cdnName, c.itemPath(domainID), udrq)
 	if err != nil {
 		return nil, err
