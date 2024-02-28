@@ -22,7 +22,7 @@ func setup() {
 	serverTest = httptest.NewServer(mux)
 
 	var err error
-	testRegion := "HN"
+	testRegion := "HaNoi"
 	client, err = NewClient(WithAPIUrl(serverTest.URL), WithRegionName(testRegion))
 	services := []*Service{
 		{Name: "Cloud Server",
