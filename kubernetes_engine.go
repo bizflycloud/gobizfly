@@ -15,7 +15,7 @@ const (
 	clusterPath           = "/_"
 	kubeConfig            = "kubeconfig"
 	k8sVersion            = "/k8s_versions"
-	clusterInfo          = "/engine/cluster_info"
+	clusterInfo           = "/engine/cluster_info"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
 	nodeEverywhere        = "/_/node_everywhere"
 )
@@ -25,7 +25,6 @@ var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
 type kubernetesEngineService struct {
 	client *Client
 }
-
 
 type KubernetesEngineService interface {
 	List(ctx context.Context, opts *ListOptions) ([]*Cluster, error)
@@ -43,6 +42,8 @@ type KubernetesEngineService interface {
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
+	UpdateCluster(ctx context.Context, id string, payload *UpdateClusterRequest) (*ExtendedCluster, error)
+	UpgradeClusterVersion(ctx context.Context, id string) error
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -64,7 +65,7 @@ func (c *kubernetesEngineService) EverywherePath(id string) string {
 }
 
 type GetKubeConfigOptions struct {
-	ExpiteTime  string `json:"expire_time,omitempty"`
+	ExpiteTime string `json:"expire_time,omitempty"`
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster
