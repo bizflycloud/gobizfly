@@ -27,11 +27,8 @@ func TestDomainList(t *testing.T) {
     "prev": "/users/0b722b886f0d43f49e69e4648684c0b7/domains?page=1&limit=50",
     "results": [
         {
-            "id": 2483,
-            "user": 7353,
             "certificate": null,
             "cname": "",
-            "upstream_addrs": "192.168.6.49:7602,192.168.6.57:7602",
             "slug": "autopro",
             "pagespeed": 0,
             "upstream_proto": "http",
@@ -45,13 +42,13 @@ func TestDomainList(t *testing.T) {
     ]
 }
 `
-		_, _ = fmt.Fprintf(writer, resp)
+		writer.Write([]byte(resp))
 	})
 	resp, err := client.CDN.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, resp.Domains, 1)
 	assert.Equal(t, resp.Total, 1)
-	assert.Equal(t, resp.Domains[0].ID, 2483)
+	assert.Equal(t, resp.Domains[0].DomainID, "2a535a9d-b963-4148-a522-e68c10b3d337")
 }
 
 func TestDomainGet(t *testing.T) {
@@ -81,26 +78,6 @@ func TestDomainGet(t *testing.T) {
             {
                 "type": "ip",
                 "host": "192.168.6.37"
-            },
-            {
-                "type": "ip",
-                "host": "192.168.6.89"
-            },
-            {
-                "type": "ip",
-                "host": "10.5.20.105"
-            },
-            {
-                "type": "ip",
-                "host": "10.5.20.107"
-            },
-            {
-                "type": "ip",
-                "host": "10.5.20.110"
-            },
-            {
-                "type": "ip",
-                "host": "10.5.20.92"
             }
         ],
         "domain_id": "4f235b0f-497d-4483-8326-ed695152da57",
@@ -127,41 +104,33 @@ func TestDomainCreate(t *testing.T) {
 	var c cdnService
 	mux.HandleFunc(testlib.CDNURL(c.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
-		var payload *CreateDomainReq
+		var payload *CreateDomainPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, "cdn.monkidia.com", payload.Domain)
 		resp := `
 {
     "message": "domain created",
     "domain": {
-        "type": "REWRITE",
         "domain_id": "53e220ff-9aab-4cd3-935b-36ba8b20ded8",
-        "upstream_proto": "http",
-        "certificate": null,
-        "ddos_protection": 0,
         "domain": "cdn.monkidia.com",
-        "status": null,
-        "cname": null,
-        "user": 7353,
-        "pagespeed": 1,
-        "slug": "cdn-monkidia",
-        "created_at": "2019-02-22T16:36:27+00:00",
-        "upstream_addrs": "103.69.194.139",
-        "id": 5758
+        "slug": "cdn-monkidia"
     }
 }
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.CDN.Create(ctx, &CreateDomainReq{
-		Domain:        "cdn.monkidia.com",
-		PageSpeed:     1,
-		UpstreamAddrs: "103.69.194.139",
-		UpstreamProto: "http",
+	resp, err := client.CDN.Create(ctx, &CreateDomainPayload{
+		Domain: "cdn.monkidia.com",
+		Origin: &Origin{
+			Name:          "monkidia",
+			UpstreamHost:  "www.huylvt.com",
+			UpstreamAddrs: "www.huylvt.com",
+			UpstreamProto: "http",
+		},
 	})
 	require.NoError(t, err)
 	require.Equal(t, "domain created", resp.Message)
-	require.Equal(t, 7353, resp.Domain.User)
+	require.Equal(t, "cdn-monkidia", resp.Domain.Slug)
 }
 
 func TestDomainUpdate(t *testing.T) {

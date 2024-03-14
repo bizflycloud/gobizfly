@@ -14,8 +14,10 @@ import (
 )
 
 const (
-	domainPath = "/domains"
-	usersPath  = "/users"
+	domainPath  = "/domains"
+	usersPath   = "/users"
+	clientsPath = "/clients"
+	originPath  = "/origins"
 )
 
 type cdnService struct {
@@ -26,29 +28,27 @@ var _ CDNService = (*cdnService)(nil)
 
 type CDNService interface {
 	List(ctx context.Context, opts *ListOptions) (*DomainsResp, error)
-	Get(ctx context.Context, domainID string) (*ExtendedDomain, error)
-	Create(ctx context.Context, cdrq *CreateDomainReq) (*CreateDomainResp, error)
-	Update(ctx context.Context, domainID string, udrq *UpdateDomainReq) (*UpdateDomainResp, error)
+	Get(ctx context.Context, domainID string) (*Domain, error)
+	Create(ctx context.Context, cdrq *CreateDomainPayload) (*CreateDomainResponse, error)
+	Update(ctx context.Context, domainID string, udrq *UpdateDomainPayload) (*UpdateDomainResp, error)
 	Delete(ctx context.Context, domainID string) error
 	DeleteCache(ctx context.Context, domainID string, files *Files) error
 }
 
+// Origin represents a CDN origin information
+type Origin struct {
+	Name          string `json:"name"`
+	UpstreamHost  string `json:"upstream_host"`
+	UpstreamAddrs string `json:"upstream_addrs"`
+	UpstreamProto string `json:"upstream_proto"`
+}
+
 // Domain represents CDN domain information
 type Domain struct {
-	ID             int    `json:"id"`
-	User           int    `json:"user"`
-	Certificate    int    `json:"certificate"`
-	CName          string `json:"cname"`
-	UpstreamAddrs  string `json:"upstream_addrs"`
-	Slug           string `json:"slug"`
-	PageSpeed      int    `json:"pagespeed"`
-	UpstreamProto  string `json:"upstream_proto"`
-	DDOSProtection int    `json:"ddos_protection"`
-	Status         string `json:"status"`
-	CreatedAt      string `json:"created_at"`
-	DomainID       string `json:"domain_id"`
-	Domain         string `json:"domain"`
-	Type           string `json:"type"`
+	Domain    string `json:"domain"`
+	Slug      string `json:"slug"`
+	DomainCDN string `json:"domain_cdn"`
+	DomainID  string `json:"domain_id"`
 }
 
 // DomainsResp represents a list of CDN domains and pagination information
@@ -79,16 +79,13 @@ type ExtendedDomain struct {
 }
 
 // CreateDomainReq represents a request body for creating CDN domain
-type CreateDomainReq struct {
-	Domain        string `json:"domain"`
-	Email         string `json:"email,omitempty"`
-	UpstreamAddrs string `json:"upstream_addrs"`
-	UpstreamProto string `json:"upstream_proto"`
-	PageSpeed     int    `json:"pagespeed"`
+type CreateDomainPayload struct {
+	Domain string  `json:"domain"`
+	Origin *Origin `json:"origin"`
 }
 
 // CreateDomainResp represents a response body when creating CDN domain
-type CreateDomainResp struct {
+type CreateDomainResponse struct {
 	Message string `json:"message"`
 	Domain  Domain `json:"domain"`
 }
@@ -99,6 +96,10 @@ type UpdateDomainReq struct {
 	UpstreamProto string `json:"upstream_proto"`
 	PageSpeed     int    `json:"pagespeed"`
 	SecureLink    int    `json:"secure_link"`
+}
+
+type UpdateDomainPayload struct {
+	Origin *Origin `json:"origin"`
 }
 
 // UpdateDomainResp represents a response body when updating CDN domain
@@ -117,11 +118,11 @@ type Files struct {
 }
 
 func (c *cdnService) resourcePath() string {
-	return domainPath
+	return strings.Join([]string{clientsPath, domainPath}, "")
 }
 
 func (c *cdnService) itemPath(id string) string {
-	return strings.Join([]string{domainPath, id}, "/")
+	return strings.Join([]string{c.resourcePath(), id}, "/")
 }
 
 func (c *cdnService) List(ctx context.Context, opts *ListOptions) (*DomainsResp, error) {
@@ -150,11 +151,9 @@ func (c *cdnService) List(ctx context.Context, opts *ListOptions) (*DomainsResp,
 	return data, nil
 }
 
-func (c *cdnService) Get(ctx context.Context, domainID string) (*ExtendedDomain, error) {
+func (c *cdnService) Get(ctx context.Context, domainID string) (*Domain, error) {
+	var data *CreateDomainResponse
 	req, err := c.client.NewRequest(ctx, http.MethodGet, cdnName, c.itemPath(domainID), nil)
-	var data struct {
-		Domain *ExtendedDomain `json:"domain"`
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -166,11 +165,12 @@ func (c *cdnService) Get(ctx context.Context, domainID string) (*ExtendedDomain,
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data.Domain, nil
+
+	return &data.Domain, nil
 }
 
-func (c *cdnService) Create(ctx context.Context, cdrq *CreateDomainReq) (*CreateDomainResp, error) {
-	var data *CreateDomainResp
+func (c *cdnService) Create(ctx context.Context, cdrq *CreateDomainPayload) (*CreateDomainResponse, error) {
+	var data *CreateDomainResponse
 	req, err := c.client.NewRequest(ctx, http.MethodPost, cdnName, c.resourcePath(), &cdrq)
 	if err != nil {
 		return nil, err
@@ -186,7 +186,7 @@ func (c *cdnService) Create(ctx context.Context, cdrq *CreateDomainReq) (*Create
 	return data, nil
 }
 
-func (c *cdnService) Update(ctx context.Context, domainID string, udrq *UpdateDomainReq) (*UpdateDomainResp, error) {
+func (c *cdnService) Update(ctx context.Context, domainID string, udrq *UpdateDomainPayload) (*UpdateDomainResp, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodPut, cdnName, c.itemPath(domainID), udrq)
 	if err != nil {
 		return nil, err
