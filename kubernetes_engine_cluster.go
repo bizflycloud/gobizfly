@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // EverywhereNode represents a Kubernetes everywhere node
@@ -32,6 +33,8 @@ type ClusterCreateRequest struct {
 	VPCNetworkID string       `json:"private_network_id"     yaml:"private_network_id"`
 	EnableCloud  bool         `json:"enable_cloud,omitempty" yaml:"enable_cloud,omitempty"`
 	Tags         []string     `json:"tags,omitempty"         yaml:"tags,omitempty"`
+	LocalDNS     bool         `json:"local_dns"`
+	CNIPlugin    string       `json:"cni_plugin,omitempty"`
 	WorkerPools  []WorkerPool `json:"worker_pools"           yaml:"worker_pools"`
 }
 
@@ -54,6 +57,7 @@ type Cluster struct {
 	Name             string            `json:"name"               yaml:"name"`
 	Version          ControllerVersion `json:"version"            yaml:"version"`
 	VPCNetworkID     string            `json:"private_network_id" yaml:"private_network_id"`
+	SubnetID         string            `json:"private_subnet_id"`
 	AutoUpgrade      bool              `json:"auto_upgrade"       yaml:"auto_upgrade"`
 	Tags             []string          `json:"tags"               yaml:"tags"`
 	ProvisionStatus  string            `json:"provision_status"   yaml:"provision_status"`
@@ -62,6 +66,11 @@ type Cluster struct {
 	CreatedBy        string            `json:"created_by"         yaml:"created_by"`
 	WorkerPoolsCount int               `json:"worker_pools_count" yaml:"worker_pools_count"`
 	ProvisionType    string            `json:"provision_type"     yaml:"provision_type"`
+	AccessMode       string            `json:"access_mode"`
+	CNIPlugin        string            `json:"cni_plugin"`
+	ForceUpgrade     bool              `json:"force_upgrade"`
+	LocalDNS         bool              `json:"local_dns"`
+	BcrIntegrated    bool              `json:"bcr_integrated"`
 }
 
 // ExtendedCluster represents a Kubernetes cluster with additional worker pools' information
@@ -77,10 +86,36 @@ type ClusterStat struct {
 	TotalMemory     int `json:"total_memory" yaml:"total_memory"`
 }
 
+// UpgradeVersionTime represents the upgrade version time of a Kubernetes cluster
+type UpgradeVersionTime struct {
+	Day  int    `json:"day"`
+	Time string `json:"time"`
+}
+
 // FullCluster represents a Kubernetes cluster with additional worker pools' data and its statistic information
 type FullCluster struct {
 	ExtendedCluster
-	Stat ClusterStat `json:"stat" yaml:"stat"`
+	UpgradeTime UpgradeVersionTime `json:"upgrade_time"`
+	Stat        ClusterStat        `json:"stat" yaml:"stat"`
+}
+
+// UpdateClusterRequest represents the request body for update a Kubernetes cluster
+type UpdateClusterRequest struct {
+	AccessPolicies *[]string              `json:"access_policies,omitempty"`
+	AutoUpgrade    *bool                  `json:"auto_upgrade,omitempty"`
+	BcrIntegrated  *bool                  `json:"bcr_integrated,omitempty"`
+	UpgradeTime    map[string]interface{} `json:"upgrade_time,omitempty"`
+}
+
+// UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
+type UpgradeClusterVersionRequest struct {
+	ControlPlaneOnly string `json:"control_plane_only,omitempty"`
+}
+
+// UpgradeClusterVersionResponse represents the response of the request for upgrade version a Kubernetes cluster
+type UpgradeClusterVersionResponse struct {
+	IsLatest  bool   `json:"is_latest"`
+	UpgradeTo string `json:"upgrade_to"`
 }
 
 // List returns a list of Kubernetes clusters
@@ -172,4 +207,54 @@ func (c *kubernetesEngineService) GetEverywhere(ctx context.Context, id string) 
 		return nil, err
 	}
 	return everywhereNode, nil
+}
+
+func (c *kubernetesEngineService) UpdateCluster(ctx context.Context, id string, payload *UpdateClusterRequest) (*ExtendedCluster, error) {
+	var detailCluster ExtendedCluster
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, kubernetesServiceName, c.itemPath(id), payload)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&detailCluster); err != nil {
+		return nil, err
+	}
+	return &detailCluster, nil
+}
+
+func (c *kubernetesEngineService) GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error) {
+	var upgradeClusterVersion struct {
+		Upgrade UpgradeClusterVersionResponse
+	}
+	path := strings.Join([]string{id, "upgrade"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&upgradeClusterVersion); err != nil {
+		return nil, err
+	}
+	return &upgradeClusterVersion.Upgrade, nil
+}
+
+func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id string, payload *UpgradeClusterVersionRequest) error {
+	path := strings.Join([]string{id, "upgrade"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	return resp.Body.Close()
 }
