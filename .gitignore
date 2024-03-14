@@ -26,3 +26,8 @@
 # End of https://www.gitignore.io/api/go
 
 .idea/
+
+# Config VSCode IDE
+.vscode
+
+build/

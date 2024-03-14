@@ -13,6 +13,8 @@ import (
 	"net/url"
 	"path"
 	"strings"
+
+	"github.com/bizflycloud/gobizfly/utils"
 )
 
 const (
@@ -117,7 +119,11 @@ func WithHTTPClient(client *http.Client) Option {
 // WithRegionName sets the client region for Bizfly client.
 func WithRegionName(region string) Option {
 	return func(c *Client) error {
-		c.regionName = region
+		regionName, err := utils.ParseRegionName(region)
+		if err != nil {
+			return err
+		}
+		c.regionName = regionName
 		return nil
 	}
 }
