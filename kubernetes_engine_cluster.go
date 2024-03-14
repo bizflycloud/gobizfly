@@ -86,17 +86,36 @@ type ClusterStat struct {
 	TotalMemory     int `json:"total_memory" yaml:"total_memory"`
 }
 
+// UpgradeVersionTime represents the upgrade version time of a Kubernetes cluster
+type UpgradeVersionTime struct {
+	Day  int    `json:"day"`
+	Time string `json:"time"`
+}
+
 // FullCluster represents a Kubernetes cluster with additional worker pools' data and its statistic information
 type FullCluster struct {
 	ExtendedCluster
-	Stat ClusterStat `json:"stat" yaml:"stat"`
+	UpgradeTime UpgradeVersionTime `json:"upgrade_time"`
+	Stat        ClusterStat        `json:"stat" yaml:"stat"`
 }
 
+// UpdateClusterRequest represents the request body for update a Kubernetes cluster
 type UpdateClusterRequest struct {
 	AccessPolicies *[]string              `json:"access_policies,omitempty"`
 	AutoUpgrade    *bool                  `json:"auto_upgrade,omitempty"`
 	BcrIntegrated  *bool                  `json:"bcr_integrated,omitempty"`
 	UpgradeTime    map[string]interface{} `json:"upgrade_time,omitempty"`
+}
+
+// UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
+type UpgradeClusterVersionRequest struct {
+	ControlPlaneOnly string `json:"control_plane_only,omitempty"`
+}
+
+// UpgradeClusterVersionResponse represents the response of the request for upgrade version a Kubernetes cluster
+type UpgradeClusterVersionResponse struct {
+	IsLatest  bool   `json:"is_latest"`
+	UpgradeTo string `json:"upgrade_to"`
 }
 
 // List returns a list of Kubernetes clusters
@@ -207,9 +226,29 @@ func (c *kubernetesEngineService) UpdateCluster(ctx context.Context, id string, 
 	return &detailCluster, nil
 }
 
-func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id string) error {
+func (c *kubernetesEngineService) GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error) {
+	var upgradeClusterVersion struct {
+		Upgrade UpgradeClusterVersionResponse
+	}
 	path := strings.Join([]string{id, "upgrade"}, "/")
-	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&upgradeClusterVersion); err != nil {
+		return nil, err
+	}
+	return &upgradeClusterVersion.Upgrade, nil
+}
+
+func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id string, payload *UpgradeClusterVersionRequest) error {
+	path := strings.Join([]string{id, "upgrade"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
 	if err != nil {
 		return err
 	}

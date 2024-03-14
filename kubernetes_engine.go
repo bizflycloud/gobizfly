@@ -43,7 +43,8 @@ type KubernetesEngineService interface {
 	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
 	UpdateCluster(ctx context.Context, id string, payload *UpdateClusterRequest) (*ExtendedCluster, error)
-	UpgradeClusterVersion(ctx context.Context, id string) error
+	UpgradeClusterVersion(ctx context.Context, id string, payload *UpgradeClusterVersionRequest) error
+	GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
