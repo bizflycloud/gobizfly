@@ -26,6 +26,8 @@ type WorkerPool struct {
 	Tags              []string          `json:"tags,omitempty"               yaml:"tags,omitempty"`
 	Taints            []Taint           `json:"taints,omitempty"             yaml:"taints,omitempty"`
 	Labels            map[string]string `json:"labels,omitempty"             yaml:"labels,omitempty"`
+	NetworkPlan       string            `json:"network_plan,omitempty"`
+	BillingPlan       string            `json:"billing_plan,omitempty"`
 }
 
 type Taint struct {
