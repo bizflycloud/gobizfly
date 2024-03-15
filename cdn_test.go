@@ -55,7 +55,7 @@ func TestDomainGet(t *testing.T) {
 	setup()
 	defer teardown()
 	var c cdnService
-	mux.HandleFunc(testlib.CDNURL(c.itemPath("4f235b0f-497d-4483-8326-ed695152da57")), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("3a9e0da6-3c2c-4856-b120-b54e944b352f")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -80,7 +80,7 @@ func TestDomainGet(t *testing.T) {
                 "host": "192.168.6.37"
             }
         ],
-        "domain_id": "4f235b0f-497d-4483-8326-ed695152da57",
+        "domain_id": "3a9e0da6-3c2c-4856-b120-b54e944b352f",
         "domain": "cafefcdn.com",
         "host_id": "99700105af1edb30ac17c3cf9ea6a165",
         "pagespeed": 1,
@@ -92,10 +92,10 @@ func TestDomainGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	domain, err := client.CDN.Get(ctx, "4f235b0f-497d-4483-8326-ed695152da57")
+	domain, err := client.CDN.Get(ctx, "3a9e0da6-3c2c-4856-b120-b54e944b352f")
 	require.NoError(t, err)
-	assert.Equal(t, "cafefcdn.com", domain.Domain.Domain)
-	assert.Equal(t, 0, domain.DDOSProtection)
+	assert.Equal(t, "cafefcdn.com", domain.Domain)
+	assert.Equal(t, "cafefcdn.edge.vccloud.vn", domain.DomainCDN)
 }
 
 func TestDomainCreate(t *testing.T) {
@@ -136,11 +136,12 @@ func TestDomainCreate(t *testing.T) {
 func TestDomainUpdate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "4f235b0f-497d-4483-8326-ed695152da57"}, "/"), func(writer http.ResponseWriter, r *http.Request) {
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("3a9e0da6-3c2c-4856-b120-b54e944b352f")), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
-		var payload *UpdateDomainReq
+		var payload *UpdateDomainPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "103.69.194.139", payload.UpstreamAddrs)
+		assert.Equal(t, "cafefcdn.com", payload.Origin.UpstreamHost)
 		resp := `{
     "message": "Domain updated",
     "domain": {
@@ -184,7 +185,7 @@ func TestDomainUpdate(t *testing.T) {
                 "host": "10.5.20.92"
             }
         ],
-        "domain_id": "4f235b0f-497d-4483-8326-ed695152da57",
+        "domain_id": "3a9e0da6-3c2c-4856-b120-b54e944b352f",
         "domain": "cafefcdn.com",
         "host_id": "99700105af1edb30ac17c3cf9ea6a165",
         "pagespeed": 1,
@@ -195,11 +196,11 @@ func TestDomainUpdate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	resp, err := client.CDN.Update(ctx, "4f235b0f-497d-4483-8326-ed695152da57", &UpdateDomainReq{
-		UpstreamAddrs: "103.69.194.139",
-		UpstreamProto: "http",
-		PageSpeed:     1,
-		SecureLink:    0,
+	resp, err := client.CDN.Update(ctx, "3a9e0da6-3c2c-4856-b120-b54e944b352f", &UpdateDomainPayload{
+		Origin: &Origin{
+			Name:         "cafefcdn",
+			UpstreamHost: "cafefcdn.com",
+		},
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "99700105af1edb30ac17c3cf9ea6a165", resp.Domain.HostID)
@@ -209,17 +210,19 @@ func TestDomainUpdate(t *testing.T) {
 func TestDeleteDomain(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "a0afe23e-437b-43e8-906e-055bdac9ed3c"}, "/"),
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("3a9e0da6-3c2c-4856-b120-b54e944b352f")),
 		func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.CDN.Delete(ctx, "a0afe23e-437b-43e8-906e-055bdac9ed3c"))
+	require.NoError(t, client.CDN.Delete(ctx, "3a9e0da6-3c2c-4856-b120-b54e944b352f"))
 }
 
 func TestDeleteCache(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "a0afe23e-437b-43e8-906e-055bdac9ed3c"}, "/"),
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("3a9e0da6-3c2c-4856-b120-b54e944b352f")),
 		func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 			var payload *Files
@@ -227,5 +230,5 @@ func TestDeleteCache(t *testing.T) {
 		})
 	files := Files{
 		Files: []string{"/css/style.js", "/js/script.js", "/images/logo.jpg"}}
-	require.NoError(t, client.CDN.DeleteCache(ctx, "a0afe23e-437b-43e8-906e-055bdac9ed3c", &files))
+	require.NoError(t, client.CDN.DeleteCache(ctx, "3a9e0da6-3c2c-4856-b120-b54e944b352f", &files))
 }
