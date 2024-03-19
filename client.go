@@ -70,6 +70,7 @@ type Client struct {
 	keystoneToken         string
 	KubernetesEngine      KubernetesEngineService
 	Listener              ListenerService
+	L7Policy              L7PolicyService
 	LoadBalancer          LoadBalancerService
 	Member                MemberService
 	NetworkInterface      NetworkInterfaceService
@@ -167,6 +168,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Token = &token{client: c}
 	c.LoadBalancer = &loadbalancer{client: c}
 	c.Listener = &listener{client: c}
+	c.L7Policy = &l7Policy{client: c}
 	c.Pool = &pool{client: c}
 	c.HealthMonitor = &healthmonitor{client: c}
 	c.Member = &member{client: c}
