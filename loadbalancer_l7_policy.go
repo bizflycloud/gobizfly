@@ -103,12 +103,12 @@ type l7Policy struct {
 }
 
 func (p *l7Policy) itemPath(policyId string) string {
-	return strings.Join([]string{"l7policy", policyId}, "/")
+	return strings.Join([]string{l7PolicyPath, policyId}, "/")
 }
 
 // Create - create policy for listener
 func (p *l7Policy) Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error) {
-	createL7PolicyPath := strings.Join([]string{"listen", listenerId, "l7policy"}, "/")
+	createL7PolicyPath := strings.Join([]string{listenerPath, listenerId, "l7policy"}, "/")
 	clpr := struct {
 		L7Policy CreateL7PolicyRequest `json:"l7policy"`
 	}{L7Policy: *payload}
@@ -124,7 +124,7 @@ func (p *l7Policy) Create(ctx context.Context, listenerId string, payload *Creat
 	var data struct {
 		L7Policy DetailL7Policy `json:"l7policy"`
 	}
-	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
 
@@ -143,7 +143,7 @@ func (p *l7Policy) Get(ctx context.Context, policyId string) (*DetailL7Policy, e
 	}
 	defer resp.Body.Close()
 	var data DetailL7Policy
-	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
 	return &data, err
@@ -166,7 +166,7 @@ func (p *l7Policy) Update(ctx context.Context, policyId string, payload *UpdateL
 	var data struct {
 		L7Policy DetailL7Policy `json:"l7policy"`
 	}
-	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
 	return &data.L7Policy, nil
