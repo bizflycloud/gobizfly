@@ -14,6 +14,7 @@ type L7PolicyService interface {
 	Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error)
 	Delete(ctx context.Context, policyId string) error
 	ListL7PolicyRules(ctx context.Context, policyId string) ([]DetailL7PolicyRule, error)
+	CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error)
 }
 
 // L7PolicyRuleRequest is rule of l7 policy payload
@@ -204,4 +205,27 @@ func (p *l7Policy) ListL7PolicyRules(ctx context.Context, policyId string) ([]De
 		return nil, err
 	}
 	return data.Rules, nil
+}
+
+func (p *l7Policy) CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error) {
+	path := strings.Join([]string{p.itemPath(policyId), "rules"}, "/")
+	clpr := struct {
+		Rule L7PolicyRuleRequest `json:"rule"`
+	}{Rule: payload}
+	req, err := p.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, path, clpr)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var data struct {
+		Rule DetailL7PolicyRule `json:"rule"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return &data.Rule, nil
 }
