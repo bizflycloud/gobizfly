@@ -29,13 +29,36 @@ type SessionPersistence struct {
 	PersistenceGranularity *string `json:"persistence_granularity,omitempty"`
 }
 
+type PoolHealthMonitorRequest struct {
+	Name           string `json:"name"`
+	Delay          int    `json:"delay"`
+	ExpectedCodes  string `json:"expected_codes"`
+	HttpMethod     string `json:"http_method"`
+	MaxRetries     int    `json:"max_retries"`
+	MaxRetriesDown int    `json:"max_retries_down"`
+	Timeout        int    `json:"timeout"`
+	Type           string `json:"type"`
+	UrlPath        string `json:"url_path"`
+}
+
+type PoolMemberRequest struct {
+	ID          int    `json:"id"`
+	Address     string `json:"address"`
+	Name        string `json:"name"`
+	Weight      int    `json:"weight"`
+	Port        int    `json:"protocol_port"`
+	NetworkName string `json:"network_name,omitempty"`
+}
+
 // PoolCreateRequest represents create new pool request payload.
 type PoolCreateRequest struct {
-	LBAlgorithm        string              `json:"lb_algorithm"`
-	ListenerID         string              `json:"listener_id,omitempty"`
-	Name               *string             `json:"name,omitempty"`
-	Protocol           string              `json:"protocol"`
-	SessionPersistence *SessionPersistence `json:"session_persistence,omitempty"`
+	LBAlgorithm        string                    `json:"lb_algorithm"`
+	ListenerID         string                    `json:"listener_id,omitempty"`
+	Name               *string                   `json:"name,omitempty"`
+	Protocol           string                    `json:"protocol"`
+	SessionPersistence *SessionPersistence       `json:"session_persistence,omitempty"`
+	HealthMonitor      *PoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
+	Members            []PoolMemberRequest       `json:"members,omitempty"`
 }
 
 // PoolUpdateRequest represents update pool request payload.
