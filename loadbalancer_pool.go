@@ -63,11 +63,13 @@ type PoolCreateRequest struct {
 
 // PoolUpdateRequest represents update pool request payload.
 type PoolUpdateRequest struct {
-	AdminStateUp       *bool               `json:"admin_state_up,omitempty"`
-	Description        *string             `json:"description,omitempty"`
-	LBAlgorithm        *string             `json:"lb_algorithm,omitempty"`
-	Name               *string             `json:"name,omitempty"`
-	SessionPersistence *SessionPersistence `json:"session_persistence"`
+	AdminStateUp       *bool                    `json:"admin_state_up,omitempty"`
+	Description        *string                  `json:"description,omitempty"`
+	LBAlgorithm        *string                  `json:"lb_algorithm,omitempty"`
+	Name               *string                  `json:"name,omitempty"`
+	SessionPersistence *SessionPersistence      `json:"session_persistence"`
+	Members            []PoolMemberRequest      `json:"members,omitempty"`
+	HealthMonitor      PoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
 }
 
 // Pool contains pool information.
