@@ -30,15 +30,16 @@ type SessionPersistence struct {
 }
 
 type PoolHealthMonitorRequest struct {
-	Name           string `json:"name"`
+	ID             string `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
 	Delay          int    `json:"delay"`
-	ExpectedCodes  string `json:"expected_codes"`
-	HttpMethod     string `json:"http_method"`
+	ExpectedCodes  string `json:"expected_codes,omitempty"`
+	HttpMethod     string `json:"http_method,omitempty"`
 	MaxRetries     int    `json:"max_retries"`
 	MaxRetriesDown int    `json:"max_retries_down"`
 	Timeout        int    `json:"timeout"`
 	Type           string `json:"type"`
-	UrlPath        string `json:"url_path"`
+	UrlPath        string `json:"url_path,omitempty"`
 }
 
 type PoolMemberRequest struct {
