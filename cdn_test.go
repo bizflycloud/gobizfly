@@ -94,8 +94,7 @@ func TestDomainGet(t *testing.T) {
 
 	domain, err := client.CDN.Get(ctx, "4f235b0f-497d-4483-8326-ed695152da57")
 	require.NoError(t, err)
-	assert.Equal(t, "cafefcdn.com", domain.Domain.Domain)
-	assert.Equal(t, 0, domain.DDOSProtection)
+	assert.Equal(t, "cafefcdn.com", domain.Domain)
 }
 
 func TestDomainCreate(t *testing.T) {
@@ -136,11 +135,12 @@ func TestDomainCreate(t *testing.T) {
 func TestDomainUpdate(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "4f235b0f-497d-4483-8326-ed695152da57"}, "/"), func(writer http.ResponseWriter, r *http.Request) {
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("4f235b0f-497d-4483-8326-ed695152da57")), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
-		var payload *UpdateDomainReq
+		var payload *UpdateDomainPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "103.69.194.139", payload.UpstreamAddrs)
+		assert.Equal(t, "103.69.194.139", payload.Origin.UpstreamAddrs)
 		resp := `{
     "message": "Domain updated",
     "domain": {
@@ -195,11 +195,13 @@ func TestDomainUpdate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	resp, err := client.CDN.Update(ctx, "4f235b0f-497d-4483-8326-ed695152da57", &UpdateDomainReq{
-		UpstreamAddrs: "103.69.194.139",
-		UpstreamProto: "http",
-		PageSpeed:     1,
-		SecureLink:    0,
+	resp, err := client.CDN.Update(ctx, "4f235b0f-497d-4483-8326-ed695152da57", &UpdateDomainPayload{
+		Origin: &Origin{
+			Name:          "name",
+			UpstreamHost:  "upstream-host",
+			UpstreamAddrs: "103.69.194.139",
+			UpstreamProto: "upstream-proto",
+		},
 	})
 	require.NoError(t, err)
 	assert.Equal(t, "99700105af1edb30ac17c3cf9ea6a165", resp.Domain.HostID)
@@ -209,7 +211,8 @@ func TestDomainUpdate(t *testing.T) {
 func TestDeleteDomain(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "a0afe23e-437b-43e8-906e-055bdac9ed3c"}, "/"),
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("a0afe23e-437b-43e8-906e-055bdac9ed3c")),
 		func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
@@ -219,7 +222,8 @@ func TestDeleteDomain(t *testing.T) {
 func TestDeleteCache(t *testing.T) {
 	setup()
 	defer teardown()
-	mux.HandleFunc(strings.Join([]string{testlib.CDNURL(domainPath), "a0afe23e-437b-43e8-906e-055bdac9ed3c"}, "/"),
+	var c cdnService
+	mux.HandleFunc(testlib.CDNURL(c.itemPath("a0afe23e-437b-43e8-906e-055bdac9ed3c")),
 		func(w http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 			var payload *Files
