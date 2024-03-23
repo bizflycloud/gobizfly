@@ -85,11 +85,11 @@ type Pool struct {
 	ProvisoningStatus  string              `json:"provisioning_status"`
 	ProjectID          string              `json:"project_id"`
 	LoadBalancers      []resourceID        `json:"loadbalancers"`
-	Members            []string            `json:"memebers"`
 	AdminStateUp       bool                `json:"admin_state_up"`
 	Protocol           string              `json:"protocol"`
 	CreatedAt          string              `json:"created_at"`
 	HealthMonitorID    string              `json:"healthmonitor_id"`
+	Members            []Member            `json:"members"`
 }
 
 type pool struct {
