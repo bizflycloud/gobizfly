@@ -9,7 +9,7 @@ import (
 
 // L7PolicyService is an interface to interact with Bizfly API L7Policy endpoint.
 type L7PolicyService interface {
-	Create(ctx context.Context, listenerId string, paylaod *CreateL7PolicyRequest) (*DetailL7Policy, error)
+	Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error)
 	Get(ctx context.Context, policyId string) (*DetailL7Policy, error)
 	Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error)
 	Delete(ctx context.Context, policyId string) error

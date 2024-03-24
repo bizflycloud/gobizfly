@@ -1185,3 +1185,279 @@ func TestBatchUpdateMember(t *testing.T) {
 	err := client.Member.BatchUpdate(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2", &members)
 	require.NoError(t, err)
 }
+
+func TestL7PolicyCreate(t *testing.T) {
+	setup()
+	defer teardown()
+	listenerID := "33188fce-15a1-4ef5-8587-f1cc2e1e31de"
+	createPath := strings.Join([]string{listenerPath, listenerID, "l7policy"}, "/")
+	mux.HandleFunc(testlib.LoadBalancerURL(createPath), func(w http.ResponseWriter, r *http.Request) {
+		var payload struct {
+			L7Policy CreateL7PolicyRequest `json:"l7policy"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		resp := `{
+			"l7policy": {
+			  	"id": "00ec77c0-dd79-44cc-9476-9d2db4bfaef8",
+			  	"name": "ducnv",
+			  	"description": "",
+			  	"provisioning_status": "PENDING_CREATE",
+			  	"operating_status": "OFFLINE",
+			  	"admin_state_up": true,
+			  	"project_id": "7e96a5c1a73542f599bace3b038399e3",
+			  	"action": "REDIRECT_TO_URL",
+			  	"listener_id": "33188fce-15a1-4ef5-8587-f1cc2e1e31de",
+			  	"redirect_pool_id": null,
+			  	"redirect_url": "http://localhost.vn/api",
+			  	"redirect_prefix": null,
+			  	"position": 1,
+			  	"rules": [],
+			  	"created_at": "2024-03-24T16:35:04",
+			  	"updated_at": null,
+			  	"tags": [],
+			  	"redirect_http_code": 302,
+			  	"tenant_id": "7e96a5c1a73542f599bace3b038399e3"
+			}
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	rule := L7PolicyRuleRequest{
+		Invert:      true,
+		Type:        "HOST_NAME",
+		CompareType: "EQUAL_TO",
+		Value:       "localhost.vn",
+	}
+	rules := []L7PolicyRuleRequest{rule}
+	createPolicyPayload := CreateL7PolicyRequest{
+		Action:      "REDIRECT_TO_URL",
+		Name:        "ducnv",
+		Position:    "1",
+		RedirectUrl: "http://localhost.vn/api",
+		Rules:       rules,
+	}
+	resp, err := client.L7Policy.Create(ctx, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", &createPolicyPayload)
+	require.NoError(t, err)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "ducnv", resp.Name)
+	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, 1, resp.Position)
+}
+
+func TestL7PolicyGet(t *testing.T) {
+	setup()
+	defer teardown()
+	var policy l7Policy
+	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		resp := `{
+			"id": "00ec77c0-dd79-44cc-9476-9d2db4bfaef8",
+			"name": "ducnv",
+			"description": "",
+			"provisioning_status": "ACTIVE",
+			"operating_status": "ONLINE",
+			"admin_state_up": true,
+			"project_id": "7e96a5c1a73542f599bace3b038399e3",
+			"action": "REDIRECT_TO_URL",
+			"listener_id": "33188fce-15a1-4ef5-8587-f1cc2e1e31de",
+			"redirect_pool_id": null,
+			"redirect_url": "http://localhost.vn/api",
+			"redirect_prefix": null,
+			"position": 1,
+			"rules": [
+				{
+					"id": "ab92aa21-10c6-490a-8d7e-f57086c32692"
+				}
+			],
+			"created_at": "2024-03-24T16:35:04",
+			"updated_at": "2024-03-24T16:35:10",
+			"tags": [],
+			"redirect_http_code": 302,
+			"tenant_id": "7e96a5c1a73542f599bace3b038399e3"
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	resp, err := client.L7Policy.Get(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	require.NoError(t, err)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "ducnv", resp.Name)
+	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, 1, resp.Position)
+}
+
+func TestL7PolicyUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+	var policy l7Policy
+	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
+		var payload struct {
+			L7Plicy UpdateL7PolicyRequest `json:"l7policy"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, http.MethodPut, r.Method)
+
+		resp := `{
+			"l7policy": {
+				"id": "00ec77c0-dd79-44cc-9476-9d2db4bfaef8",
+				"name": "ducnv-policy",
+				"description": "",
+				"provisioning_status": "PENDING_UPDATE",
+				"operating_status": "ONLINE",
+				"admin_state_up": true,
+				"project_id": "7e96a5c1a73542f599bace3b038399e3",
+				"action": "REDIRECT_TO_URL",
+				"listener_id": "33188fce-15a1-4ef5-8587-f1cc2e1e31de",
+				"redirect_pool_id": null,
+				"redirect_url": "http://localhost.vn/api",
+				"redirect_prefix": null,
+				"position": 1,
+				"rules": [
+					{
+					"id": "ab92aa21-10c6-490a-8d7e-f57086c32692"
+					}
+				],
+				"created_at": "2024-03-24T16:35:04",
+				"updated_at": "2024-03-24T17:01:49",
+				"tags": [],
+				"redirect_http_code": 302,
+				"tenant_id": "7e96a5c1a73542f599bace3b038399e3"
+			}
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	rule := UpdateL7PolicyRuleRequest{
+		ID: "ab92aa21-10c6-490a-8d7e-f57086c32692",
+		L7PolicyRuleRequest: L7PolicyRuleRequest{
+			Invert:      true,
+			Type:        "HOST_NAME",
+			CompareType: "EQUAL_TO",
+			Value:       "localhost.vn",
+		},
+	}
+	rules := []UpdateL7PolicyRuleRequest{rule}
+	redirectUrl := "http://localhost.vn/api"
+	updatePolicyPayload := UpdateL7PolicyRequest{
+		Action:      "REDIRECT_TO_URL",
+		Name:        "ducnv-policy",
+		Position:    1,
+		RedirectUrl: &redirectUrl,
+		Rules:       rules,
+	}
+	resp, err := client.L7Policy.Update(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", &updatePolicyPayload)
+	require.NoError(t, err)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "ducnv-policy", resp.Name)
+	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, 1, resp.Position)
+}
+
+func TestL7PolicyDelete(t *testing.T) {
+	setup()
+	defer teardown()
+	var policy l7Policy
+	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodDelete, r.Method)
+
+		resp := `{
+			"message": "Deleting l7 policy"
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	err := client.L7Policy.Delete(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	require.NoError(t, err)
+}
+
+func TestL7PolicyRulesList(t *testing.T) {
+	setup()
+	defer teardown()
+	var policy l7Policy
+	path := strings.Join([]string{policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8"), "rules"}, "/")
+	mux.HandleFunc(testlib.LoadBalancerURL(path), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		resp := `{
+			"rules": [
+				{
+					"id": "b575f1b7-ef8e-4eef-a2d9-b26addf266c0",
+					"type": "HOST_NAME",
+					"compare_type": "EQUAL_TO",
+					"key": null,
+					"value": "localhost.vn",
+					"invert": true,
+					"provisioning_status": "ACTIVE",
+					"operating_status": "ONLINE",
+					"created_at": "2024-03-24T17:18:24",
+					"updated_at": "2024-03-24T17:18:27",
+					"project_id": "7e96a5c1a73542f599bace3b038399e3",
+					"admin_state_up": true,
+					"tags": [],
+					"tenant_id": "7e96a5c1a73542f599bace3b038399e3"
+				}
+			],
+			"rules_links": []
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	resp, err := client.L7Policy.ListL7PolicyRules(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	require.NoError(t, err)
+	firstRule := resp[0]
+	assert.Equal(t, "b575f1b7-ef8e-4eef-a2d9-b26addf266c0", firstRule.Id)
+	assert.Equal(t, "HOST_NAME", firstRule.Type)
+	assert.Equal(t, "EQUAL_TO", firstRule.CompareType)
+	assert.Equal(t, "localhost.vn", firstRule.Value)
+	assert.Equal(t, true, firstRule.Invert)
+}
+
+func TestL7PolicyRuleCreate(t *testing.T) {
+	setup()
+	defer teardown()
+	var policy l7Policy
+	path := strings.Join([]string{policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8"), "rules"}, "/")
+	mux.HandleFunc(testlib.LoadBalancerURL(path), func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+		var payload struct {
+			Rule L7PolicyRuleRequest `json:"rule"`
+		}
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		resp := `{
+			"rule": {
+				"id": "a1509ea5-f4cc-4ae4-86f2-96cf0400a7d5",
+				"type": "HOST_NAME",
+				"compare_type": "EQUAL_TO",
+				"key": "",
+				"value": "duc.nv",
+				"invert": true,
+				"provisioning_status": "PENDING_CREATE",
+				"operating_status": "OFFLINE",
+				"created_at": "2024-03-24T17:23:11",
+				"updated_at": null,
+				"project_id": "7e96a5c1a73542f599bace3b038399e3",
+				"admin_state_up": true,
+				"tags": [],
+				"tenant_id": "7e96a5c1a73542f599bace3b038399e3"
+			}
+		}`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	payload := L7PolicyRuleRequest{
+		Invert:      true,
+		Type:        "HOST_NAME",
+		CompareType: "EQUAL_TO",
+		Value:       "duc.nv",
+	}
+	resp, err := client.L7Policy.CreateL7PolicyRule(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", payload)
+	require.NoError(t, err)
+	assert.Equal(t, "a1509ea5-f4cc-4ae4-86f2-96cf0400a7d5", resp.Id)
+	assert.Equal(t, "HOST_NAME", resp.Type)
+	assert.Equal(t, "EQUAL_TO", resp.CompareType)
+	assert.Equal(t, "duc.nv", resp.Value)
+	assert.Equal(t, true, resp.Invert)
+}
