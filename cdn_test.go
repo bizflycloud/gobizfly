@@ -42,7 +42,7 @@ func TestDomainList(t *testing.T) {
     ]
 }
 `
-		writer.Write([]byte(resp))
+		_, _ = fmt.Fprint(writer, resp)
 	})
 	resp, err := client.CDN.List(ctx, &ListOptions{})
 	require.NoError(t, err)
