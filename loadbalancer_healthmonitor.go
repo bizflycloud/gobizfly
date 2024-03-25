@@ -11,23 +11,24 @@ import (
 
 // HealthMonitor represent the load balancer health monitor information
 type HealthMonitor struct {
-	Name           string       `json:"name"`
-	Type           string       `json:"type"`
-	Delay          int          `json:"delay"`
-	MaxRetries     int          `json:"max_retries"`
-	MaxRetriesDown int          `json:"max_retries_down"`
-	TimeOut        int          `json:"timeout"`
-	HTTPMethod     string       `json:"http_method"`
-	UrlPath        string       `json:"url_path"`
-	ExpectedCodes  string       `json:"expected_codes"`
-	HTTPVersion    float32      `json:"http_version"`
-	OpratingStatus string       `json:"oprating_status"`
-	DomainName     string       `json:"domain_name"`
-	ID             string       `json:"id"`
-	CreatedAt      string       `json:"created_at"`
-	UpdatedAt      string       `json:"updated_at"`
-	TenantID       string       `json:"tenant_id"`
-	Pool           []resourceID `json:"pool"`
+	Name               string       `json:"name"`
+	Type               string       `json:"type"`
+	Delay              int          `json:"delay"`
+	MaxRetries         int          `json:"max_retries"`
+	MaxRetriesDown     int          `json:"max_retries_down"`
+	TimeOut            int          `json:"timeout"`
+	HTTPMethod         string       `json:"http_method"`
+	UrlPath            string       `json:"url_path"`
+	ExpectedCodes      string       `json:"expected_codes"`
+	HTTPVersion        float32      `json:"http_version"`
+	OperatingStatus    string       `json:"operating_status"`
+	ProvisioningStatus string       `json:"provisioning_status"`
+	DomainName         string       `json:"domain_name"`
+	ID                 string       `json:"id"`
+	CreatedAt          string       `json:"created_at"`
+	UpdatedAt          string       `json:"updated_at"`
+	TenantID           string       `json:"tenant_id"`
+	Pool               []resourceID `json:"pool"`
 }
 
 // HealthMonitorCreateRequest represent the request bodfor creating a health monitor

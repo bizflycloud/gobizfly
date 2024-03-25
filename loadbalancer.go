@@ -8,6 +8,7 @@ const (
 	listenerPath             = "/listener"
 	poolPath                 = "/pool"
 	healthMonitorPath        = "/healthmonitor"
+	l7PolicyPath             = "/l7policy"
 )
 
 type resourceID struct {

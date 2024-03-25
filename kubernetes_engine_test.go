@@ -220,6 +220,154 @@ func TestClusterDelete(t *testing.T) {
 	require.NoError(t, client.KubernetesEngine.Delete(ctx, "ji84wqtzr77ogo6b"))
 }
 
+func TestClusterUpdate(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("zdckkshu1he44fsb")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPatch, r.Method)
+		var payload *UpdateClusterRequest
+		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+		assert.Equal(t, true, *payload.AutoUpgrade)
+		resp := `{
+      "uid": "zdckkshu1he44fsb",
+      "name": "test--cluster",
+      "version": {
+        "id": "6528edeac362ab8b6db3f795",
+        "name": "v1.28.2-6528edea",
+        "description": null,
+        "kubernetes_version": "v1.28.2",
+        "local_dns_supported": true,
+        "cni_plugin_supported": [
+          "cilium",
+          "kube-router"
+        ]
+      },
+      "provision_type": "standard",
+      "private_network_id": "2d70b001-5634-4dbe-8c3e-fe75a742a1ec",
+      "private_subnet_id": "1b9816a6-b647-4970-92ff-4996d39f5192",
+      "access_mode": "PUBLIC",
+      "access_policies": [],
+      "auto_upgrade": true,
+      "tags": [],
+      "provision_status": "PROVISIONING",
+      "cluster_status": "PROVISIONING",
+      "created_at": "2024-03-24T17:41:02.314000",
+      "created_by": "ducnguyenvan99@bizflycloud.vn",
+      "worker_pools_count": 1,
+      "migrations_count": 0,
+      "kubelet_communication": "INTERNAL",
+      "upgrade_time": {
+        "day": -1,
+        "time": "17:00:00"
+      },
+      "force_upgrade": true,
+      "local_dns": false,
+      "bcr_integrated": false,
+      "message": "",
+      "cni_plugin": "kube-router",
+      "package": {
+        "id": "65dc09c51d722ebf15c48b91",
+        "name": "STANDARD - 1",
+        "max_nodes": 50,
+        "memory": 8,
+        "high_availability": true,
+        "sla": "99.99",
+        "price": {
+          "amount": 1260000,
+          "billing_cycle": "month"
+        },
+        "specify": "standard"
+      },
+      "nodes_count": 1,
+      "worker_pools": [
+        {
+          "id": "660065ae0a45091b62ee6eef",
+          "name": "pool-az4i4byf",
+          "version": "v1.28.2",
+          "provision_type": "standard",
+          "flavor": "nix.2c_2g",
+          "profile_type": "premium",
+          "volume_type": "PREMIUM-SSD1",
+          "volume_size": 50,
+          "availability_zone": "HN1",
+          "desired_size": 1,
+          "enable_autoscaling": false,
+          "min_size": 1,
+          "max_size": 1,
+          "network_plan": "free_datatransfer",
+          "billing_plan": "on_demand",
+          "tags": [],
+          "provision_status": "PENDING_PROVISION",
+          "launch_config_id": null,
+          "autoscaling_group_id": null,
+          "created_at": "2024-03-24T17:41:02.268000",
+          "labels": {},
+          "taints": [],
+          "flavor_detail": {
+            "name": "nix.2c_2g",
+            "vcpus": 2,
+            "ram": 2048,
+            "gpu": null,
+            "category": "premium"
+          }
+        }
+      ],
+      "stats": {
+        "worker_pools": 1,
+        "total_cpu": null,
+        "total_memory": null,
+        "total_disk": {}
+      }
+    }`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	autoUpgrade := true
+	payload := UpdateClusterRequest{
+		AutoUpgrade: &autoUpgrade,
+	}
+	cluster, err := client.KubernetesEngine.UpdateCluster(ctx, "zdckkshu1he44fsb", &payload)
+	require.NoError(t, err)
+	assert.Equal(t, true, cluster.AutoUpgrade)
+}
+
+func TestGetUpgradeClusterVersion(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var c kubernetesEngineService
+	path := strings.Join([]string{"zdckkshu1he44fsb", "upgrade"}, "/")
+	mux.HandleFunc(testlib.K8sURL(c.itemPath(path)), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `{
+      "upgrade": {
+        "upgrade_to": "v1.28.2",
+        "is_latest": true,
+        "force_upgrade_time": null
+      }
+    }`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	resp, err := client.KubernetesEngine.GetUpgradeClusterVersion(ctx, "zdckkshu1he44fsb")
+	require.NoError(t, err)
+	assert.Equal(t, true, resp.IsLatest)
+	assert.Equal(t, "v1.28.2", resp.UpgradeTo)
+}
+
+func TestUpgradeClusterVersion(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var c kubernetesEngineService
+	path := strings.Join([]string{"zdckkshu1he44fsb", "upgrade"}, "/")
+	mux.HandleFunc(testlib.K8sURL(c.itemPath(path)), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+	})
+	err := client.KubernetesEngine.UpgradeClusterVersion(ctx, "zdckkshu1he44fsb", nil)
+	require.NoError(t, err)
+}
+
 func TestAddWorkerPool(t *testing.T) {
 	setup()
 	defer teardown()

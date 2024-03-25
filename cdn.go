@@ -17,7 +17,6 @@ const (
 	domainPath  = "/domains"
 	usersPath   = "/users"
 	clientsPath = "/clients"
-	originPath  = "/origins"
 )
 
 type cdnService struct {
