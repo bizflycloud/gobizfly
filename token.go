@@ -5,7 +5,6 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"net/http"
 )
 
@@ -30,6 +29,7 @@ type TokenCreateRequest struct {
 	Password      string `json:"password,omitempty"`
 	ProjectID     string `json:"project_id,omitempty"`
 	Username      string `json:"username,omitempty"`
+	AuthType      string `json:"auth_type,omitempty"`
 }
 
 // Token contains token information.
@@ -67,23 +67,23 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 }
 
 func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+	var tok Token
+	if tcr.AuthType != AppCredentialAuthType {
+		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := t.client.Do(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
 
-	req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
-	if err != nil {
-		return nil, err
+		if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
+			return nil, err
+		}
 	}
-	resp, err := t.client.Do(ctx, req)
-	body, _ := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	var tok *Token
-	err = json.Unmarshal(body, &tok)
-	if err != nil {
-		return nil, err
-	}
 	// Get new services catalog after create token
 	services, err := t.client.Service.List(ctx)
 	if err != nil {
@@ -96,27 +96,26 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 	t.client.projectID = tcr.ProjectID
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
+	t.client.authType = tcr.AuthType
 	t.client.services = services
 
-	return tok, nil
+	return &tok, nil
 }
 
 func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
+	var tok Token
+	if tcr.AuthType != AppCredentialAuthType {
+		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := t.client.DoInit(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+	}
 
-	req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := t.client.DoInit(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	tok := &Token{}
-	if err := json.NewDecoder(resp.Body).Decode(tok); err != nil {
-		return nil, err
-	}
 	// Get new services catalog after create token
 	services, err := t.client.Service.List(ctx)
 	if err != nil {
@@ -129,7 +128,8 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 	t.client.projectID = tcr.ProjectID
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
+	t.client.authType = tcr.AuthType
 	t.client.services = services
 
-	return tok, nil
+	return &tok, nil
 }

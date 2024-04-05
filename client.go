@@ -18,6 +18,7 @@ import (
 )
 
 const (
+	AppCredentialAuthType   = "application_credential"
 	accountName             = "bizfly_account"
 	authServiceName         = "auth"
 	autoScalingServiceName  = "auto_scaling"
@@ -240,6 +241,10 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	}
 
 	req.Header.Add("X-Auth-Type", c.authType)
+	if c.authType == AppCredentialAuthType {
+		req.Header.Add("X-App-Credential-Id", c.appCredID)
+		req.Header.Add("X-App-Credential-Secret", c.appCredSecret)
+	}
 	return req, nil
 }
 
