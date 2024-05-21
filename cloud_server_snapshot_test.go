@@ -154,7 +154,7 @@ func TestSnapshotList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	snapshots, err := client.Snapshot.List(ctx, &ListSnasphotsOptions{})
+	snapshots, err := client.CloudServer.Snapshots().List(ctx, &ListSnasphotsOptions{})
 	require.NoError(t, err)
 	assert.Len(t, snapshots, 2)
 	snapshot := snapshots[0]
@@ -259,7 +259,7 @@ func TestSnapshotGet(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	snapshot, err := client.Snapshot.Get(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5")
+	snapshot, err := client.CloudServer.Snapshots().Get(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5")
 	require.NoError(t, err)
 	require.Equal(t, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5", snapshot.Id, "check snapshot id")
 	require.Equal(t, "ducpx-snapshot-test", snapshot.Name, "check snapshot name")
@@ -346,7 +346,7 @@ func TestSnapshotCreate(t *testing.T) {
 		_, _ = fmt.Fprint(writer, resp)
 	})
 
-	snapshot, err := client.Snapshot.Create(ctx, &SnapshotCreateRequest{
+	snapshot, err := client.CloudServer.Snapshots().Create(ctx, &SnapshotCreateRequest{
 		Name:     "ducpx-test-create-snapshot",
 		VolumeId: "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246",
 		Force:    true,
@@ -367,5 +367,5 @@ func TestSnapshotDelete(t *testing.T) {
 			require.Equal(t, http.MethodDelete, request.Method)
 			writer.WriteHeader(http.StatusNoContent)
 		})
-	require.NoError(t, client.Snapshot.Delete(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"))
+	require.NoError(t, client.CloudServer.Snapshots().Delete(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5"))
 }

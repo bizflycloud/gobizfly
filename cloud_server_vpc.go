@@ -13,21 +13,25 @@ const (
 	vpcPath = "/vpc-networks"
 )
 
-var _ VPCService = (*vpcService)(nil)
+var _ VPCNetworkService = (*cloudServerVPCNetworkResource)(nil)
 
-type vpcService struct {
+type cloudServerVPCNetworkResource struct {
 	client *Client
 }
 
-type VPCService interface {
-	List(ctx context.Context) ([]*VPC, error)
-	Get(ctx context.Context, vpcID string) (*VPC, error)
-	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error)
-	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error)
+func (cs *cloudServerService) VPCNetworks() *cloudServerVPCNetworkResource {
+	return &cloudServerVPCNetworkResource{client: cs.client}
+}
+
+type VPCNetworkService interface {
+	List(ctx context.Context) ([]*VPCNetwork, error)
+	Get(ctx context.Context, vpcID string) (*VPCNetwork, error)
+	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPCNetwork, error)
+	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPCNetwork, error)
 	Delete(ctx context.Context, vpcID string) error
 }
 
-type VPC struct {
+type VPCNetwork struct {
 	ID                    string   `json:"id"`
 	Name                  string   `json:"name"`
 	TenantID              string   `json:"tenant_id"`
@@ -99,20 +103,20 @@ type UpdateVPCPayload struct {
 	IsDefault   bool   `json:"is_default,omitempty"`
 }
 
-func (v vpcService) resourcePath() string {
+func (v cloudServerVPCNetworkResource) resourcePath() string {
 	return vpcPath
 }
 
-func (v vpcService) itemPath(id string) string {
+func (v cloudServerVPCNetworkResource) itemPath(id string) string {
 	return strings.Join([]string{vpcPath, id}, "/")
 }
 
-func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
+func (v cloudServerVPCNetworkResource) List(ctx context.Context) ([]*VPCNetwork, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
-	var data []*VPC
+	var data []*VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -124,12 +128,12 @@ func (v vpcService) List(ctx context.Context) ([]*VPC, error) {
 	return data, nil
 }
 
-func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
+func (v cloudServerVPCNetworkResource) Get(ctx context.Context, vpcID string) (*VPCNetwork, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.itemPath(vpcID), nil)
 	if err != nil {
 		return nil, err
 	}
-	var data *VPC
+	var data *VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -141,12 +145,12 @@ func (v vpcService) Get(ctx context.Context, vpcID string) (*VPC, error) {
 	return data, nil
 }
 
-func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPC, error) {
+func (v cloudServerVPCNetworkResource) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPCNetwork, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPut, serverServiceName, v.itemPath(vpcID), uvpl)
 	if err != nil {
 		return nil, err
 	}
-	var data *VPC
+	var data *VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -158,12 +162,12 @@ func (v vpcService) Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPay
 	return data, nil
 }
 
-func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, error) {
+func (v cloudServerVPCNetworkResource) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPCNetwork, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, v.resourcePath(), cvpl)
 	if err != nil {
 		return nil, err
 	}
-	var data *VPC
+	var data *VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -175,7 +179,7 @@ func (v vpcService) Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPC, e
 	return data, nil
 }
 
-func (v vpcService) Delete(ctx context.Context, vpcID string) error {
+func (v cloudServerVPCNetworkResource) Delete(ctx context.Context, vpcID string) error {
 	req, err := v.client.NewRequest(ctx, http.MethodDelete, serverServiceName, v.itemPath(vpcID), nil)
 	if err != nil {
 		return err

@@ -17,7 +17,7 @@ const (
 	volumeTypesBasePath = "/volume-types"
 )
 
-var _ VolumeService = (*volume)(nil)
+var _ VolumeService = (*cloudServerVolumeResource)(nil)
 
 // VolumeService is an interface to interact with Bizfly API Volume endpoint.
 type VolumeService interface {
@@ -129,12 +129,16 @@ type ListVolumeTypesOptions struct {
 	AvailabilityZone string `json:"availability_zone,omitempty"`
 }
 
-type volume struct {
+type cloudServerVolumeResource struct {
 	client *Client
 }
 
+func (cs *cloudServerService) Volumes() *cloudServerVolumeResource {
+	return &cloudServerVolumeResource{client: cs.client}
+}
+
 // List lists all volumes of users.
-func (v *volume) List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, error) {
+func (v *cloudServerVolumeResource) List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeBasePath, nil)
 	if err != nil {
 		return nil, err
@@ -179,7 +183,7 @@ func (v *volume) List(ctx context.Context, opts *VolumeListOptions) ([]*Volume, 
 }
 
 // Create creates a new volume.
-func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume, error) {
+func (v *cloudServerVolumeResource) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPost, serverServiceName, volumeBasePath, &vcr)
 	if err != nil {
 		return nil, err
@@ -200,7 +204,7 @@ func (v *volume) Create(ctx context.Context, vcr *VolumeCreateRequest) (*Volume,
 }
 
 // Get gets information of a volume.
-func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
+func (v *cloudServerVolumeResource) Get(ctx context.Context, id string) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
@@ -223,7 +227,7 @@ func (v *volume) Get(ctx context.Context, id string) (*Volume, error) {
 }
 
 // Delete deletes a volume.
-func (v *volume) Delete(ctx context.Context, id string) error {
+func (v *cloudServerVolumeResource) Delete(ctx context.Context, id string) error {
 	req, err := v.client.NewRequest(ctx, http.MethodDelete, serverServiceName, volumeBasePath+"/"+id, nil)
 
 	if err != nil {
@@ -258,16 +262,16 @@ type VolumeAttachDetachResponse struct {
 	VolumeDetail Volume `json:"volume_detail"`
 }
 
-func (v *volume) itemActionPath(id string) string {
+func (v *cloudServerVolumeResource) itemActionPath(id string) string {
 	return strings.Join([]string{volumeBasePath, id, "action"}, "/")
 }
 
-func (v *volume) itemPath(id string) string {
+func (v *cloudServerVolumeResource) itemPath(id string) string {
 	return strings.Join([]string{volumeBasePath, id}, "/")
 }
 
 // ExtendVolume extends capacity of a volume.
-func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Task, error) {
+func (v *cloudServerVolumeResource) ExtendVolume(ctx context.Context, id string, newsize int) (*Task, error) {
 	var payload = &VolumeAction{
 		Type:    "extend",
 		NewSize: newsize}
@@ -292,7 +296,7 @@ func (v *volume) ExtendVolume(ctx context.Context, id string, newsize int) (*Tas
 }
 
 // Attach attaches a volume to a server.
-func (v *volume) Attach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
+func (v *cloudServerVolumeResource) Attach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
 		Type:     "attach",
 		ServerID: serverID}
@@ -317,7 +321,7 @@ func (v *volume) Attach(ctx context.Context, id string, serverID string) (*Volum
 }
 
 // Detach detaches a volume from a server.
-func (v *volume) Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
+func (v *cloudServerVolumeResource) Detach(ctx context.Context, id string, serverID string) (*VolumeAttachDetachResponse, error) {
 	var payload = &VolumeAction{
 		Type:     "detach",
 		ServerID: serverID}
@@ -342,7 +346,7 @@ func (v *volume) Detach(ctx context.Context, id string, serverID string) (*Volum
 }
 
 // Restore restores a volume from a snapshot.
-func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Task, error) {
+func (v *cloudServerVolumeResource) Restore(ctx context.Context, id string, snapshotID string) (*Task, error) {
 	var payload = &VolumeAction{
 		Type:       "restore_volume",
 		SnapshotID: snapshotID}
@@ -367,7 +371,7 @@ func (v *volume) Restore(ctx context.Context, id string, snapshotID string) (*Ta
 }
 
 // Patch partially updates a volume.
-func (v *volume) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) (*Volume, error) {
+func (v *cloudServerVolumeResource) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) (*Volume, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodPatch, serverServiceName, v.itemPath(id), bpr)
 	if err != nil {
 		return nil, err
@@ -385,7 +389,7 @@ func (v *volume) Patch(ctx context.Context, id string, bpr *VolumePatchRequest) 
 }
 
 // ListVolumeTypes lists volume types.
-func (v *volume) ListVolumeTypes(ctx context.Context, opts *ListVolumeTypesOptions) ([]*VolumeType, error) {
+func (v *cloudServerVolumeResource) ListVolumeTypes(ctx context.Context, opts *ListVolumeTypesOptions) ([]*VolumeType, error) {
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, volumeTypesBasePath, nil)
 	if err != nil {
 		return nil, err

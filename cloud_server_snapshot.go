@@ -17,10 +17,18 @@ const (
 	snapshotPath = "/snapshots"
 )
 
-var _ SnapshotService = (*snapshot)(nil)
+var _ SnapshotService = (*cloudServerSnapshotResource)(nil)
 
 type ListSnasphotsOptions struct {
 	VolumeId string `json:"volume_id,omitempty"`
+}
+
+type cloudServerSnapshotResource struct {
+	client *Client
+}
+
+func (cs *cloudServerService) Snapshots() *cloudServerSnapshotResource {
+	return &cloudServerSnapshotResource{client: cs.client}
 }
 
 // SnapshotService is an interface to interact with Bizfly API Snapshot endpoint.
@@ -62,12 +70,8 @@ type Snapshot struct {
 	RegionName       string            `json:"region_name"`
 }
 
-type snapshot struct {
-	client *Client
-}
-
 // Get gets a snapshot
-func (s *snapshot) Get(ctx context.Context, id string) (*Snapshot, error) {
+func (s *cloudServerSnapshotResource) Get(ctx context.Context, id string) (*Snapshot, error) {
 	var snapshot *Snapshot
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, strings.Join([]string{snapshotPath, id}, "/"), nil)
 	if err != nil {
@@ -86,7 +90,7 @@ func (s *snapshot) Get(ctx context.Context, id string) (*Snapshot, error) {
 }
 
 // Delete deletes a snapshot
-func (s *snapshot) Delete(ctx context.Context, id string) error {
+func (s *cloudServerSnapshotResource) Delete(ctx context.Context, id string) error {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, strings.Join([]string{snapshotPath, id}, "/"), nil)
 
 	if err != nil {
@@ -104,7 +108,7 @@ func (s *snapshot) Delete(ctx context.Context, id string) error {
 }
 
 // Create creates a new snapshot
-func (s *snapshot) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Snapshot, error) {
+func (s *cloudServerSnapshotResource) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Snapshot, error) {
 	var snapshot *Snapshot
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, snapshotPath, &scr)
 	if err != nil {
@@ -123,7 +127,7 @@ func (s *snapshot) Create(ctx context.Context, scr *SnapshotCreateRequest) (*Sna
 }
 
 // List lists all snapshot of user
-func (s *snapshot) List(ctx context.Context, opts *ListSnasphotsOptions) ([]*Snapshot, error) {
+func (s *cloudServerSnapshotResource) List(ctx context.Context, opts *ListSnasphotsOptions) ([]*Snapshot, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, snapshotPath, nil)
 	if err != nil {
 		return nil, err

@@ -12,10 +12,14 @@ const (
 	sshKeyBasePath = "/keypairs"
 )
 
-var _ SSHKeyService = (*sshkey)(nil)
+var _ SSHKeyService = (*cloudServerSSHKeyResource)(nil)
 
-type sshkey struct {
+type cloudServerSSHKeyResource struct {
 	client *Client
+}
+
+func (cs *cloudServerService) SSHKeys() *cloudServerSSHKeyResource {
+	return &cloudServerSSHKeyResource{client: cs.client}
 }
 
 // SSHKeyService is an interface to interact with Bizfly API SSH Key
@@ -50,10 +54,10 @@ type SSHKeyDeleteResponse struct {
 	Message string `json:"message"`
 }
 
-func (s *sshkey) itemPath(keyname string) string {
+func (s *cloudServerSSHKeyResource) itemPath(keyname string) string {
 	return sshKeyBasePath + "/" + keyname
 }
-func (s *sshkey) List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error) {
+func (s *cloudServerSSHKeyResource) List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, sshKeyBasePath, nil)
 	if err != nil {
 		return nil, err
@@ -72,7 +76,7 @@ func (s *sshkey) List(ctx context.Context, opts *ListOptions) ([]*KeyPair, error
 	return sshKeys, nil
 }
 
-func (s *sshkey) Get(ctx context.Context, keyname string) (*SSHKey, error) {
+func (s *cloudServerSSHKeyResource) Get(ctx context.Context, keyname string) (*SSHKey, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, s.itemPath(keyname), nil)
 	if err != nil {
 		return nil, err
@@ -89,7 +93,7 @@ func (s *sshkey) Get(ctx context.Context, keyname string) (*SSHKey, error) {
 	return sshKey, nil
 }
 
-func (s *sshkey) Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyCreateResponse, error) {
+func (s *cloudServerSSHKeyResource) Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyCreateResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, sshKeyBasePath, &scr)
 	if err != nil {
 		return nil, err
@@ -108,7 +112,7 @@ func (s *sshkey) Create(ctx context.Context, scr *SSHKeyCreateRequest) (*SSHKeyC
 	return sshKey, nil
 }
 
-func (s *sshkey) Delete(ctx context.Context, keyname string) (*SSHKeyDeleteResponse, error) {
+func (s *cloudServerSSHKeyResource) Delete(ctx context.Context, keyname string) (*SSHKeyDeleteResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, sshKeyBasePath+"/"+keyname, nil)
 	if err != nil {
 		return nil, err

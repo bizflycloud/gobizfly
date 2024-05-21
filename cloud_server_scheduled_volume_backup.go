@@ -10,10 +10,14 @@ const (
 	backupPath = "/backup"
 )
 
-var _ ScheduledVolumeBackup = (*scheduledVolumeBackup)(nil)
+var _ ScheduledVolumeBackup = (*cloudServerScheduledVolumeBackupResource)(nil)
 
-type scheduledVolumeBackup struct {
+type cloudServerScheduledVolumeBackupResource struct {
 	client *Client
+}
+
+func (cs *cloudServerService) ScheduledVolumeBackups() *cloudServerScheduledVolumeBackupResource {
+	return &cloudServerScheduledVolumeBackupResource{client: cs.client}
 }
 
 type ScheduledVolumeBackup interface {
@@ -63,15 +67,15 @@ type UpdateBackupPayload struct {
 	Hour      int    `json:"hour,omitempty"`
 }
 
-func (b scheduledVolumeBackup) resourcePath() string {
+func (b cloudServerScheduledVolumeBackupResource) resourcePath() string {
 	return backupPath
 }
 
-func (b scheduledVolumeBackup) itemPath(id string) string {
+func (b cloudServerScheduledVolumeBackupResource) itemPath(id string) string {
 	return b.resourcePath() + "/" + id
 }
 
-func (b scheduledVolumeBackup) Create(ctx context.Context, payload *CreateBackupPayload) (*ExtendedBackup, error) {
+func (b cloudServerScheduledVolumeBackupResource) Create(ctx context.Context, payload *CreateBackupPayload) (*ExtendedBackup, error) {
 	req, err := b.client.NewRequest(ctx, http.MethodPost, serverServiceName, b.resourcePath(), payload)
 	if err != nil {
 		return nil, err
@@ -90,7 +94,7 @@ func (b scheduledVolumeBackup) Create(ctx context.Context, payload *CreateBackup
 	return dataResponse.Data, nil
 }
 
-func (b scheduledVolumeBackup) Get(ctx context.Context, backupID string) (*ExtendedBackup, error) {
+func (b cloudServerScheduledVolumeBackupResource) Get(ctx context.Context, backupID string) (*ExtendedBackup, error) {
 	req, err := b.client.NewRequest(ctx, http.MethodGet, serverServiceName, b.itemPath(backupID), nil)
 	if err != nil {
 		return nil, err
@@ -107,7 +111,7 @@ func (b scheduledVolumeBackup) Get(ctx context.Context, backupID string) (*Exten
 	return backup, nil
 }
 
-func (b scheduledVolumeBackup) List(ctx context.Context) ([]*Backup, error) {
+func (b cloudServerScheduledVolumeBackupResource) List(ctx context.Context) ([]*Backup, error) {
 	req, err := b.client.NewRequest(ctx, http.MethodGet, serverServiceName, b.resourcePath(), nil)
 	if err != nil {
 		return nil, err
@@ -124,7 +128,7 @@ func (b scheduledVolumeBackup) List(ctx context.Context) ([]*Backup, error) {
 	return backups, nil
 }
 
-func (b scheduledVolumeBackup) Delete(ctx context.Context, backupID string) error {
+func (b cloudServerScheduledVolumeBackupResource) Delete(ctx context.Context, backupID string) error {
 	req, err := b.client.NewRequest(ctx, http.MethodDelete, serverServiceName, b.itemPath(backupID), nil)
 	if err != nil {
 		return err
@@ -137,7 +141,7 @@ func (b scheduledVolumeBackup) Delete(ctx context.Context, backupID string) erro
 	return nil
 }
 
-func (b scheduledVolumeBackup) Update(ctx context.Context, backupID string, payload *UpdateBackupPayload) (*ExtendedBackup, error) {
+func (b cloudServerScheduledVolumeBackupResource) Update(ctx context.Context, backupID string, payload *UpdateBackupPayload) (*ExtendedBackup, error) {
 	req, err := b.client.NewRequest(ctx, http.MethodPut, serverServiceName, b.itemPath(backupID), payload)
 	if err != nil {
 		return nil, err

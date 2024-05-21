@@ -11,10 +11,6 @@ const (
 	serverTypeBasePath = "/server-types"
 )
 
-type server struct {
-	client *Client
-}
-
 // ServerSecurityGroup contains information of security group of a server.
 type ServerSecurityGroup struct {
 	Name string `json:"name"`
@@ -207,12 +203,12 @@ type ServerCreateRequest struct {
 }
 
 // itemActionPath return http path of server action
-func (s *server) itemActionPath(id string) string {
+func (s *cloudServerService) itemActionPath(id string) string {
 	return strings.Join([]string{serverBasePath, id, "action"}, "/")
 }
 
 // List lists all servers.
-func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, error) {
+func (s *cloudServerService) List(ctx context.Context, opts *ServerListOptions) ([]*Server, error) {
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath, nil)
 	if err != nil {
@@ -247,7 +243,7 @@ func (s *server) List(ctx context.Context, opts *ServerListOptions) ([]*Server, 
 }
 
 // Create creates a new server.
-func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error) {
+func (s *cloudServerService) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerCreateResponse, error) {
 	payload := []*ServerCreateRequest{scr}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, serverBasePath, payload)
 	if err != nil {
@@ -267,7 +263,7 @@ func (s *server) Create(ctx context.Context, scr *ServerCreateRequest) (*ServerC
 }
 
 // Get gets a server.
-func (s *server) Get(ctx context.Context, id string) (*Server, error) {
+func (s *cloudServerService) Get(ctx context.Context, id string) (*Server, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverBasePath+"/"+id, nil)
 	if err != nil {
 		return nil, err
@@ -286,7 +282,7 @@ func (s *server) Get(ctx context.Context, id string) (*Server, error) {
 }
 
 // Delete deletes a server.
-func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
+func (s *cloudServerService) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
 	deleteOpts := &DeletedVolumes{
 		Ids: deletedRootDisk,
 	}
@@ -307,7 +303,7 @@ func (s *server) Delete(ctx context.Context, id string, deletedRootDisk []string
 }
 
 // Resize resizes a server.
-func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error) {
+func (s *cloudServerService) Resize(ctx context.Context, id string, newFlavor string) (*ServerTask, error) {
 	var payload = &ServerAction{
 		Action:     "resize",
 		FlavorName: newFlavor}
@@ -330,7 +326,7 @@ func (s *server) Resize(ctx context.Context, id string, newFlavor string) (*Serv
 }
 
 // Start starts a server.
-func (s *server) Start(ctx context.Context, id string) (*Server, error) {
+func (s *cloudServerService) Start(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "start"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
@@ -350,7 +346,7 @@ func (s *server) Start(ctx context.Context, id string) (*Server, error) {
 }
 
 // Stop stops a server
-func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
+func (s *cloudServerService) Stop(ctx context.Context, id string) (*Server, error) {
 	payload := &ServerAction{Action: "stop"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
@@ -370,7 +366,7 @@ func (s *server) Stop(ctx context.Context, id string) (*Server, error) {
 }
 
 // SoftReboot soft reboots a server.
-func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
+func (s *cloudServerService) SoftReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "soft_reboot"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
@@ -390,7 +386,7 @@ func (s *server) SoftReboot(ctx context.Context, id string) (*ServerMessageRespo
 }
 
 // HardReboot hard reboots a server.
-func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
+func (s *cloudServerService) HardReboot(ctx context.Context, id string) (*ServerMessageResponse, error) {
 	payload := &ServerAction{Action: "hard_reboot"}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {
@@ -410,7 +406,7 @@ func (s *server) HardReboot(ctx context.Context, id string) (*ServerMessageRespo
 }
 
 // Rebuild rebuilds a server.
-func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error) {
+func (s *cloudServerService) Rebuild(ctx context.Context, id string, imageID string) (*ServerTask, error) {
 	var payload = &ServerAction{
 		Action:  "rebuild",
 		ImageID: imageID}
@@ -433,7 +429,7 @@ func (s *server) Rebuild(ctx context.Context, id string, imageID string) (*Serve
 }
 
 // GetVNC gets vnc console of a server.
-func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error) {
+func (s *cloudServerService) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse, error) {
 	payload := &ServerAction{
 		Action:      "get_vnc",
 		ConsoleType: "novnc"}
@@ -457,7 +453,7 @@ func (s *server) GetVNC(ctx context.Context, id string) (*ServerConsoleResponse,
 }
 
 // GetTask get tasks result from Server API
-func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, error) {
+func (s *cloudServerService) GetTask(ctx context.Context, id string) (*ServerTaskResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, taskPath+"/"+id, nil)
 	if err != nil {
 		return nil, err
@@ -474,7 +470,7 @@ func (s *server) GetTask(ctx context.Context, id string) (*ServerTaskResponse, e
 }
 
 // ChangeCategory changes category of the server
-func (s server) ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error) {
+func (s cloudServerService) ChangeCategory(ctx context.Context, id string, newCategory string) (*ServerTask, error) {
 	payload := &ServerAction{
 		Action:  "change_type",
 		NewType: newCategory}
@@ -495,8 +491,8 @@ func (s server) ChangeCategory(ctx context.Context, id string, newCategory strin
 	return svt, nil
 }
 
-// AddVPC add the VPC to the server
-func (s server) AddVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
+// AddVirtualPrivateNetwork add the VPCNetwork to the server
+func (s cloudServerService) AddVirtualPrivateNetwork(ctx context.Context, id string, vpcs []string) (*Server, error) {
 	payload := &ServerAction{
 		Action:        "add_vpc",
 		VPCNetworkIDs: vpcs,
@@ -517,8 +513,8 @@ func (s server) AddVPC(ctx context.Context, id string, vpcs []string) (*Server, 
 	return server, nil
 }
 
-// RemoveVPC remove the VPC from the server
-func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Server, error) {
+// RemoveNetworkInterface remove the VPCNetwork from the server
+func (s cloudServerService) RemoveNetworkInterface(ctx context.Context, id string, vpcs []string) (*Server, error) {
 	payload := &ServerAction{
 		Action:        "remove_vpc",
 		VPCNetworkIDs: vpcs,
@@ -539,8 +535,8 @@ func (s server) RemoveVPC(ctx context.Context, id string, vpcs []string) (*Serve
 	return server, nil
 }
 
-// AttachWanIps attach batch WAN IPs to the server
-func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) error {
+// AttachPublicNetworkInterface attach batch WAN IPs to the server
+func (s cloudServerService) AttachPublicNetworkInterface(ctx context.Context, id string, wanIpIds []string) error {
 	payload := &ServerAction{
 		Action:       "attach_wan_ips",
 		AttachWanIPs: wanIpIds,
@@ -556,7 +552,7 @@ func (s server) AttachWanIps(ctx context.Context, id string, wanIpIds []string) 
 	return resp.Body.Close()
 }
 
-func (s server) ListServerTypes(ctx context.Context) ([]*ServerType, error) {
+func (s cloudServerService) ListServerTypes(ctx context.Context) ([]*ServerType, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, serverTypeBasePath, nil)
 	if err != nil {
 		return nil, err
@@ -575,7 +571,7 @@ func (s server) ListServerTypes(ctx context.Context) ([]*ServerType, error) {
 	return serverTypes.ServerTypes, nil
 }
 
-func (s server) ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan string) error {
+func (s cloudServerService) ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan string) error {
 	payload := &ServerAction{
 		Action:         "change_network_plan",
 		NewNetworkPlan: newNetworkPlan,
@@ -591,7 +587,7 @@ func (s server) ChangeNetworkPlan(ctx context.Context, id string, newNetworkPlan
 	return resp.Body.Close()
 }
 
-func (s server) SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error {
+func (s cloudServerService) SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error {
 	payload := &ServerAction{
 		Action:         "switch_billing_plan",
 		NewBillingPlan: newBillingPlan,
@@ -607,7 +603,7 @@ func (s server) SwitchBillingPlan(ctx context.Context, id string, newBillingPlan
 	return resp.Body.Close()
 }
 
-func (s server) Rename(ctx context.Context, id string, newName string) error {
+func (s cloudServerService) Rename(ctx context.Context, id string, newName string) error {
 	payload := &ServerAction{
 		Action:  "rename",
 		NewName: newName,
@@ -623,7 +619,7 @@ func (s server) Rename(ctx context.Context, id string, newName string) error {
 	return resp.Body.Close()
 }
 
-func (s server) EnableIpv6(ctx context.Context, id string) error {
+func (s cloudServerService) EnableIPv6(ctx context.Context, id string) error {
 	payload := &ServerAction{
 		Action: "enable_ipv6",
 	}
