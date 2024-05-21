@@ -62,22 +62,27 @@ type Client struct {
 	userAgent     string
 	username      string
 
-	apiURL     *url.URL
-	httpClient *http.Client
-	services   []*Service
+	apiURL   *url.URL
+	services []*Service
 
 	Account           AccountService
 	AutoScaling       AutoScalingService
 	CDN               CDNService
 	CloudBackup       CloudBackupService
 	CloudDatabase     CloudDatabaseService
-	CloudLoadBalancer LoadBalancerService
 	CloudServer       CloudServerService
 	CloudWatcher      CloudWatcherService
 	ContainerRegistry ContainerRegistryService
 	DNS               DNSService
+	HealthMonitor     HealthMonitorService
+	httpClient        *http.Client
 	IAM               IAMService
 	KubernetesEngine  KubernetesEngineService
+	L7Policy          L7PolicyService
+	Listener          ListenerService
+	LoadBalancer      LoadBalancerService
+	Member            MemberService
+	Pool              PoolService
 	Service           ServiceInterface
 	Token             TokenService
 }
@@ -160,9 +165,14 @@ func NewClient(options ...Option) (*Client, error) {
 	c.CloudWatcher = &cloudwatcherService{client: c}
 	c.ContainerRegistry = &containerRegistry{client: c}
 	c.DNS = &dnsService{client: c}
+	c.HealthMonitor = &healthmonitor{client: c}
 	c.IAM = &iamService{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
-	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
+	c.L7Policy = &l7Policy{client: c}
+	c.Listener = &listener{client: c}
+	c.LoadBalancer = &loadbalancer{client: c}
+	c.Member = &member{client: c}
+	c.Pool = &pool{client: c}
 	c.Service = &service{client: c}
 	c.Token = &token{client: c}
 	return c, nil
