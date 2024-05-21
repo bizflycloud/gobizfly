@@ -69,7 +69,7 @@ func main() {
 	}
 	client.SetKeystoneToken(tok)
 
-	lbs, err := client.LoadBalancer.List(ctx, &gobizfly.ListOptions{})
+	lbs, err := client.CloudLoadBalancer.List(ctx, &gobizfly.ListOptions{})
 	if err != nil {
 		log.Fatal(err)
 	}

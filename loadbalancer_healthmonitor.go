@@ -61,11 +61,15 @@ type HealthMonitorUpdateRequest struct {
 	DomainName     *string  `json:"domain_name,omitempty"`
 }
 
-type healthmonitor struct {
+type cloudLoadBalancerHealthMonitorResource struct {
 	client *Client
 }
 
-var _ HealthMonitorService = (*healthmonitor)(nil)
+var _ HealthMonitorService = (*cloudLoadBalancerHealthMonitorResource)(nil)
+
+func (lbs *cloudLoadBalancerService) HealthMonitors() *cloudLoadBalancerHealthMonitorResource {
+	return &cloudLoadBalancerHealthMonitorResource{client: lbs.client}
+}
 
 // HealthMonitorService is an interface to interact with Bizfly API Health Monitor endpoint.
 type HealthMonitorService interface {
@@ -75,12 +79,12 @@ type HealthMonitorService interface {
 	Update(Ctx context.Context, healthMonitorID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error)
 }
 
-func (h *healthmonitor) itemPath(hmID string) string {
+func (h *cloudLoadBalancerHealthMonitorResource) itemPath(hmID string) string {
 	return strings.Join([]string{healthMonitorPath, hmID}, "/")
 }
 
 // Get gets detail a health monitor
-func (h *healthmonitor) Get(ctx context.Context, hmID string) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID string) (*HealthMonitor, error) {
 	req, err := h.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, h.itemPath(hmID), nil)
 	if err != nil {
 		return nil, err
@@ -99,7 +103,7 @@ func (h *healthmonitor) Get(ctx context.Context, hmID string) (*HealthMonitor, e
 }
 
 // Create creates a health monitor for a pool
-func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error) {
 	var data struct {
 		HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
 	}
@@ -125,7 +129,7 @@ func (h *healthmonitor) Create(ctx context.Context, poolID string, hmcr *HealthM
 }
 
 // Delete deletes a health monitor
-func (h *healthmonitor) Delete(ctx context.Context, hmID string) error {
+func (h *cloudLoadBalancerHealthMonitorResource) Delete(ctx context.Context, hmID string) error {
 	req, err := h.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, h.itemPath(hmID), nil)
 	if err != nil {
 		return err
@@ -140,7 +144,7 @@ func (h *healthmonitor) Delete(ctx context.Context, hmID string) error {
 }
 
 // Update - updates a health monitor
-func (h *healthmonitor) Update(ctx context.Context, hmID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Update(ctx context.Context, hmID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error) {
 	var data struct {
 		HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
 	}

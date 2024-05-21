@@ -9,10 +9,10 @@ import (
 	"strings"
 )
 
-var _ PoolService = (*pool)(nil)
+var _ CloudLoadBalancerPoolService = (*cloudLoadBalancerPoolResource)(nil)
 
-// PoolService is an interface to interact with Bizfly API Pools endpoint.
-type PoolService interface {
+// CloudLoadBalancerPoolService is an interface to interact with Bizfly API Pools endpoint.
+type CloudLoadBalancerPoolService interface {
 	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Pool, error)
 	Create(ctx context.Context, loadBalancerID string, req *PoolCreateRequest) (*Pool, error)
 	Get(ctx context.Context, id string) (*Pool, error)
@@ -94,20 +94,24 @@ type Pool struct {
 	Members            []Member            `json:"members"`
 }
 
-type pool struct {
+type cloudLoadBalancerPoolResource struct {
 	client *Client
 }
 
-func (p *pool) resourcePath(lbID string) string {
+func (lbs *cloudLoadBalancerService) Pools() *cloudLoadBalancerPoolResource {
+	return &cloudLoadBalancerPoolResource{client: lbs.client}
+}
+
+func (p *cloudLoadBalancerPoolResource) resourcePath(lbID string) string {
 	return strings.Join([]string{loadBalancerResourcePath, lbID, "pools"}, "/")
 }
 
-func (p *pool) itemPath(id string) string {
+func (p *cloudLoadBalancerPoolResource) itemPath(id string) string {
 	return strings.Join([]string{poolPath, id}, "/")
 }
 
 // List - retrieves a list of pools' information.
-func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
+func (p *cloudLoadBalancerPoolResource) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Pool, error) {
 	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
@@ -130,7 +134,7 @@ func (p *pool) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Poo
 }
 
 // Create - Create a new pool
-func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) (*Pool, error) {
+func (p *cloudLoadBalancerPoolResource) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) (*Pool, error) {
 	var data struct {
 		Pool *PoolCreateRequest `json:"pool"`
 	}
@@ -155,7 +159,7 @@ func (p *pool) Create(ctx context.Context, lbID string, pcr *PoolCreateRequest) 
 }
 
 // Get - Get a pool's information
-func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
+func (p *cloudLoadBalancerPoolResource) Get(ctx context.Context, id string) (*Pool, error) {
 	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.itemPath(id), nil)
 	if err != nil {
 		return nil, err
@@ -174,7 +178,7 @@ func (p *pool) Get(ctx context.Context, id string) (*Pool, error) {
 }
 
 // Update - Update a pool's information
-func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*Pool, error) {
+func (p *cloudLoadBalancerPoolResource) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*Pool, error) {
 	var data struct {
 		Pool *PoolUpdateRequest `json:"pool"`
 	}
@@ -199,7 +203,7 @@ func (p *pool) Update(ctx context.Context, id string, pur *PoolUpdateRequest) (*
 }
 
 // Delete - Delete a pool
-func (p *pool) Delete(ctx context.Context, id string) error {
+func (p *cloudLoadBalancerPoolResource) Delete(ctx context.Context, id string) error {
 	req, err := p.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, p.itemPath(id), nil)
 	if err != nil {
 		return err
