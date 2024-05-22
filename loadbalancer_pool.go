@@ -80,6 +80,7 @@ type Pool struct {
 	Description        string              `json:"description"`
 	LBAlgorithm        string              `json:"lb_algorithm"`
 	Name               string              `json:"name"`
+	HealthMonitor      *HealthMonitor      `json:"healthmonitor"`
 	UpdatedAt          string              `json:"updated_at"`
 	OperatingStatus    string              `json:"operating_status"`
 	Listeners          []resourceID        `json:"listeners"`
