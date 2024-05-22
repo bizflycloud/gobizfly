@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var _ MemberService = (*member)(nil)
+var _ MemberService = (*cloudLoadBalancerMemberResource)(nil)
 
 // MemberService is an interface to interact with Bizfly API Members endpoint.
 type MemberService interface {
@@ -73,20 +73,24 @@ type Member struct {
 	Backup            bool    `json:"backup"`
 }
 
-type member struct {
+type cloudLoadBalancerMemberResource struct {
 	client *Client
 }
 
-func (m *member) resourcePath(poolID string) string {
+func (lbs *cloudLoadBalancerService) Members() *cloudLoadBalancerMemberResource {
+	return &cloudLoadBalancerMemberResource{client: lbs.client}
+}
+
+func (m *cloudLoadBalancerMemberResource) resourcePath(poolID string) string {
 	return strings.Join([]string{poolPath, poolID, "member"}, "/")
 }
 
-func (m *member) itemPath(poolID string, id string) string {
+func (m *cloudLoadBalancerMemberResource) itemPath(poolID string, id string) string {
 	return strings.Join([]string{poolPath, poolID, "member", id}, "/")
 }
 
 // List - list members' information
-func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error) {
+func (m *cloudLoadBalancerMemberResource) List(ctx context.Context, poolID string, opts *ListOptions) ([]*Member, error) {
 	req, err := m.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, m.resourcePath(poolID), nil)
 	if err != nil {
 		return nil, err
@@ -109,7 +113,7 @@ func (m *member) List(ctx context.Context, poolID string, opts *ListOptions) ([]
 }
 
 // Get - Get member's information
-func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
+func (m *cloudLoadBalancerMemberResource) Get(ctx context.Context, poolID, id string) (*Member, error) {
 	req, err := m.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return nil, err
@@ -128,7 +132,7 @@ func (m *member) Get(ctx context.Context, poolID, id string) (*Member, error) {
 }
 
 // Update - Update member's information
-func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdateRequest) (*Member, error) {
+func (m *cloudLoadBalancerMemberResource) Update(ctx context.Context, poolID, id string, mur *MemberUpdateRequest) (*Member, error) {
 	var data struct {
 		Member *MemberUpdateRequest `json:"member"`
 	}
@@ -154,7 +158,7 @@ func (m *member) Update(ctx context.Context, poolID, id string, mur *MemberUpdat
 }
 
 // BatchUpdate - Batch update members
-func (m *member) BatchUpdate(ctx context.Context, poolID string, members *BatchMemberUpdateRequest) error {
+func (m *cloudLoadBalancerMemberResource) BatchUpdate(ctx context.Context, poolID string, members *BatchMemberUpdateRequest) error {
 	req, err := m.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, m.resourcePath(poolID), &members)
 	if err != nil {
 		return err
@@ -168,7 +172,7 @@ func (m *member) BatchUpdate(ctx context.Context, poolID string, members *BatchM
 }
 
 // Delete - Delete a member
-func (m *member) Delete(ctx context.Context, poolID, id string) error {
+func (m *cloudLoadBalancerMemberResource) Delete(ctx context.Context, poolID, id string) error {
 	req, err := m.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, m.itemPath(poolID, id), nil)
 	if err != nil {
 		return err
@@ -183,7 +187,7 @@ func (m *member) Delete(ctx context.Context, poolID, id string) error {
 }
 
 // Create - Create a new member
-func (m *member) Create(ctx context.Context, poolID string, mcr *MemberCreateRequest) (*Member, error) {
+func (m *cloudLoadBalancerMemberResource) Create(ctx context.Context, poolID string, mcr *MemberCreateRequest) (*Member, error) {
 	var data struct {
 		Member *MemberCreateRequest `json:"member"`
 	}

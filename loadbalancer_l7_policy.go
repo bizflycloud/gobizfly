@@ -99,16 +99,20 @@ type UpdateL7PolicyRequest struct {
 	Rules          []UpdateL7PolicyRuleRequest `json:"rules"`
 }
 
-type l7Policy struct {
+type cloudLoadBalancerL7PolicyResource struct {
 	client *Client
 }
 
-func (p *l7Policy) itemPath(policyId string) string {
+func (lbs *cloudLoadBalancerService) L7Policies() *cloudLoadBalancerL7PolicyResource {
+	return &cloudLoadBalancerL7PolicyResource{client: lbs.client}
+}
+
+func (p *cloudLoadBalancerL7PolicyResource) itemPath(policyId string) string {
 	return strings.Join([]string{l7PolicyPath, policyId}, "/")
 }
 
 // Create - create policy for listener
-func (p *l7Policy) Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error) {
+func (p *cloudLoadBalancerL7PolicyResource) Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error) {
 	createL7PolicyPath := strings.Join([]string{listenerPath, listenerId, "l7policy"}, "/")
 	clpr := struct {
 		L7Policy CreateL7PolicyRequest `json:"l7policy"`
@@ -133,7 +137,7 @@ func (p *l7Policy) Create(ctx context.Context, listenerId string, payload *Creat
 }
 
 // Get - get detail l7 policy
-func (p *l7Policy) Get(ctx context.Context, policyId string) (*DetailL7Policy, error) {
+func (p *cloudLoadBalancerL7PolicyResource) Get(ctx context.Context, policyId string) (*DetailL7Policy, error) {
 	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.itemPath(policyId), nil)
 	if err != nil {
 		return nil, err
@@ -151,7 +155,7 @@ func (p *l7Policy) Get(ctx context.Context, policyId string) (*DetailL7Policy, e
 }
 
 // Update - update l7 policy
-func (p *l7Policy) Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error) {
+func (p *cloudLoadBalancerL7PolicyResource) Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error) {
 	ulpr := struct {
 		L7Plicy UpdateL7PolicyRequest `json:"l7policy"`
 	}{L7Plicy: *payload}
@@ -174,7 +178,7 @@ func (p *l7Policy) Update(ctx context.Context, policyId string, payload *UpdateL
 }
 
 // Delete - delete l7 policy
-func (p *l7Policy) Delete(ctx context.Context, policyId string) error {
+func (p *cloudLoadBalancerL7PolicyResource) Delete(ctx context.Context, policyId string) error {
 	req, err := p.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, p.itemPath(policyId), nil)
 	if err != nil {
 		return err
@@ -187,7 +191,7 @@ func (p *l7Policy) Delete(ctx context.Context, policyId string) error {
 }
 
 // ListL7PolicyRules - list l7 policy rules
-func (p *l7Policy) ListL7PolicyRules(ctx context.Context, policyId string) ([]DetailL7PolicyRule, error) {
+func (p *cloudLoadBalancerL7PolicyResource) ListL7PolicyRules(ctx context.Context, policyId string) ([]DetailL7PolicyRule, error) {
 	path := strings.Join([]string{p.itemPath(policyId), "rules"}, "/")
 	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, path, nil)
 	if err != nil {
@@ -207,7 +211,7 @@ func (p *l7Policy) ListL7PolicyRules(ctx context.Context, policyId string) ([]De
 	return data.Rules, nil
 }
 
-func (p *l7Policy) CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error) {
+func (p *cloudLoadBalancerL7PolicyResource) CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error) {
 	path := strings.Join([]string{p.itemPath(policyId), "rules"}, "/")
 	clpr := struct {
 		Rule L7PolicyRuleRequest `json:"rule"`

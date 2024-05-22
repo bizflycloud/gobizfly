@@ -16,8 +16,16 @@ type serverFlavorResponse struct {
 	Category string `json:"category"`
 }
 
-// ListFlavors lists server flavors
-func (s *server) ListFlavors(ctx context.Context) ([]*serverFlavorResponse, error) {
+type cloudServerFlavorResource struct {
+	client *Client
+}
+
+func (cs *cloudServerService) Flavors() *cloudServerFlavorResource {
+	return &cloudServerFlavorResource{client: cs.client}
+}
+
+// List lists server flavors
+func (s *cloudServerFlavorResource) List(ctx context.Context) ([]*serverFlavorResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, flavorPath, nil)
 	if err != nil {
 		return nil, err

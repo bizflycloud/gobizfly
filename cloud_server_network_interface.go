@@ -11,10 +11,14 @@ const (
 	networkInterfacePath = "/network-interfaces"
 )
 
-var _ NetworkInterfaceService = (*networkInterfaceService)(nil)
+var _ NetworkInterfaceService = (*cloudServerNetworkInterfaceResource)(nil)
 
-type networkInterfaceService struct {
+type cloudServerNetworkInterfaceResource struct {
 	client *Client
+}
+
+func (cs *cloudServerService) NetworkInterfaces() *cloudServerNetworkInterfaceResource {
+	return &cloudServerNetworkInterfaceResource{client: cs.client}
 }
 
 type NetworkInterfaceService interface {
@@ -103,24 +107,24 @@ type ActionNetworkInterfacePayload struct {
 	SecurityGroups []string `json:"security_groups,omitempty"`
 }
 
-func (n networkInterfaceService) createPath(networkID string) string {
+func (n cloudServerNetworkInterfaceResource) createPath(networkID string) string {
 	return strings.Join([]string{vpcPath, networkID, "network-interfaces"}, "/")
 }
 
-func (n networkInterfaceService) actionPath(id string) string {
+func (n cloudServerNetworkInterfaceResource) actionPath(id string) string {
 	return strings.Join([]string{networkInterfacePath, id, "action"}, "/")
 }
 
-func (n networkInterfaceService) resourcePath() string {
+func (n cloudServerNetworkInterfaceResource) resourcePath() string {
 	return networkInterfacePath
 }
 
-func (n networkInterfaceService) itemPath(id string) string {
+func (n cloudServerNetworkInterfaceResource) itemPath(id string) string {
 	return strings.Join([]string{networkInterfacePath, id}, "/")
 }
 
 // Create - Create a network interface
-func (n networkInterfaceService) Create(ctx context.Context, networkID string, payload *CreateNetworkInterfacePayload) (*NetworkInterface, error) {
+func (n cloudServerNetworkInterfaceResource) Create(ctx context.Context, networkID string, payload *CreateNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.createPath(networkID), payload)
 	if err != nil {
 		return nil, err
@@ -138,7 +142,7 @@ func (n networkInterfaceService) Create(ctx context.Context, networkID string, p
 }
 
 // Get - Get a network interface
-func (n networkInterfaceService) Get(ctx context.Context, networkInterfaceID string) (*NetworkInterface, error) {
+func (n cloudServerNetworkInterfaceResource) Get(ctx context.Context, networkInterfaceID string) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
 		return nil, err
@@ -156,7 +160,7 @@ func (n networkInterfaceService) Get(ctx context.Context, networkInterfaceID str
 }
 
 // Update - Update the network interface information
-func (n networkInterfaceService) Update(ctx context.Context, networkInterfaceID string, payload *UpdateNetworkInterfacePayload) (*NetworkInterface, error) {
+func (n cloudServerNetworkInterfaceResource) Update(ctx context.Context, networkInterfaceID string, payload *UpdateNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPut, serverServiceName, n.itemPath(networkInterfaceID), payload)
 	if err != nil {
 		return nil, err
@@ -174,7 +178,7 @@ func (n networkInterfaceService) Update(ctx context.Context, networkInterfaceID 
 }
 
 // Delete - Delete the network interface
-func (n networkInterfaceService) Delete(ctx context.Context, networkInterfaceID string) error {
+func (n cloudServerNetworkInterfaceResource) Delete(ctx context.Context, networkInterfaceID string) error {
 	req, err := n.client.NewRequest(ctx, http.MethodDelete, serverServiceName, n.itemPath(networkInterfaceID), nil)
 	if err != nil {
 		return err
@@ -187,7 +191,7 @@ func (n networkInterfaceService) Delete(ctx context.Context, networkInterfaceID 
 }
 
 // List - List network interfaces with options
-func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
+func (n cloudServerNetworkInterfaceResource) List(ctx context.Context, opts *ListNetworkInterfaceOptions) ([]*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodGet, serverServiceName, n.resourcePath(), nil)
 	if err != nil {
 		return nil, err
@@ -223,7 +227,7 @@ func (n networkInterfaceService) List(ctx context.Context, opts *ListNetworkInte
 }
 
 // Action - Execute action on a network interface
-func (n networkInterfaceService) Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error) {
+func (n cloudServerNetworkInterfaceResource) Action(ctx context.Context, networkInterfaceID string, payload *ActionNetworkInterfacePayload) (*NetworkInterface, error) {
 	req, err := n.client.NewRequest(ctx, http.MethodPost, serverServiceName, n.actionPath(networkInterfaceID), payload)
 	if err != nil {
 		return nil, err

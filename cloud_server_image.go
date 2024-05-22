@@ -51,7 +51,7 @@ type CustomImageGetResp struct {
 }
 
 // itemCustomImagePath represents the path to get a custom image
-func (s *server) itemCustomImagePath(id string) string {
+func (s *cloudServerCustomOSImageResource) itemCustomImagePath(id string) string {
 	return strings.Join([]string{customImagePath, id}, "/")
 }
 
@@ -67,8 +67,24 @@ type osImageResponse struct {
 	Version        []osDistributionVersion `json:"versions"`
 }
 
-// ListOSImages list server os images
-func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
+type cloudServerOSImageResource struct {
+	client *Client
+}
+
+type cloudServerCustomOSImageResource struct {
+	client *Client
+}
+
+func (cs *cloudServerService) OSImages() *cloudServerOSImageResource {
+	return &cloudServerOSImageResource{client: cs.client}
+}
+
+func (cs *cloudServerService) CustomImages() *cloudServerCustomOSImageResource {
+	return &cloudServerCustomOSImageResource{client: cs.client}
+}
+
+// Get list server os images
+func (s *cloudServerOSImageResource) List(ctx context.Context) ([]osImageResponse, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, osImagePath, nil)
 
 	if err != nil {
@@ -91,8 +107,8 @@ func (s *server) ListOSImages(ctx context.Context) ([]osImageResponse, error) {
 	return respPayload.OSImages, nil
 }
 
-// ListCustomImages - List custom images
-func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
+// List - List custom images
+func (s *cloudServerCustomOSImageResource) List(ctx context.Context) ([]*CustomImage, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, customImagesPath, nil)
 	if err != nil {
 		return nil, err
@@ -111,8 +127,8 @@ func (s *server) ListCustomImages(ctx context.Context) ([]*CustomImage, error) {
 	return data.Images, nil
 }
 
-// CreateCustomImage - Create custom image
-func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error) {
+// Create - Create custom image
+func (s *cloudServerCustomOSImageResource) Create(ctx context.Context, cipl *CreateCustomImagePayload) (*CreateCustomImageResp, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{customImagePath, "upload"}, "/"), cipl)
 	if err != nil {
 		return nil, err
@@ -129,8 +145,8 @@ func (s *server) CreateCustomImage(ctx context.Context, cipl *CreateCustomImageP
 	return data, nil
 }
 
-// DeleteCustomImage - Delete a custom image by id
-func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
+// Delete - Delete a custom image by id
+func (s *cloudServerCustomOSImageResource) Delete(ctx context.Context, imageID string) error {
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, s.itemCustomImagePath(imageID), nil)
 
 	if err != nil {
@@ -143,8 +159,8 @@ func (s *server) DeleteCustomImage(ctx context.Context, imageID string) error {
 	return resp.Body.Close()
 }
 
-// GetCustomImage - Get a custom image by id
-func (s *server) GetCustomImage(ctx context.Context, imageID string) (*CustomImageGetResp, error) {
+// Get - Get a custom image by id
+func (s *cloudServerCustomOSImageResource) Get(ctx context.Context, imageID string) (*CustomImageGetResp, error) {
 	req, err := s.client.NewRequest(ctx, http.MethodGet, serverServiceName, strings.Join([]string{customImagePath, imageID}, "/"), nil)
 	if err != nil {
 		return nil, err

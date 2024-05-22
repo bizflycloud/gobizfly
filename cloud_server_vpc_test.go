@@ -271,7 +271,7 @@ func TestVPCList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	vpcs, err := client.VPC.List(ctx)
+	vpcs, err := client.CloudServer.VPCNetworks().List(ctx)
 	require.NoError(t, err)
 	assert.Len(t, vpcs, 4)
 	assert.Equal(t, 1500, vpcs[0].MTU)
@@ -320,7 +320,7 @@ func TestVPCCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	vpc, err := client.VPC.Create(ctx, &CreateVPCPayload{
+	vpc, err := client.CloudServer.VPCNetworks().Create(ctx, &CreateVPCPayload{
 		Name: "test",
 	})
 	require.NoError(t, err)
@@ -331,7 +331,7 @@ func TestVPCCreate(t *testing.T) {
 func TestVPCGet(t *testing.T) {
 	setup()
 	defer teardown()
-	var v vpcService
+	var v cloudServerVPCNetworkResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
@@ -418,7 +418,7 @@ func TestVPCGet(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.VPC.Get(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50")
+	vpc, err := client.CloudServer.VPCNetworks().Get(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50")
 	require.NoError(t, err)
 	assert.Equal(t, "2021-01-28T02:50:49Z", vpc.CreatedAt)
 	assert.Equal(t, "10.241.10.129", vpc.Subnets[0].HostRoutes[0].NextHop)
@@ -427,7 +427,7 @@ func TestVPCGet(t *testing.T) {
 func TestVPCUpdate(t *testing.T) {
 	setup()
 	defer teardown()
-	var v vpcService
+	var v cloudServerVPCNetworkResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPut, r.Method)
@@ -511,7 +511,7 @@ func TestVPCUpdate(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	vpc, err := client.VPC.Update(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50", &UpdateVPCPayload{
+	vpc, err := client.CloudServer.VPCNetworks().Update(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50", &UpdateVPCPayload{
 		Name:      "test_update",
 		IsDefault: false,
 	})
@@ -522,10 +522,10 @@ func TestVPCUpdate(t *testing.T) {
 func TestVPCDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var v vpcService
+	var v cloudServerVPCNetworkResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("0e03c7c5-267b-41f9-baa7-c4d2f2283d50")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.VPC.Delete(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50"))
+	require.NoError(t, client.CloudServer.VPCNetworks().Delete(ctx, "0e03c7c5-267b-41f9-baa7-c4d2f2283d50"))
 }

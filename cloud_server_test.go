@@ -156,7 +156,7 @@ func TestServerList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	servers, err := client.Server.List(ctx, &ServerListOptions{
+	servers, err := client.CloudServer.List(ctx, &ServerListOptions{
 		Name: "meeting-now-1",
 	})
 	require.NoError(t, err)
@@ -211,7 +211,7 @@ func TestServerCreate(t *testing.T) {
 		NetworkPlan:       "free_datatransfer",
 		NetworkInterfaces: []string{"123", "456"},
 	}
-	task, err := client.Server.Create(ctx, scr)
+	task, err := client.CloudServer.Create(ctx, scr)
 	require.NoError(t, err)
 	assert.Equal(t, "71b9caeb-1df3-4a60-8741-fdea426fed4c", task.Task[0])
 
@@ -258,7 +258,7 @@ func TestUpdatedServerCreate(t *testing.T) {
 		NetworkPlan:       "free_datatransfer",
 		NetworkInterfaces: []string{"123", "456"},
 	}
-	task, err := client.Server.Create(ctx, scr)
+	task, err := client.CloudServer.Create(ctx, scr)
 	require.NoError(t, err)
 	assert.Equal(t, "71b9caeb-1df3-4a60-8741-fdea426fed4c", task.Task[0])
 
@@ -277,7 +277,7 @@ func TestServerDelete(t *testing.T) {
 
 	})
 
-	task, err := client.Server.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477", []string{})
+	task, err := client.CloudServer.Delete(ctx, "c0f541d1-385a-4b0f-8c9a-5bd583475477", []string{})
 	require.NoError(t, err)
 	assert.Equal(t, task.TaskID, "725620b1-92b2-48f4-a878-9c1662f35b39")
 }
@@ -285,7 +285,7 @@ func TestServerDelete(t *testing.T) {
 func TestServerSoftReboot(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -299,7 +299,7 @@ func TestServerSoftReboot(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	response, err := client.Server.SoftReboot(ctx, "6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")
+	response, err := client.CloudServer.SoftReboot(ctx, "6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")
 	require.NoError(t, err)
 	assert.Equal(t, "Soft reboot server th\u00e0nh c\u00f4ng", response.Message)
 
@@ -308,7 +308,7 @@ func TestServerSoftReboot(t *testing.T) {
 func TestServerHardReboot(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -321,7 +321,7 @@ func TestServerHardReboot(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	response, err := client.Server.HardReboot(ctx, "6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")
+	response, err := client.CloudServer.HardReboot(ctx, "6768e664-7e3e-11ea-ba40-ffdde7ae9a5b")
 	require.NoError(t, err)
 	assert.Equal(t, "Hard reboot server th\u00e0nh c\u00f4ng", response.Message)
 
@@ -330,7 +330,7 @@ func TestServerHardReboot(t *testing.T) {
 func TestServerStart(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -411,7 +411,7 @@ func TestServerStart(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	server, err := client.Server.Start(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
+	server, err := client.CloudServer.Start(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
 	require.NoError(t, err)
 	assert.Equal(t, "5767c20e-fba4-4b23-8045-31e641d10d57", server.ID)
 
@@ -420,7 +420,7 @@ func TestServerStart(t *testing.T) {
 func TestServerStop(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -501,7 +501,7 @@ func TestServerStop(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	server, err := client.Server.Stop(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
+	server, err := client.CloudServer.Stop(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
 	require.NoError(t, err)
 	assert.Equal(t, "5767c20e-fba4-4b23-8045-31e641d10d57", server.ID)
 
@@ -510,7 +510,7 @@ func TestServerStop(t *testing.T) {
 func TestServerRebuild(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -525,7 +525,7 @@ func TestServerRebuild(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	task, err := client.Server.Rebuild(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "263457d0-7e40-11ea-99fe-3b298a7e3e62")
+	task, err := client.CloudServer.Rebuild(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "263457d0-7e40-11ea-99fe-3b298a7e3e62")
 	require.NoError(t, err)
 	assert.Equal(t, "f188d844-7e3f-11ea-a878-17c5949416eb", task.TaskID)
 
@@ -534,7 +534,7 @@ func TestServerRebuild(t *testing.T) {
 func TestServerGetVNC(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -551,7 +551,7 @@ func TestServerGetVNC(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	console, err := client.Server.GetVNC(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
+	console, err := client.CloudServer.GetVNC(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57")
 	require.NoError(t, err)
 	assert.Equal(t, "novnc", console.Type)
 	assert.Equal(t, "https://hn-1.vccloud.vn:6080/vnc_auto.html?token=d2f12bd2-631c-4e97-950f-f8c6b3fce1cb", console.URL)
@@ -561,7 +561,7 @@ func TestServerGetVNC(t *testing.T) {
 func TestServerResize(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -576,7 +576,7 @@ func TestServerResize(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	task, err := client.Server.Resize(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "4c_4g")
+	task, err := client.CloudServer.Resize(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "4c_4g")
 	require.NoError(t, err)
 	assert.Equal(t, "6ac1c3aa-7e41-11ea-a8b0-9b7b1be3dcee", task.TaskID)
 
@@ -617,7 +617,7 @@ func TestServerFlavorList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	flavors, err := client.Server.ListFlavors(ctx)
+	flavors, err := client.CloudServer.Flavors().List(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, 3, len(flavors))
 	assert.Equal(t, "00e88d8e-a4c2-44a8-a423-2568b78e9702", flavors[0].ID)
@@ -717,7 +717,7 @@ func TestOSImageList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	osImages, err := client.Server.ListOSImages(ctx)
+	osImages, err := client.CloudServer.OSImages().List(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, "d9513b4e-60c4-45c6-a8e0-0d814a7c0799", osImages[0].Version[0].ID)
 }
@@ -740,7 +740,7 @@ func TestGetServerTaskResponseNotReady(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Server.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
+	resp, err := client.CloudServer.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
 	require.NoError(t, err)
 	assert.Equal(t, false, resp.Ready)
 }
@@ -909,7 +909,7 @@ func TestGetServerTaskResponseReady(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Server.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
+	resp, err := client.CloudServer.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
 	require.NoError(t, err)
 	assert.Equal(t, true, resp.Ready)
 	assert.Equal(t, "366d5fa3-49d2-4c0d-bde5-f542bddb212a", resp.Result.Server.ID)
@@ -918,7 +918,7 @@ func TestGetServerTaskResponseReady(t *testing.T) {
 func TestServerChangeCategory(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("5767c20e-fba4-4b23-8045-31e641d10d57")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
 		var sa *ServerAction
@@ -933,16 +933,16 @@ func TestServerChangeCategory(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	task, err := client.Server.ChangeCategory(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "enterprise")
+	task, err := client.CloudServer.ChangeCategory(ctx, "5767c20e-fba4-4b23-8045-31e641d10d57", "enterprise")
 	require.NoError(t, err)
 	assert.Equal(t, "f188d844-7e3f-11ea-a878-17c5949416eb", task.TaskID)
 
 }
 
-func TestServerAddVPC(t *testing.T) {
+func TestServerAddVirtualPrivateNetwork(t *testing.T) {
 	setup()
 	defer teardown()
-	var s *server
+	var s *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
@@ -1170,15 +1170,15 @@ func TestServerAddVPC(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	server, err := client.Server.AddVPC(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
+	server, err := client.CloudServer.AddVirtualPrivateNetwork(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
 	require.NoError(t, err)
 	assert.Len(t, server.IPAddresses.LanAddresses, 3)
 }
 
-func TestServerRemoveVPC(t *testing.T) {
+func TestServerRemoveNetworkInterface(t *testing.T) {
 	setup()
 	defer teardown()
-	var s *server
+	var s *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
@@ -1399,7 +1399,7 @@ func TestServerRemoveVPC(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	server, err := client.Server.RemoveVPC(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
+	server, err := client.CloudServer.RemoveNetworkInterface(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", []string{"04c13e91-ede3-41b8-8824-7d3541f33b5a"})
 	require.NoError(t, err)
 	assert.Len(t, server.IPAddresses.LanAddresses, 2)
 }
@@ -1447,7 +1447,7 @@ func TestCustomImageList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	images, err := client.Server.ListCustomImages(ctx)
+	images, err := client.CloudServer.CustomImages().List(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, "/v2/schemas/image", images[0].Schema)
 }
@@ -1492,7 +1492,7 @@ func TestCustomImageCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	resp, err := client.Server.CreateCustomImage(ctx, &CreateCustomImagePayload{
+	resp, err := client.CloudServer.CustomImages().Create(ctx, &CreateCustomImagePayload{
 		Name:       "Cloud-server.postman_collection.jsonafasds",
 		DiskFormat: "raw",
 	})
@@ -1507,7 +1507,7 @@ func TestCustomImageDelete(t *testing.T) {
 		func(writer http.ResponseWriter, r *http.Request) {
 			require.Equal(t, http.MethodDelete, r.Method)
 		})
-	err := client.Server.DeleteCustomImage(ctx, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532")
+	err := client.CloudServer.CustomImages().Delete(ctx, "0b5ae9ed-7cfb-454b-a5cc-df0bba693532")
 	require.NoError(t, err)
 }
 
@@ -1554,7 +1554,7 @@ func TestCustomImageDownload(t *testing.T) {
 `
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	image, err := client.Server.GetCustomImage(ctx, "809cd001-07e3-4e00-a5c5-2d8fa0516d90")
+	image, err := client.CloudServer.CustomImages().Get(ctx, "809cd001-07e3-4e00-a5c5-2d8fa0516d90")
 	require.NoError(t, err)
 	assert.Equal(t, image.Token, "gAAAAABgQY1kuIcMMK17B1nWBMd5dHTcitsChmDv1WU4xIGgHph09_Do4wDjY8V5XTyTYWgeYVaN5cNJG2In3oyvSm6uYlugYk6nxC-XiD81rp-8zxvSPTDd2jlaKfrrFgd2HJH5rfpV5iQlMMps52vGpxFrxFa-2ppK8BQbye63nKK_e4LwahE")
 }
@@ -1607,7 +1607,7 @@ func TestListServerTypes(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.Server.ListServerTypes(ctx)
+	resp, err := client.CloudServer.ListServerTypes(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, len(resp), 4)
 	assert.Equal(t, resp[0].Name, "Basic")
@@ -1620,32 +1620,32 @@ func TestListServerTypes(t *testing.T) {
 func TestServerChangeNetworkPlan(t *testing.T) {
 	setup()
 	defer teardown()
-	var svr *server
+	var svr *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(svr.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 	})
-	err := client.Server.ChangeNetworkPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "free_datatransfer")
+	err := client.CloudServer.ChangeNetworkPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "free_datatransfer")
 	require.NoError(t, err)
 }
 
 func TestServerSwitchBillingPlan(t *testing.T) {
 	setup()
 	defer teardown()
-	var s *server
+	var s *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 	})
-	err := client.Server.SwitchBillingPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "on_demand")
+	err := client.CloudServer.SwitchBillingPlan(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "on_demand")
 	require.NoError(t, err)
 }
 
 func TestServerChangeBackupPlan(t *testing.T) {
 	setup()
 	defer teardown()
-	var s *server
+	var s *cloudServerService
 	mux.HandleFunc(testlib.CloudServerURL(s.itemActionPath("04c13e91-ede3-41b8-8824-7d3541f33b5a")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 	})
-	err := client.Server.Rename(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "backup")
+	err := client.CloudServer.Rename(ctx, "04c13e91-ede3-41b8-8824-7d3541f33b5a", "backup")
 	require.NoError(t, err)
 }

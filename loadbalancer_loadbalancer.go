@@ -9,16 +9,22 @@ import (
 	"strings"
 )
 
-var _ LoadBalancerService = (*loadbalancer)(nil)
+var _ LoadBalancerService = (*cloudLoadBalancerService)(nil)
 
 // LoadBalancerService is an interface to interact with Bizfly API Load Balancers endpoint.
 type LoadBalancerService interface {
-	List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error)
 	Create(ctx context.Context, req *LoadBalancerCreateRequest) (*LoadBalancer, error)
-	Get(ctx context.Context, id string) (*LoadBalancer, error)
-	Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error)
 	Delete(ctx context.Context, req *LoadBalancerDeleteRequest) error
+	Get(ctx context.Context, id string) (*LoadBalancer, error)
+	List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error)
 	Resize(ctx context.Context, id string, newType string) error
+	Update(ctx context.Context, id string, req *LoadBalancerUpdateRequest) (*LoadBalancer, error)
+
+	Listeners() *cloudLoadBalancerListenerResource
+	Pools() *cloudLoadBalancerPoolResource
+	HealthMonitors() *cloudLoadBalancerHealthMonitorResource
+	L7Policies() *cloudLoadBalancerL7PolicyResource
+	Members() *cloudLoadBalancerMemberResource
 }
 
 type ListenerHealthMonitor struct {
@@ -101,20 +107,20 @@ type LoadBalancer struct {
 	CreatedAt          string       `json:"created_at"`
 }
 
-type loadbalancer struct {
+type cloudLoadBalancerService struct {
 	client *Client
 }
 
-func (l *loadbalancer) resourcePath() string {
+func (l *cloudLoadBalancerService) resourcePath() string {
 	return loadBalancersPath
 }
 
-func (l *loadbalancer) itemPath(id string) string {
+func (l *cloudLoadBalancerService) itemPath(id string) string {
 	return strings.Join([]string{loadBalancerResourcePath, id}, "/")
 }
 
 // List returns a list of load balancers' information.
-func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error) {
+func (l *cloudLoadBalancerService) List(ctx context.Context, opts *ListOptions) ([]*LoadBalancer, error) {
 	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.resourcePath(), nil)
 	if err != nil {
 		return nil, err
@@ -137,7 +143,7 @@ func (l *loadbalancer) List(ctx context.Context, opts *ListOptions) ([]*LoadBala
 }
 
 // Create - creates a new load balancer.
-func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateRequest) (*LoadBalancer, error) {
+func (l *cloudLoadBalancerService) Create(ctx context.Context, lbcr *LoadBalancerCreateRequest) (*LoadBalancer, error) {
 	var data struct {
 		LoadBalancer *LoadBalancerCreateRequest `json:"loadbalancer"`
 	}
@@ -162,7 +168,7 @@ func (l *loadbalancer) Create(ctx context.Context, lbcr *LoadBalancerCreateReque
 }
 
 // Get - retrieves a load balancer by its ID.
-func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error) {
+func (l *cloudLoadBalancerService) Get(ctx context.Context, id string) (*LoadBalancer, error) {
 	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
@@ -181,7 +187,7 @@ func (l *loadbalancer) Get(ctx context.Context, id string) (*LoadBalancer, error
 }
 
 // Update - update the load balancer's information.
-func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
+func (l *cloudLoadBalancerService) Update(ctx context.Context, id string, lbur *LoadBalancerUpdateRequest) (*LoadBalancer, error) {
 	var data struct {
 		LoadBalancer *LoadBalancerUpdateRequest `json:"loadbalancer"`
 	}
@@ -206,7 +212,7 @@ func (l *loadbalancer) Update(ctx context.Context, id string, lbur *LoadBalancer
 }
 
 // Delete - deletes a load balancer by its ID.
-func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
+func (l *cloudLoadBalancerService) Delete(ctx context.Context, lbdr *LoadBalancerDeleteRequest) error {
 	req, err := l.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, l.itemPath(lbdr.ID), lbdr)
 	if err != nil {
 		return err
@@ -220,7 +226,7 @@ func (l *loadbalancer) Delete(ctx context.Context, lbdr *LoadBalancerDeleteReque
 	return resp.Body.Close()
 }
 
-func (l *loadbalancer) Resize(ctx context.Context, id string, newType string) error {
+func (l *cloudLoadBalancerService) Resize(ctx context.Context, id string, newType string) error {
 	lrq := &LoadBalancerResizeRequest{
 		NewType: newType,
 		Action:  "resize",

@@ -50,47 +50,36 @@ var (
 
 // Client represents Bizfly API client.
 type Client struct {
-	Account               AccountService
-	apiURL                *url.URL
-	appCredID             string
-	appCredSecret         string
-	authMethod            string
-	authType              string
-	AutoScaling           AutoScalingService
-	basicAuth             string
-	CDN                   CDNService
-	CloudBackup           CloudBackupService
-	CloudDatabase         CloudDatabaseService
-	CloudWatcher          CloudWatcherService
-	ContainerRegistry     ContainerRegistryService
-	DNS                   DNSService
-	Firewall              FirewallService
-	HealthMonitor         HealthMonitorService
-	httpClient            *http.Client
-	IAM                   IAMService
-	keystoneToken         string
-	KubernetesEngine      KubernetesEngineService
-	Listener              ListenerService
-	L7Policy              L7PolicyService
-	LoadBalancer          LoadBalancerService
-	Member                MemberService
-	NetworkInterface      NetworkInterfaceService
-	password              string
-	Pool                  PoolService
-	projectID             string
-	regionName            string
-	ScheduledVolumeBackup ScheduledVolumeBackup
-	Server                ServerService
-	Service               ServiceInterface
-	services              []*Service
-	Snapshot              SnapshotService
-	SSHKey                SSHKeyService
-	Token                 TokenService
-	userAgent             string
-	username              string
-	Volume                VolumeService
-	VPC                   VPCService
-	WanIP                 WanIPService
+	appCredID     string
+	appCredSecret string
+	authMethod    string
+	authType      string
+	basicAuth     string
+	keystoneToken string
+	password      string
+	projectID     string
+	regionName    string
+	userAgent     string
+	username      string
+
+	apiURL     *url.URL
+	httpClient *http.Client
+	services   []*Service
+
+	Account           AccountService
+	AutoScaling       AutoScalingService
+	CDN               CDNService
+	CloudBackup       CloudBackupService
+	CloudDatabase     CloudDatabaseService
+	CloudLoadBalancer LoadBalancerService
+	CloudServer       CloudServerService
+	CloudWatcher      CloudWatcherService
+	ContainerRegistry ContainerRegistryService
+	DNS               DNSService
+	IAM               IAMService
+	KubernetesEngine  KubernetesEngineService
+	Service           ServiceInterface
+	Token             TokenService
 }
 
 // Option set Client specific attributes
@@ -162,33 +151,20 @@ func NewClient(options ...Option) (*Client, error) {
 		}
 	}
 
-	c.AutoScaling = &autoscalingService{client: c}
-	c.CloudBackup = &cloudBackupService{client: c}
-	c.CloudWatcher = &cloudwatcherService{client: c}
-	c.Snapshot = &snapshot{client: c}
-	c.Token = &token{client: c}
-	c.LoadBalancer = &loadbalancer{client: c}
-	c.Listener = &listener{client: c}
-	c.L7Policy = &l7Policy{client: c}
-	c.Pool = &pool{client: c}
-	c.HealthMonitor = &healthmonitor{client: c}
-	c.Member = &member{client: c}
-	c.Volume = &volume{client: c}
-	c.Server = &server{client: c}
-	c.Service = &service{client: c}
-	c.ScheduledVolumeBackup = &scheduledVolumeBackup{client: c}
-	c.Firewall = &firewall{client: c}
-	c.SSHKey = &sshkey{client: c}
-	c.KubernetesEngine = &kubernetesEngineService{client: c}
-	c.ContainerRegistry = &containerRegistry{client: c}
-	c.CDN = &cdnService{client: c}
-	c.DNS = &dnsService{client: c}
 	c.Account = &accountService{client: c}
-	c.VPC = &vpcService{client: c}
-	c.NetworkInterface = &networkInterfaceService{client: c}
-	c.WanIP = &wanIPService{client: c}
+	c.AutoScaling = &autoscalingService{client: c}
+	c.CDN = &cdnService{client: c}
+	c.CloudBackup = &cloudBackupService{client: c}
 	c.CloudDatabase = &cloudDatabaseService{client: c}
+	c.CloudServer = &cloudServerService{client: c}
+	c.CloudWatcher = &cloudwatcherService{client: c}
+	c.ContainerRegistry = &containerRegistry{client: c}
+	c.DNS = &dnsService{client: c}
 	c.IAM = &iamService{client: c}
+	c.KubernetesEngine = &kubernetesEngineService{client: c}
+	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
+	c.Service = &service{client: c}
+	c.Token = &token{client: c}
 	return c, nil
 }
 

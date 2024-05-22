@@ -129,7 +129,7 @@ func TestFirewallList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	fws, err := client.Firewall.List(ctx, &ListOptions{})
+	fws, err := client.CloudServer.Firewalls().List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, fws, 1)
 	fw := fws[0]
@@ -418,7 +418,7 @@ func TestFirewallGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	fw, err := client.Firewall.Get(ctx, "b1a01fdf-492b-48aa-9b7b-399509cbb5e4")
+	fw, err := client.CloudServer.Firewalls().Get(ctx, "b1a01fdf-492b-48aa-9b7b-399509cbb5e4")
 	require.NoError(t, err)
 	assert.Equal(t, "b1a01fdf-492b-48aa-9b7b-399509cbb5e4", fw.ID)
 	assert.Equal(t, "sapd-fw-hcm", fw.Name)
@@ -439,7 +439,7 @@ func TestDeleteFirewall(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Firewall.Delete(ctx, "b1a01fdf-492b-48aa-9b7b-399509cbb5e4")
+	resp, err := client.CloudServer.Firewalls().Delete(ctx, "b1a01fdf-492b-48aa-9b7b-399509cbb5e4")
 	require.NoError(t, err)
 	assert.Equal(t, "Delete firewall successfully", resp.Message)
 }
@@ -699,7 +699,7 @@ func TestFirewallCreate(t *testing.T) {
 			"6ee4ed07-ba59-4dd9-a0ca-cbc21861ca4b",
 		},
 	}
-	fw, err := client.Firewall.Create(ctx, &fcr)
+	fw, err := client.CloudServer.Firewalls().Create(ctx, &fcr)
 	require.NoError(t, err)
 	assert.Equal(t, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", fw.ID)
 	assert.Equal(t, "192.168.0.0/28", fw.OutBound[0].CIDR)
@@ -819,7 +819,7 @@ func TestUpdateFirewall(t *testing.T) {
 		InBound:  []FirewallRuleCreateRequest{},
 		OutBound: []FirewallRuleCreateRequest{},
 	}
-	fw, err := client.Firewall.Update(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", &fur)
+	fw, err := client.CloudServer.Firewalls().Update(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", &fur)
 	require.NoError(t, err)
 	assert.Equal(t, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", fw.ID)
 	assert.Equal(t, "b6c43097-27b2-4f09-8498-b7f4067909a0", fw.Servers[0].ID)
@@ -854,7 +854,7 @@ func TestRemoveServerFirewall(t *testing.T) {
 	frsr := FirewallRemoveServerRequest{
 		Servers: []string{"b6c43097-27b2-4f09-8498-b7f4067909a0"},
 	}
-	fw, err := client.Firewall.RemoveServer(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", &frsr)
+	fw, err := client.CloudServer.Firewalls().RemoveServer(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", &frsr)
 	require.NoError(t, err)
 	assert.Len(t, fw.Servers, 0)
 	assert.Equal(t, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0", fw.ID)
@@ -873,7 +873,7 @@ func TestDeleteFirewallRule(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Firewall.DeleteRule(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0")
+	resp, err := client.CloudServer.Firewalls().DeleteRule(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0")
 	require.NoError(t, err)
 	assert.Equal(t, "Deleted Firewall Rule", resp.Message)
 }
@@ -916,7 +916,7 @@ func TestCreateFirewallRule(t *testing.T) {
 			PortRange: "80-90",
 		},
 	}
-	resp, err := client.Firewall.CreateRule(ctx, "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552", &fsrcr)
+	resp, err := client.CloudServer.Firewalls().CreateRule(ctx, "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552", &fsrcr)
 	require.NoError(t, err)
 	assert.Equal(t, "45c37e35-86ff-4fc6-9285-0bb9f5110db8", resp.ID)
 	assert.Equal(t, "ingress", resp.Direction)

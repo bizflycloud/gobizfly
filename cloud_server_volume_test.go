@@ -70,7 +70,7 @@ func TestVolumeList(t *testing.T) {
 	})
 
 	isBootable := false
-	volumes, err := client.Volume.List(ctx, &VolumeListOptions{
+	volumes, err := client.CloudServer.Volumes().List(ctx, &VolumeListOptions{
 		Name:     "datadisk-0kr",
 		Bootable: &isBootable,
 	})
@@ -225,7 +225,7 @@ func TestVolumeGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	volume, err := client.Volume.Get(ctx, "7b099bbb-21e9-48f9-8cec-4076d78fa201")
+	volume, err := client.CloudServer.Volumes().Get(ctx, "7b099bbb-21e9-48f9-8cec-4076d78fa201")
 	require.NoError(t, err)
 	assert.Equal(t, "7b099bbb-21e9-48f9-8cec-4076d78fa201", volume.ID)
 	assert.Equal(t, "sapd-vol-1", volume.Name)
@@ -247,7 +247,7 @@ func TestVolumeDelete(t *testing.T) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
-	require.NoError(t, client.Volume.Delete(ctx, "7b099bbb-21e9-48f9-8cec-4076d78fa201"))
+	require.NoError(t, client.CloudServer.Volumes().Delete(ctx, "7b099bbb-21e9-48f9-8cec-4076d78fa201"))
 }
 
 func TestVolumeCreate(t *testing.T) {
@@ -293,7 +293,7 @@ func TestVolumeCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	volume, err := client.Volume.Create(ctx, &VolumeCreateRequest{
+	volume, err := client.CloudServer.Volumes().Create(ctx, &VolumeCreateRequest{
 		Name:             "sapd-test-goclient",
 		Size:             20,
 		VolumeType:       "SSD",
@@ -314,7 +314,7 @@ func TestVolumeExtend(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var v volume
+	var v cloudServerVolumeResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
@@ -325,7 +325,7 @@ func TestVolumeExtend(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Volume.ExtendVolume(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", 30)
+	resp, err := client.CloudServer.Volumes().ExtendVolume(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", 30)
 	require.NoError(t, err)
 	assert.Equal(t, "3c414504-8fba-4b70-bdcb-a5b44a2ae406", resp.TaskID)
 }
@@ -334,7 +334,7 @@ func TestVolumeRestore(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var v volume
+	var v cloudServerVolumeResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("4cb94590-c4a2-4a37-90d6-30064f68d19e")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
@@ -345,7 +345,7 @@ func TestVolumeRestore(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Volume.Restore(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "38466e4e-7cca-11ea-a78b-9794b3babf27")
+	resp, err := client.CloudServer.Volumes().Restore(ctx, "4cb94590-c4a2-4a37-90d6-30064f68d19e", "38466e4e-7cca-11ea-a78b-9794b3babf27")
 	require.NoError(t, err)
 	assert.Equal(t, "3c414504-8fba-4b70-bdcb-a5b44a2ae406", resp.TaskID)
 }
@@ -354,7 +354,7 @@ func TestVolumeAttach(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var v volume
+	var v cloudServerVolumeResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
@@ -388,7 +388,7 @@ func TestVolumeAttach(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Volume.Attach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
+	resp, err := client.CloudServer.Volumes().Attach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
 	require.NoError(t, err)
 	assert.Equal(t, "894f0e66-4571-4fea-9766-5fc615aec4a5", resp.VolumeDetail.ID)
 	assert.Equal(t, "Attach successfully", resp.Message)
@@ -398,7 +398,7 @@ func TestVolumeDetach(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var v volume
+	var v cloudServerVolumeResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemActionPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		resp := `
@@ -432,7 +432,7 @@ func TestVolumeDetach(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	resp, err := client.Volume.Detach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
+	resp, err := client.CloudServer.Volumes().Detach(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", "abc3f3cc-7ccb-11ea-945f-7be40572932e")
 	require.NoError(t, err)
 	assert.Equal(t, "894f0e66-4571-4fea-9766-5fc615aec4a5", resp.VolumeDetail.ID)
 	assert.Equal(t, "Detach successfully", resp.Message)
@@ -442,7 +442,7 @@ func TestPatchVolume(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var v volume
+	var v cloudServerVolumeResource
 	mux.HandleFunc(testlib.CloudServerURL(v.itemPath("894f0e66-4571-4fea-9766-5fc615aec4a5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPatch, r.Method)
 		// get the request body
@@ -573,7 +573,7 @@ func TestPatchVolume(t *testing.T) {
 		Name:        "test_rename",
 		Description: "test_description",
 	}
-	resp, err := client.Volume.Patch(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", patchRequest)
+	resp, err := client.CloudServer.Volumes().Patch(ctx, "894f0e66-4571-4fea-9766-5fc615aec4a5", patchRequest)
 	require.NoError(t, err)
 	require.Equal(t, resp.Description, "test_description")
 
@@ -610,7 +610,7 @@ func TestListVolumeTypes(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.Volume.ListVolumeTypes(ctx, &ListVolumeTypesOptions{})
+	resp, err := client.CloudServer.Volumes().ListVolumeTypes(ctx, &ListVolumeTypesOptions{})
 	require.NoError(t, err)
 	require.Equal(t, len(resp), 2)
 	require.Equal(t, resp[0].Name, "DEDICATED-HDD1")

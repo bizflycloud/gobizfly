@@ -11,21 +11,25 @@ const (
 	wanIpPath = "/wanips"
 )
 
-var _ WanIPService = (*wanIPService)(nil)
+var _ CloudServerPublicNetworkInterfaceService = (*cloudServerPublicNetworkInterfaceResource)(nil)
 
-type wanIPService struct {
+type cloudServerPublicNetworkInterfaceResource struct {
 	client *Client
 }
 
-type WanIPService interface {
-	Create(ctx context.Context, payload *CreateWanIpPayload) (*WanIP, error)
-	List(ctx context.Context) ([]*WanIP, error)
-	Get(ctx context.Context, wanIPId string) (*WanIP, error)
-	Delete(ctx context.Context, wanIpId string) error
-	Action(ctx context.Context, wanIpId string, payload *ActionWanIpPayload) error
+func (cs *cloudServerService) PublicNetworkInterfaces() *cloudServerPublicNetworkInterfaceResource {
+	return &cloudServerPublicNetworkInterfaceResource{client: cs.client}
 }
 
-type WanIP struct {
+type CloudServerPublicNetworkInterfaceService interface {
+	Create(ctx context.Context, payload *CreatePublicNetworkInterfacePayload) (*CloudServerPublicNetworkInterface, error)
+	List(ctx context.Context) ([]*CloudServerPublicNetworkInterface, error)
+	Get(ctx context.Context, wanIPId string) (*CloudServerPublicNetworkInterface, error)
+	Delete(ctx context.Context, publicNetworkInterfaceID string) error
+	Action(ctx context.Context, publicNetworkInterfaceID string, payload *ActionPublicNetworkInterfacePayload) error
+}
+
+type CloudServerPublicNetworkInterface struct {
 	ID                  string               `json:"id"`
 	Name                string               `json:"name"`
 	NetworkID           string               `json:"network_id"`
@@ -57,35 +61,35 @@ type WanIP struct {
 	IpVersion           int                  `json:"ip_version"`
 }
 
-type CreateWanIpPayload struct {
+type CreatePublicNetworkInterfacePayload struct {
 	Name             string `json:"name"`
 	AttachedServer   string `json:"attached_server"`
 	AvailabilityZone string `json:"availability_zone"`
 }
 
-type ActionWanIpPayload struct {
+type ActionPublicNetworkInterfacePayload struct {
 	Action   string `json:"action"`
 	ServerId string `json:"server_id,omitempty"`
 }
 
-func (w wanIPService) resourcePath() string {
+func (w cloudServerPublicNetworkInterfaceResource) resourcePath() string {
 	return wanIpPath
 }
 
-func (w wanIPService) itemPath(id string) string {
+func (w cloudServerPublicNetworkInterfaceResource) itemPath(id string) string {
 	return strings.Join([]string{wanIpPath, id}, "/")
 }
 
-func (w wanIPService) actionPath(id string) string {
+func (w cloudServerPublicNetworkInterfaceResource) actionPath(id string) string {
 	return strings.Join([]string{wanIpPath, id, "action"}, "/")
 }
 
-func (w wanIPService) Create(ctx context.Context, payload *CreateWanIpPayload) (*WanIP, error) {
+func (w cloudServerPublicNetworkInterfaceResource) Create(ctx context.Context, payload *CreatePublicNetworkInterfacePayload) (*CloudServerPublicNetworkInterface, error) {
 	req, err := w.client.NewRequest(ctx, http.MethodPost, serverServiceName, w.resourcePath(), payload)
 	if err != nil {
 		return nil, err
 	}
-	var wanIP *WanIP
+	var wanIP *CloudServerPublicNetworkInterface
 	resp, err := w.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -97,12 +101,12 @@ func (w wanIPService) Create(ctx context.Context, payload *CreateWanIpPayload) (
 	return wanIP, nil
 }
 
-func (w wanIPService) List(ctx context.Context) ([]*WanIP, error) {
+func (w cloudServerPublicNetworkInterfaceResource) List(ctx context.Context) ([]*CloudServerPublicNetworkInterface, error) {
 	req, err := w.client.NewRequest(ctx, http.MethodGet, serverServiceName, w.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
-	var wanIps []*WanIP
+	var wanIps []*CloudServerPublicNetworkInterface
 	resp, err := w.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -114,12 +118,12 @@ func (w wanIPService) List(ctx context.Context) ([]*WanIP, error) {
 	return wanIps, nil
 }
 
-func (w wanIPService) Get(ctx context.Context, id string) (*WanIP, error) {
+func (w cloudServerPublicNetworkInterfaceResource) Get(ctx context.Context, id string) (*CloudServerPublicNetworkInterface, error) {
 	req, err := w.client.NewRequest(ctx, http.MethodGet, serverServiceName, w.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
-	var wanIp *WanIP
+	var wanIp *CloudServerPublicNetworkInterface
 	resp, err := w.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
@@ -131,7 +135,7 @@ func (w wanIPService) Get(ctx context.Context, id string) (*WanIP, error) {
 	return wanIp, nil
 }
 
-func (w wanIPService) Delete(ctx context.Context, id string) error {
+func (w cloudServerPublicNetworkInterfaceResource) Delete(ctx context.Context, id string) error {
 	req, err := w.client.NewRequest(ctx, http.MethodDelete, serverServiceName, w.itemPath(id), nil)
 	if err != nil {
 		return err
@@ -143,7 +147,7 @@ func (w wanIPService) Delete(ctx context.Context, id string) error {
 	return resp.Body.Close()
 }
 
-func (w wanIPService) Action(ctx context.Context, id string, payload *ActionWanIpPayload) error {
+func (w cloudServerPublicNetworkInterfaceResource) Action(ctx context.Context, id string, payload *ActionPublicNetworkInterfacePayload) error {
 	req, err := w.client.NewRequest(ctx, http.MethodPost, serverServiceName, w.actionPath(id), payload)
 	if err != nil {
 		return err

@@ -38,7 +38,7 @@ func TestSSHKeyList(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	sshkeys, err := client.SSHKey.List(ctx, &ListOptions{})
+	sshkeys, err := client.CloudServer.SSHKeys().List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, sshkeys, 2)
 	assert.Equal(t, "sapd1", sshkeys[0].SSHKeyPair.Name)
@@ -58,7 +58,7 @@ func TestSSHKeyDelete(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	_, err := client.SSHKey.Delete(ctx, "sapd1")
+	_, err := client.CloudServer.SSHKeys().Delete(ctx, "sapd1")
 	require.NoError(t, err)
 }
 
@@ -78,7 +78,7 @@ func TestSSHKeyCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	sshkey, err := client.SSHKey.Create(ctx, &SSHKeyCreateRequest{
+	sshkey, err := client.CloudServer.SSHKeys().Create(ctx, &SSHKeyCreateRequest{
 		Name:      "ssh-key-1601308814384",
 		PublicKey: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDgXX0Kdd3XKojgj7maVd3PsPApzh9n2lT2CtgcJs8jw9i3mit5SZu02QFS772Pa9VdGeSjbqxtADLRpnuigW5ii0dHBQTgWqx593Cs7QKRhyRPb88u0TFCZynRwfMRnb6qngiKoWp5TtaHuIY+7kS8SyqNVIwoCYlr9a4ePX8rwydf9crhJocgKb2LgQkdW3TBE5QAvxbruYlj201jjXFeE5BtE4QER0QyY5MqW8MAgG98N3w95pKIffhHZ4TO4A3zgpWbNn1ROproZgV+9COzZ7WYuvPWqWdLAntd9b1/lLnDrDHXa/lrefJXJVamhz4i1cfIZ/p+aFWG0a7DpL5b saphi@saphi-kma\n",
 	})
@@ -109,7 +109,7 @@ func TestSSHKeyGet(t *testing.T) {
 `
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	sshkey, err := client.SSHKey.Get(ctx, "lam621")
+	sshkey, err := client.CloudServer.SSHKeys().Get(ctx, "lam621")
 	require.NoError(t, err)
 	assert.Equal(t, "lam621", sshkey.Name)
 	assert.Equal(t, "43:a0:26:b7:6a:f9:26:94:8a:83:a0:90:a0:cb:cb:fa", sshkey.FingerPrint)

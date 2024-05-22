@@ -20,7 +20,7 @@ func TestLoadBalancerList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -64,7 +64,7 @@ func TestLoadBalancerList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	lbs, err := client.LoadBalancer.List(ctx, &ListOptions{})
+	lbs, err := client.CloudLoadBalancer.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, lbs, 1)
 	lb := lbs[0]
@@ -75,7 +75,7 @@ func TestLoadBalancerCreate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
@@ -114,7 +114,7 @@ func TestLoadBalancerCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	lb, err := client.LoadBalancer.Create(ctx, &LoadBalancerCreateRequest{
+	lb, err := client.CloudLoadBalancer.Create(ctx, &LoadBalancerCreateRequest{
 		Description: "Test Create LB",
 		Name:        "LB",
 	})
@@ -129,7 +129,7 @@ func TestLoadBalancerGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -168,7 +168,7 @@ func TestLoadBalancerGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	lb, err := client.LoadBalancer.Get(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d")
+	lb, err := client.CloudLoadBalancer.Get(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d")
 	require.NoError(t, err)
 	assert.Equal(t, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", lb.ID)
 	assert.Equal(t, "ACTIVE", lb.ProvisioningStatus)
@@ -179,20 +179,20 @@ func TestLoadBalancerDelete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	require.NoError(t, client.LoadBalancer.Delete(ctx, &LoadBalancerDeleteRequest{ID: "ae8e2072-31fb-464a-8285-bc2f2a6bab4d"}))
+	require.NoError(t, client.CloudLoadBalancer.Delete(ctx, &LoadBalancerDeleteRequest{ID: "ae8e2072-31fb-464a-8285-bc2f2a6bab4d"}))
 }
 
 func TestLoadBalancerUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 		var payload struct {
@@ -229,7 +229,7 @@ func TestLoadBalancerUpdate(t *testing.T) {
 	adminStateUp := true
 	desc := "Temporarily disabled load balancer"
 	name := "disabled_load_balancer"
-	lb, err := client.LoadBalancer.Update(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &LoadBalancerUpdateRequest{
+	lb, err := client.CloudLoadBalancer.Update(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &LoadBalancerUpdateRequest{
 		Description:  &desc,
 		Name:         &name,
 		AdminStateUp: &adminStateUp,
@@ -242,7 +242,7 @@ func TestListenerList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l listener
+	var l cloudLoadBalancerListenerResource
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -287,7 +287,7 @@ func TestListenerList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	listeners, err := client.Listener.List(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListOptions{})
+	listeners, err := client.CloudLoadBalancer.Listeners().List(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, listeners, 1)
 	listener := listeners[0]
@@ -298,7 +298,7 @@ func TestListenerCreate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l listener
+	var l cloudLoadBalancerListenerResource
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
@@ -349,7 +349,7 @@ func TestListenerCreate(t *testing.T) {
 
 	name := "Listener"
 	desc := "Test Create Listener"
-	listener, err := client.Listener.Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListenerCreateRequest{
+	listener, err := client.CloudLoadBalancer.Listeners().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListenerCreateRequest{
 		Description: &desc,
 		Name:        &name,
 	})
@@ -363,7 +363,7 @@ func TestListenerGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l listener
+	var l cloudLoadBalancerListenerResource
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("5482c4a4-f822-46d0-9af3-026f7579d653")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -403,7 +403,7 @@ func TestListenerGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	listener, err := client.Listener.Get(ctx, "5482c4a4-f822-46d0-9af3-026f7579d653")
+	listener, err := client.CloudLoadBalancer.Listeners().Get(ctx, "5482c4a4-f822-46d0-9af3-026f7579d653")
 	require.NoError(t, err)
 	assert.Equal(t, "5482c4a4-f822-46d0-9af3-026f7579d653", listener.ID)
 }
@@ -412,7 +412,7 @@ func TestListenerUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l listener
+	var l cloudLoadBalancerListenerResource
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
@@ -469,7 +469,7 @@ func TestListenerUpdate(t *testing.T) {
 
 	name := "ListenerUpdated"
 	desc := "Test Update Listener"
-	_, err := client.Listener.Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListenerUpdateRequest{
+	_, err := client.CloudLoadBalancer.Listeners().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListenerUpdateRequest{
 		Name:        &name,
 		Description: &desc,
 	})
@@ -480,20 +480,20 @@ func TestListenerDelete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var l listener
+	var l cloudLoadBalancerListenerResource
 	mux.HandleFunc(testlib.LoadBalancerURL(l.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	require.NoError(t, client.Listener.Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d"))
+	require.NoError(t, client.CloudLoadBalancer.Listeners().Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d"))
 }
 
 func TestMemberList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var m member
+	var m cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -542,7 +542,7 @@ func TestMemberList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	members, err := client.Member.List(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListOptions{})
+	members, err := client.CloudLoadBalancer.Members().List(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, members, 2)
 }
@@ -551,7 +551,7 @@ func TestMemberGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var m member
+	var m cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -577,7 +577,7 @@ func TestMemberGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	member, err := client.Member.Get(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494")
+	member, err := client.CloudLoadBalancer.Members().Get(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494")
 	require.NoError(t, err)
 	assert.Equal(t, "0b9b1602-fb7a-4f9e-ac2e-99f2d4f7b494", member.ID)
 }
@@ -586,7 +586,7 @@ func TestMemberUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var m member
+	var m cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
@@ -615,7 +615,7 @@ func TestMemberUpdate(t *testing.T) {
 	})
 
 	name := "MemberUpdated"
-	_, err := client.Member.Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3", &MemberUpdateRequest{
+	_, err := client.CloudLoadBalancer.Members().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3", &MemberUpdateRequest{
 		Name: name,
 	})
 	require.NoError(t, err)
@@ -625,20 +625,20 @@ func TestMemberDelete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var m member
+	var m cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(m.itemPath("023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	require.NoError(t, client.Member.Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3"))
+	require.NoError(t, client.CloudLoadBalancer.Members().Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3"))
 }
 
 func TestMemberCreate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var m member
+	var m cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
@@ -678,7 +678,7 @@ func TestMemberCreate(t *testing.T) {
 		Address:      "192.0.2.16",
 		ProtocolPort: 80,
 	}
-	response, err := client.Member.Create(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &mcr)
+	response, err := client.CloudLoadBalancer.Members().Create(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &mcr)
 	require.NoError(t, err)
 	assert.Equal(t, "957a1ace-1bd2-449b-8455-820b6e4b63f3", response.ID)
 	assert.Equal(t, "192.0.2.16", response.Address)
@@ -689,7 +689,7 @@ func TestPoolList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var p pool
+	var p cloudLoadBalancerPoolResource
 	mux.HandleFunc(testlib.LoadBalancerURL(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -729,7 +729,7 @@ func TestPoolList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	pools, err := client.Pool.List(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListOptions{})
+	pools, err := client.CloudLoadBalancer.Pools().List(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, pools, 1)
 	pool := pools[0]
@@ -740,7 +740,7 @@ func TestPoolCreate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var p pool
+	var p cloudLoadBalancerPoolResource
 	mux.HandleFunc(testlib.LoadBalancerURL(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
@@ -810,7 +810,7 @@ func TestPoolCreate(t *testing.T) {
 	})
 
 	name := "Pool"
-	pool, err := client.Pool.Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &PoolCreateRequest{
+	pool, err := client.CloudLoadBalancer.Pools().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &PoolCreateRequest{
 		LBAlgorithm: "ROUND_ROBIN",
 		Name:        &name,
 		SessionPersistence: &SessionPersistence{
@@ -829,7 +829,7 @@ func TestPoolGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var p pool
+	var p cloudLoadBalancerPoolResource
 	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("1fb271b2-a77e-4afc-8ec6-c6bc110f4c75")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -888,7 +888,7 @@ func TestPoolGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	pool, err := client.Pool.Get(ctx, "1fb271b2-a77e-4afc-8ec6-c6bc110f4c75")
+	pool, err := client.CloudLoadBalancer.Pools().Get(ctx, "1fb271b2-a77e-4afc-8ec6-c6bc110f4c75")
 	require.NoError(t, err)
 	assert.Equal(t, "1fb271b2-a77e-4afc-8ec6-c6bc110f4c75", pool.ID)
 }
@@ -897,7 +897,7 @@ func TestPoolUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var p pool
+	var p cloudLoadBalancerPoolResource
 	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("4029d267-3983-4224-a3d0-afb3fe16a2cd")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
@@ -946,7 +946,7 @@ func TestPoolUpdate(t *testing.T) {
 
 	name := "PoolUpdated"
 	desc := "Test Update Pool"
-	_, err := client.Pool.Update(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &PoolUpdateRequest{
+	_, err := client.CloudLoadBalancer.Pools().Update(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &PoolUpdateRequest{
 		Name:        &name,
 		Description: &desc,
 	})
@@ -956,14 +956,14 @@ func TestPoolUpdate(t *testing.T) {
 func TestPoolDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var p pool
+	var p cloudLoadBalancerPoolResource
 
 	mux.HandleFunc(testlib.LoadBalancerURL(p.itemPath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	require.NoError(t, client.Pool.Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d"))
+	require.NoError(t, client.CloudLoadBalancer.Pools().Delete(ctx, "023f2e34-7806-443b-bfae-16c324569a3d"))
 }
 
 func TestHealthMonitorCreate(t *testing.T) {
@@ -1027,7 +1027,7 @@ func TestHealthMonitorCreate(t *testing.T) {
 		ExpectedCodes:  "200",
 	}
 
-	hm, err := client.HealthMonitor.Create(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &hmcr)
+	hm, err := client.CloudLoadBalancer.HealthMonitors().Create(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &hmcr)
 	require.NoError(t, err)
 	assert.Equal(t, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", hm.ID)
 	assert.Equal(t, "HTTP", hm.Type)
@@ -1038,7 +1038,7 @@ func TestHealthMonitorGet(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var h healthmonitor
+	var h cloudLoadBalancerHealthMonitorResource
 	mux.HandleFunc(testlib.LoadBalancerURL(h.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
@@ -1073,7 +1073,7 @@ func TestHealthMonitorGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	hm, err := client.HealthMonitor.Get(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2")
+	hm, err := client.CloudLoadBalancer.HealthMonitors().Get(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2")
 	require.NoError(t, err)
 	assert.Equal(t, "06052618-d756-4cf4-8e68-cfe33151eab2", hm.ID)
 }
@@ -1082,7 +1082,7 @@ func TestHealthMonitorUpdate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var hm healthmonitor
+	var hm cloudLoadBalancerHealthMonitorResource
 	mux.HandleFunc(testlib.LoadBalancerURL(hm.itemPath("8ed3c5ac-6efa-420c-bedb-99ba14e58db5")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
@@ -1126,7 +1126,7 @@ func TestHealthMonitorUpdate(t *testing.T) {
 	})
 
 	method := "HED"
-	_, err := client.HealthMonitor.Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
+	_, err := client.CloudLoadBalancer.HealthMonitors().Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
 		Name:       "super-pool-health-monitor-updated",
 		HTTPMethod: &method,
 	})
@@ -1136,20 +1136,20 @@ func TestHealthMonitorUpdate(t *testing.T) {
 func TestHealthMonitorDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var hm healthmonitor
+	var hm cloudLoadBalancerHealthMonitorResource
 
 	mux.HandleFunc(testlib.LoadBalancerURL(hm.itemPath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	require.NoError(t, client.HealthMonitor.Delete(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2"))
+	require.NoError(t, client.CloudLoadBalancer.HealthMonitors().Delete(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2"))
 }
 
 func TestBatchUpdateMember(t *testing.T) {
 	setup()
 	defer teardown()
-	var member member
+	var member cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(member.resourcePath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
 		var payload BatchMemberUpdateRequest
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
@@ -1182,7 +1182,7 @@ func TestBatchUpdateMember(t *testing.T) {
 			},
 		},
 	}
-	err := client.Member.BatchUpdate(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2", &members)
+	err := client.CloudLoadBalancer.Members().BatchUpdate(ctx, "06052618-d756-4cf4-8e68-cfe33151eab2", &members)
 	require.NoError(t, err)
 }
 
@@ -1237,7 +1237,7 @@ func TestL7PolicyCreate(t *testing.T) {
 		RedirectUrl: "http://localhost.vn/api",
 		Rules:       rules,
 	}
-	resp, err := client.L7Policy.Create(ctx, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", &createPolicyPayload)
+	resp, err := client.CloudLoadBalancer.L7Policies().Create(ctx, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", &createPolicyPayload)
 	require.NoError(t, err)
 	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
 	assert.Equal(t, "ducnv", resp.Name)
@@ -1250,7 +1250,7 @@ func TestL7PolicyCreate(t *testing.T) {
 func TestL7PolicyGet(t *testing.T) {
 	setup()
 	defer teardown()
-	var policy l7Policy
+	var policy cloudLoadBalancerL7PolicyResource
 	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 
@@ -1281,7 +1281,7 @@ func TestL7PolicyGet(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.L7Policy.Get(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	resp, err := client.CloudLoadBalancer.L7Policies().Get(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
 	require.NoError(t, err)
 	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
 	assert.Equal(t, "ducnv", resp.Name)
@@ -1294,7 +1294,7 @@ func TestL7PolicyGet(t *testing.T) {
 func TestL7PolicyUpdate(t *testing.T) {
 	setup()
 	defer teardown()
-	var policy l7Policy
+	var policy cloudLoadBalancerL7PolicyResource
 	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
 		var payload struct {
 			L7Plicy UpdateL7PolicyRequest `json:"l7policy"`
@@ -1349,7 +1349,7 @@ func TestL7PolicyUpdate(t *testing.T) {
 		RedirectUrl: &redirectUrl,
 		Rules:       rules,
 	}
-	resp, err := client.L7Policy.Update(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", &updatePolicyPayload)
+	resp, err := client.CloudLoadBalancer.L7Policies().Update(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", &updatePolicyPayload)
 	require.NoError(t, err)
 	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
 	assert.Equal(t, "ducnv-policy", resp.Name)
@@ -1362,7 +1362,7 @@ func TestL7PolicyUpdate(t *testing.T) {
 func TestL7PolicyDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var policy l7Policy
+	var policy cloudLoadBalancerL7PolicyResource
 	mux.HandleFunc(testlib.LoadBalancerURL(policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8")), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodDelete, r.Method)
 
@@ -1371,14 +1371,14 @@ func TestL7PolicyDelete(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	err := client.L7Policy.Delete(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	err := client.CloudLoadBalancer.L7Policies().Delete(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
 	require.NoError(t, err)
 }
 
 func TestL7PolicyRulesList(t *testing.T) {
 	setup()
 	defer teardown()
-	var policy l7Policy
+	var policy cloudLoadBalancerL7PolicyResource
 	path := strings.Join([]string{policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8"), "rules"}, "/")
 	mux.HandleFunc(testlib.LoadBalancerURL(path), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -1406,7 +1406,7 @@ func TestL7PolicyRulesList(t *testing.T) {
 		}`
 		_, _ = fmt.Fprint(w, resp)
 	})
-	resp, err := client.L7Policy.ListL7PolicyRules(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
+	resp, err := client.CloudLoadBalancer.L7Policies().ListL7PolicyRules(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
 	require.NoError(t, err)
 	firstRule := resp[0]
 	assert.Equal(t, "b575f1b7-ef8e-4eef-a2d9-b26addf266c0", firstRule.Id)
@@ -1419,7 +1419,7 @@ func TestL7PolicyRulesList(t *testing.T) {
 func TestL7PolicyRuleCreate(t *testing.T) {
 	setup()
 	defer teardown()
-	var policy l7Policy
+	var policy cloudLoadBalancerL7PolicyResource
 	path := strings.Join([]string{policy.itemPath("00ec77c0-dd79-44cc-9476-9d2db4bfaef8"), "rules"}, "/")
 	mux.HandleFunc(testlib.LoadBalancerURL(path), func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -1453,7 +1453,7 @@ func TestL7PolicyRuleCreate(t *testing.T) {
 		CompareType: "EQUAL_TO",
 		Value:       "duc.nv",
 	}
-	resp, err := client.L7Policy.CreateL7PolicyRule(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", payload)
+	resp, err := client.CloudLoadBalancer.L7Policies().CreateL7PolicyRule(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", payload)
 	require.NoError(t, err)
 	assert.Equal(t, "a1509ea5-f4cc-4ae4-86f2-96cf0400a7d5", resp.Id)
 	assert.Equal(t, "HOST_NAME", resp.Type)

@@ -203,13 +203,13 @@ func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 	// hardcode in here
 	for _, loadbalancer := range alarm.LoadBalancers {
 		if loadbalancer.TargetType == "frontend" {
-			frontend, err := a.client.Listener.Get(ctx, loadbalancer.TargetID)
+			frontend, err := a.client.CloudLoadBalancer.Listeners().Get(ctx, loadbalancer.TargetID)
 			if err != nil {
 				loadbalancer.TargetName = ""
 			}
 			loadbalancer.TargetName = frontend.Name
 		} else {
-			backend, err := a.client.Pool.Get(ctx, loadbalancer.TargetID)
+			backend, err := a.client.CloudLoadBalancer.Pools().Get(ctx, loadbalancer.TargetID)
 			if err != nil {
 				loadbalancer.TargetName = ""
 			}

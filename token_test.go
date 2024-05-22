@@ -83,7 +83,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	var l loadbalancer
+	var l cloudLoadBalancerService
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath()), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		token := r.Header.Get("X-Auth-Token")
@@ -121,7 +121,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 	})
 
 	client.keystoneToken = "yyy"
-	lbs, err := client.LoadBalancer.List(ctx, &ListOptions{})
+	lbs, err := client.CloudLoadBalancer.List(ctx, &ListOptions{})
 	require.NoError(t, err)
 	assert.Len(t, lbs, 0)
 	assert.Equal(t, "xxx", client.keystoneToken)

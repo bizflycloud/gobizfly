@@ -55,7 +55,7 @@ func TestWanIPList(t *testing.T) {
 ]`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	wanIps, err := client.WanIP.List(ctx)
+	wanIps, err := client.CloudServer.PublicNetworkInterfaces().List(ctx)
 	require.NoError(t, err)
 	assert.Equal(t, 1, len(wanIps))
 	assert.Equal(t, "free", wanIps[0].BillingType)
@@ -66,7 +66,7 @@ func TestWanIPCreate(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(testlib.CloudServerURL(wanIpPath), func(writer http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
-		var payload *CreateWanIpPayload
+		var payload *CreatePublicNetworkInterfacePayload
 		err := json.NewDecoder(r.Body).Decode(&payload)
 		require.NoError(t, err)
 		assert.Equal(t, "HN1", payload.AvailabilityZone)
@@ -109,7 +109,7 @@ func TestWanIPCreate(t *testing.T) {
 }`
 		_, _ = fmt.Fprint(writer, resp)
 	})
-	wanIp, err := client.WanIP.Create(ctx, &CreateWanIpPayload{
+	wanIp, err := client.CloudServer.PublicNetworkInterfaces().Create(ctx, &CreatePublicNetworkInterfacePayload{
 		AvailabilityZone: "HN1",
 		Name:             "test_123",
 	})
@@ -121,7 +121,7 @@ func TestWanIPCreate(t *testing.T) {
 func TestWanIPGet(t *testing.T) {
 	setup()
 	defer teardown()
-	var w wanIPService
+	var w cloudServerPublicNetworkInterfaceResource
 	mux.HandleFunc(testlib.CloudServerURL(w.itemPath("123")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodGet, r.Method)
@@ -164,7 +164,7 @@ func TestWanIPGet(t *testing.T) {
 }`
 			_, _ = fmt.Fprint(writer, resp)
 		})
-	wanIp, err := client.WanIP.Get(ctx, "123")
+	wanIp, err := client.CloudServer.PublicNetworkInterfaces().Get(ctx, "123")
 	require.NoError(t, err)
 	assert.Equal(t, "paid", wanIp.BillingType)
 	assert.Equal(t, 100000, wanIp.Bandwidth)
@@ -173,56 +173,56 @@ func TestWanIPGet(t *testing.T) {
 func TestWanIpDelete(t *testing.T) {
 	setup()
 	defer teardown()
-	var w wanIPService
+	var w cloudServerPublicNetworkInterfaceResource
 	mux.HandleFunc(testlib.CloudServerURL(w.itemPath("f8f78df1-43f1-4c73-9f4c-7d64fecb3b34")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodDelete, r.Method)
 		})
-	require.NoError(t, client.WanIP.Delete(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34"))
+	require.NoError(t, client.CloudServer.PublicNetworkInterfaces().Delete(ctx, "f8f78df1-43f1-4c73-9f4c-7d64fecb3b34"))
 }
 
 func TestWanIPAttachServer(t *testing.T) {
 	setup()
 	defer teardown()
-	var w wanIPService
+	var w cloudServerPublicNetworkInterfaceResource
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	payload := ActionWanIpPayload{
+	payload := ActionPublicNetworkInterfacePayload{
 		Action:   "attach_server",
 		ServerId: "123",
 	}
-	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.CloudServer.PublicNetworkInterfaces().Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
 }
 
 func TestWanIPDetachServer(t *testing.T) {
 	setup()
 	defer teardown()
-	var w wanIPService
+	var w cloudServerPublicNetworkInterfaceResource
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	payload := ActionWanIpPayload{
+	payload := ActionPublicNetworkInterfacePayload{
 		Action: "detach_server",
 	}
-	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.CloudServer.PublicNetworkInterfaces().Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
 }
 
 func TestWanIPConvertToPaid(t *testing.T) {
 	setup()
 	defer teardown()
-	var w wanIPService
+	var w cloudServerPublicNetworkInterfaceResource
 	mux.HandleFunc(testlib.CloudServerURL(w.actionPath("ceebf0de-1fc2-4a08-a200-1906a30abe7e")),
 		func(writer http.ResponseWriter, r *http.Request) {
 			assert.Equal(t, http.MethodPost, r.Method)
 		})
-	payload := ActionWanIpPayload{
+	payload := ActionPublicNetworkInterfacePayload{
 		Action: "convert_to_paid",
 	}
-	err := client.WanIP.Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
+	err := client.CloudServer.PublicNetworkInterfaces().Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)
 }
