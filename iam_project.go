@@ -15,6 +15,7 @@ type IAMProject struct {
 	Description string `json:"description"`
 	UpdatedAt   string `json:"updated_at"`
 	UUID        string `json:"uuid"`
+	ShortUUID   string `json:"short_uuid"`
 }
 
 func (i *iamService) ListProjects(ctx context.Context) ([]*IAMProject, error) {
