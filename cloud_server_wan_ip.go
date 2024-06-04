@@ -106,6 +106,11 @@ func (w cloudServerPublicNetworkInterfaceResource) List(ctx context.Context) ([]
 	if err != nil {
 		return nil, err
 	}
+
+	params := req.URL.Query()
+	params.Add("detailed", "true")
+	req.URL.RawQuery = params.Encode()
+
 	var wanIps []*CloudServerPublicNetworkInterface
 	resp, err := w.client.Do(ctx, req)
 	if err != nil {
