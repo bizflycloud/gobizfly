@@ -17,7 +17,7 @@ type CloudLoadBalancerMemberService interface {
 	Get(ctx context.Context, poolID, id string) (*CloudLoadBalancerMember, error)
 	Update(ctx context.Context, poolID, id string, req *CloudLoadBalancerMemberUpdateRequest) (*CloudLoadBalancerMember, error)
 	Delete(ctx context.Context, poolID, id string) error
-	Create(ctx context.Context, poolID string, req *CloudLoadBalancerCreateRequest) (*CloudLoadBalancerMember, error)
+	Create(ctx context.Context, poolID string, req *CloudLoadBalancerMemberCreateRequest) (*CloudLoadBalancerMember, error)
 	BatchUpdate(ctx context.Context, poolID string, members *CloudLoadBalancerBatchMemberUpdateRequest) error
 }
 
@@ -42,8 +42,8 @@ type CloudLoadBalancerBatchMemberUpdateRequest struct {
 	Members []CloudLoadBalancerExtendMemberUpdateRequest `json:"members"`
 }
 
-// CloudLoadBalancerCreateRequest represents create member request payload
-type CloudLoadBalancerCreateRequest struct {
+// CloudLoadBalancerMemberCreateRequest represents create member request payload
+type CloudLoadBalancerMemberCreateRequest struct {
 	Name           string `json:"name"`
 	Weight         int    `json:"weight,omitempty"`
 	Address        string `json:"address"`
@@ -187,9 +187,9 @@ func (m *cloudLoadBalancerMemberResource) Delete(ctx context.Context, poolID, id
 }
 
 // Create - Create a new member
-func (m *cloudLoadBalancerMemberResource) Create(ctx context.Context, poolID string, mcr *CloudLoadBalancerCreateRequest) (*CloudLoadBalancerMember, error) {
+func (m *cloudLoadBalancerMemberResource) Create(ctx context.Context, poolID string, mcr *CloudLoadBalancerMemberCreateRequest) (*CloudLoadBalancerMember, error) {
 	var data struct {
-		CloudLoadBalancerMember *CloudLoadBalancerCreateRequest `json:"member"`
+		CloudLoadBalancerMember *CloudLoadBalancerMemberCreateRequest `json:"member"`
 	}
 	data.CloudLoadBalancerMember = mcr
 	req, err := m.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, m.resourcePath(poolID), &data)
