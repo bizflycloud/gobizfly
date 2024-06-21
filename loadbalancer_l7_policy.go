@@ -9,12 +9,12 @@ import (
 
 // L7PolicyService is an interface to interact with Bizfly API L7Policy endpoint.
 type L7PolicyService interface {
-	Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error)
-	Get(ctx context.Context, policyId string) (*DetailL7Policy, error)
-	Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error)
-	Delete(ctx context.Context, policyId string) error
-	ListL7PolicyRules(ctx context.Context, policyId string) ([]DetailL7PolicyRule, error)
-	CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error)
+	Create(ctx context.Context, listenerID string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error)
+	Get(ctx context.Context, policyID string) (*DetailL7Policy, error)
+	Update(ctx context.Context, policyID string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error)
+	Delete(ctx context.Context, policyID string) error
+	ListL7PolicyRules(ctx context.Context, policyID string) ([]DetailL7PolicyRule, error)
+	CreateL7PolicyRule(ctx context.Context, policyID string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error)
 }
 
 // L7PolicyRuleRequest is rule of l7 policy payload
@@ -32,28 +32,28 @@ type CreateL7PolicyRequest struct {
 	Description    string                `json:"description"`
 	Name           string                `json:"name"`
 	Position       string                `json:"position"`
-	RedirectPoolId string                `json:"redirect_pool_id"`
+	RedirectPoolID string                `json:"redirect_pool_id"`
 	RedirectPrefix *string               `json:"redirect_prefix"`
-	RedirectUrl    string                `json:"redirect_url"`
+	RedirectURL    string                `json:"redirect_url"`
 	Rules          []L7PolicyRuleRequest `json:"rules"`
 }
 
 // L7PolicyRule is l7 policy rule id response
 type L7PolicyRule struct {
-	Id string `json:"id"`
+	ID string `json:"id"`
 }
 
 // DetailL7PolicyRule is detail l7 policy rule response
 type DetailL7PolicyRule struct {
-	Id                 string  `json:"id"`
+	ID                 string  `json:"id"`
 	AdminStateUp       bool    `json:"admin_state_up"`
 	CompareType        string  `json:"compare_type"`
 	Invert             bool    `json:"invert"`
 	Key                *string `json:"key"`
 	Value              string  `json:"value"`
 	OperatingStatus    string  `json:"operating_status"`
-	ProjectId          string  `json:"project_id"`
-	TenantId           string  `json:"tenant_id"`
+	ProjectID          string  `json:"project_id"`
+	TenantID           string  `json:"tenant_id"`
 	ProvisioningStatus string  `json:"provisioning_status"`
 	Type               string  `json:"type"`
 	CreatedAt          string  `json:"created_at"`
@@ -66,18 +66,18 @@ type DetailL7Policy struct {
 	AdminStateUp       bool           `json:"admin_state_up"`
 	CreatedAt          string         `json:"created_at"`
 	Description        string         `json:"description"`
-	Id                 string         `json:"id"`
-	ListenerId         string         `json:"listener_id"`
+	ID                 string         `json:"id"`
+	ListenerID         string         `json:"listener_id"`
 	Name               string         `json:"name"`
 	OperatingStatus    string         `json:"operating_status"`
 	Position           int            `json:"position"`
-	ProjectId          string         `json:"project_id"`
-	TenantId           string         `json:"tenant_id"`
+	ProjectID          string         `json:"project_id"`
+	TenantID           string         `json:"tenant_id"`
 	ProvisioningStatus string         `json:"provisioning_status"`
 	RedirectHttpCode   *int           `json:"redirect_http_code"`
-	RedirectPoolId     *string        `json:"redirect_pool_id"`
+	RedirectPoolID     *string        `json:"redirect_pool_id"`
 	RedirectPrefix     *string        `json:"redirect_prefix"`
-	RedirectUrl        *string        `json:"redirect_url"`
+	RedirectURL        *string        `json:"redirect_url"`
 	Rules              []L7PolicyRule `json:"rules"`
 }
 
@@ -93,9 +93,9 @@ type UpdateL7PolicyRequest struct {
 	Description    string                      `json:"description"`
 	Name           string                      `json:"name"`
 	Position       int                         `json:"position"`
-	RedirectPoolId *string                     `json:"redirect_pool_id"`
+	RedirectPoolID *string                     `json:"redirect_pool_id"`
 	RedirectPrefix *string                     `json:"redirect_prefix"`
-	RedirectUrl    *string                     `json:"redirect_url"`
+	RedirectURL    *string                     `json:"redirect_url"`
 	Rules          []UpdateL7PolicyRuleRequest `json:"rules"`
 }
 
@@ -107,13 +107,13 @@ func (lbs *cloudLoadBalancerService) L7Policies() *cloudLoadBalancerL7PolicyReso
 	return &cloudLoadBalancerL7PolicyResource{client: lbs.client}
 }
 
-func (p *cloudLoadBalancerL7PolicyResource) itemPath(policyId string) string {
-	return strings.Join([]string{l7PolicyPath, policyId}, "/")
+func (p *cloudLoadBalancerL7PolicyResource) itemPath(policyID string) string {
+	return strings.Join([]string{l7PolicyPath, policyID}, "/")
 }
 
 // Create - create policy for listener
-func (p *cloudLoadBalancerL7PolicyResource) Create(ctx context.Context, listenerId string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error) {
-	createL7PolicyPath := strings.Join([]string{listenerPath, listenerId, "l7policy"}, "/")
+func (p *cloudLoadBalancerL7PolicyResource) Create(ctx context.Context, listenerID string, payload *CreateL7PolicyRequest) (*DetailL7Policy, error) {
+	createL7PolicyPath := strings.Join([]string{listenerPath, listenerID, "l7policy"}, "/")
 	clpr := struct {
 		L7Policy CreateL7PolicyRequest `json:"l7policy"`
 	}{L7Policy: *payload}
@@ -137,8 +137,8 @@ func (p *cloudLoadBalancerL7PolicyResource) Create(ctx context.Context, listener
 }
 
 // Get - get detail l7 policy
-func (p *cloudLoadBalancerL7PolicyResource) Get(ctx context.Context, policyId string) (*DetailL7Policy, error) {
-	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.itemPath(policyId), nil)
+func (p *cloudLoadBalancerL7PolicyResource) Get(ctx context.Context, policyID string) (*DetailL7Policy, error) {
+	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, p.itemPath(policyID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -155,11 +155,11 @@ func (p *cloudLoadBalancerL7PolicyResource) Get(ctx context.Context, policyId st
 }
 
 // Update - update l7 policy
-func (p *cloudLoadBalancerL7PolicyResource) Update(ctx context.Context, policyId string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error) {
+func (p *cloudLoadBalancerL7PolicyResource) Update(ctx context.Context, policyID string, payload *UpdateL7PolicyRequest) (*DetailL7Policy, error) {
 	ulpr := struct {
 		L7Plicy UpdateL7PolicyRequest `json:"l7policy"`
 	}{L7Plicy: *payload}
-	req, err := p.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, p.itemPath(policyId), ulpr)
+	req, err := p.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, p.itemPath(policyID), ulpr)
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +178,8 @@ func (p *cloudLoadBalancerL7PolicyResource) Update(ctx context.Context, policyId
 }
 
 // Delete - delete l7 policy
-func (p *cloudLoadBalancerL7PolicyResource) Delete(ctx context.Context, policyId string) error {
-	req, err := p.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, p.itemPath(policyId), nil)
+func (p *cloudLoadBalancerL7PolicyResource) Delete(ctx context.Context, policyID string) error {
+	req, err := p.client.NewRequest(ctx, http.MethodDelete, loadBalancerServiceName, p.itemPath(policyID), nil)
 	if err != nil {
 		return err
 	}
@@ -191,8 +191,8 @@ func (p *cloudLoadBalancerL7PolicyResource) Delete(ctx context.Context, policyId
 }
 
 // ListL7PolicyRules - list l7 policy rules
-func (p *cloudLoadBalancerL7PolicyResource) ListL7PolicyRules(ctx context.Context, policyId string) ([]DetailL7PolicyRule, error) {
-	path := strings.Join([]string{p.itemPath(policyId), "rules"}, "/")
+func (p *cloudLoadBalancerL7PolicyResource) ListL7PolicyRules(ctx context.Context, policyID string) ([]DetailL7PolicyRule, error) {
+	path := strings.Join([]string{p.itemPath(policyID), "rules"}, "/")
 	req, err := p.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, path, nil)
 	if err != nil {
 		return nil, err
@@ -211,8 +211,8 @@ func (p *cloudLoadBalancerL7PolicyResource) ListL7PolicyRules(ctx context.Contex
 	return data.Rules, nil
 }
 
-func (p *cloudLoadBalancerL7PolicyResource) CreateL7PolicyRule(ctx context.Context, policyId string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error) {
-	path := strings.Join([]string{p.itemPath(policyId), "rules"}, "/")
+func (p *cloudLoadBalancerL7PolicyResource) CreateL7PolicyRule(ctx context.Context, policyID string, payload L7PolicyRuleRequest) (*DetailL7PolicyRule, error) {
+	path := strings.Join([]string{p.itemPath(policyID), "rules"}, "/")
 	clpr := struct {
 		Rule L7PolicyRuleRequest `json:"rule"`
 	}{Rule: payload}

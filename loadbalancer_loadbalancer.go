@@ -44,11 +44,11 @@ type LoadBalancerResizeRequest struct {
 }
 
 type ListenerPool struct {
-	LbAlgorithm   string                `json:"lb_algorithm"`
-	Name          string                `json:"name"`
-	Protocol      string                `json:"protocol"`
-	Members       []string              `json:"members"`
-	HealthMonitor ListenerHealthMonitor `json:"healthmonitor"`
+	LbAlgorithm                    string                `json:"lb_algorithm"`
+	Name                           string                `json:"name"`
+	Protocol                       string                `json:"protocol"`
+	Members                        []string              `json:"members"`
+	CloudLoadBalancerHealthMonitor ListenerHealthMonitor `json:"healthmonitor"`
 }
 
 type LoadBalancerListener struct {

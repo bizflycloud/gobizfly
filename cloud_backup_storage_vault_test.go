@@ -140,9 +140,9 @@ func TestCreateStorageVault(t *testing.T) {
 			fmt.Fprint(writer, resp)
 		})
 	vault, err := client.CloudBackup.CreateStorageVault(ctx, &CloudBackupCreateStorageVaultPayload{
-		AwsAccessKeyId:     "key_id",
+		AwsAccessKeyID:     "key_id",
 		AwsSecretAccessKey: "access_key",
-		EndpointUrl:        "/test",
+		EndpointURL:        "/test",
 		StorageVaultType:   "S3",
 		Name:               "custom",
 		StorageBucket:      "bucket_name",

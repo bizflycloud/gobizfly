@@ -40,7 +40,7 @@ func TestToken(t *testing.T) {
 				_, _ = fmt.Fprint(w, resp)
 			})
 
-			mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+			mux.HandleFunc(serviceURL, func(w http.ResponseWriter, r *http.Request) {
 				require.Equal(t, http.MethodGet, r.Method)
 				resp := `
 {
@@ -99,7 +99,7 @@ func TestRetryWhenTokenExpired(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(serviceURL, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {

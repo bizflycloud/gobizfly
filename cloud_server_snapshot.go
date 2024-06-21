@@ -20,7 +20,7 @@ const (
 var _ SnapshotService = (*cloudServerSnapshotResource)(nil)
 
 type ListSnasphotsOptions struct {
-	VolumeId string `json:"volume_id,omitempty"`
+	VolumeID string `json:"volume_id,omitempty"`
 }
 
 type cloudServerSnapshotResource struct {
@@ -42,20 +42,20 @@ type SnapshotService interface {
 // SnapshotCreateRequest represents create new volume request payload.
 type SnapshotCreateRequest struct {
 	Name     string `json:"name"`
-	VolumeId string `json:"volume_id"`
+	VolumeID string `json:"volume_id"`
 	Force    bool   `json:"force"`
 }
 
 // Snapshot contains snapshot information
 type Snapshot struct {
-	Id               string            `json:"id"`
+	ID               string            `json:"id"`
 	Name             string            `json:"name"`
 	Status           string            `json:"status"`
-	VolumeTypeId     string            `json:"volume_type_id"`
-	VolumeId         string            `json:"volume_id"`
+	VolumeTypeID     string            `json:"volume_type_id"`
+	VolumeID         string            `json:"volume_id"`
 	Size             int               `json:"size"`
 	Progress         string            `json:"os-extended-snapshot-attributes:progress"`
-	TenantId         string            `json:"os-extended-snapshot-attributes:project_id"`
+	TenantID         string            `json:"os-extended-snapshot-attributes:project_id"`
 	Metadata         map[string]string `json:"metadata"`
 	Description      string            `json:"description"`
 	IsUsingAutoscale bool              `json:"is_using_autoscale"`
@@ -132,9 +132,9 @@ func (s *cloudServerSnapshotResource) List(ctx context.Context, opts *ListSnasph
 	if err != nil {
 		return nil, err
 	}
-	if opts.VolumeId != "" {
+	if opts.VolumeID != "" {
 		params, _ := url.ParseQuery("")
-		params.Add("volume_id", opts.VolumeId)
+		params.Add("volume_id", opts.VolumeID)
 		req.URL.RawQuery = params.Encode()
 	}
 

@@ -72,7 +72,7 @@ func TestDeleteMultipleRecoveryPoint(t *testing.T) {
 		})
 	deleteRecoveryPoint := []string{"123", "456", "789"}
 	err := client.CloudBackup.DeleteMultipleRecoveryPoints(ctx, CloudBackupDeleteMultipleRecoveryPointPayload{
-		RecoveryPointIds: deleteRecoveryPoint,
+		RecoveryPointIDs: deleteRecoveryPoint,
 	})
 	require.NoError(t, err)
 }

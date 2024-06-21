@@ -302,11 +302,11 @@ func TestListenerCreate(t *testing.T) {
 	mux.HandleFunc(testlib.LoadBalancerURL(l.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
-			Listener *ListenerCreateRequest `json:"listener"`
+			CloudLoadBalancerListener *CloudLoadBalancerListenerCreateRequest `json:"listener"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "Test Create Listener", *payload.Listener.Description)
-		assert.Equal(t, "Listener", *payload.Listener.Name)
+		assert.Equal(t, "Test Create CloudLoadBalancerListener", *payload.CloudLoadBalancerListener.Description)
+		assert.Equal(t, "CloudLoadBalancerListener", *payload.CloudLoadBalancerListener.Name)
 
 		resp := `
 {
@@ -347,9 +347,9 @@ func TestListenerCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	name := "Listener"
-	desc := "Test Create Listener"
-	listener, err := client.CloudLoadBalancer.Listeners().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &ListenerCreateRequest{
+	name := "CloudLoadBalancerListener"
+	desc := "Test Create CloudLoadBalancerListener"
+	listener, err := client.CloudLoadBalancer.Listeners().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &CloudLoadBalancerListenerCreateRequest{
 		Description: &desc,
 		Name:        &name,
 	})
@@ -417,11 +417,11 @@ func TestListenerUpdate(t *testing.T) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
-			Listener *ListenerUpdateRequest `json:"listener"`
+			CloudLoadBalancerListener *CloudLoadBalancerListenerUpdateRequest `json:"listener"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "Test Update Listener", *payload.Listener.Description)
-		assert.Equal(t, "ListenerUpdated", *payload.Listener.Name)
+		assert.Equal(t, "Test Update CloudLoadBalancerListener", *payload.CloudLoadBalancerListener.Description)
+		assert.Equal(t, "ListenerUpdated", *payload.CloudLoadBalancerListener.Name)
 
 		resp := `
 {
@@ -468,8 +468,8 @@ func TestListenerUpdate(t *testing.T) {
 	})
 
 	name := "ListenerUpdated"
-	desc := "Test Update Listener"
-	_, err := client.CloudLoadBalancer.Listeners().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &ListenerUpdateRequest{
+	desc := "Test Update CloudLoadBalancerListener"
+	_, err := client.CloudLoadBalancer.Listeners().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", &CloudLoadBalancerListenerUpdateRequest{
 		Name:        &name,
 		Description: &desc,
 	})
@@ -615,7 +615,7 @@ func TestMemberUpdate(t *testing.T) {
 	})
 
 	name := "MemberUpdated"
-	_, err := client.CloudLoadBalancer.Members().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3", &MemberUpdateRequest{
+	_, err := client.CloudLoadBalancer.Members().Update(ctx, "023f2e34-7806-443b-bfae-16c324569a3d", "957a1ace-1bd2-449b-8455-820b6e4b63f3", &CloudLoadBalancerMemberUpdateRequest{
 		Name: name,
 	})
 	require.NoError(t, err)
@@ -642,12 +642,12 @@ func TestMemberCreate(t *testing.T) {
 	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
-			Member *MemberCreateRequest `json:"member"`
+			CloudLoadBalancerMember *CloudLoadBalancerCreateRequest `json:"member"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "web-server-1", payload.Member.Name)
-		assert.Equal(t, 80, payload.Member.ProtocolPort)
-		assert.Equal(t, "192.0.2.16", payload.Member.Address)
+		assert.Equal(t, "web-server-1", payload.CloudLoadBalancerMember.Name)
+		assert.Equal(t, 80, payload.CloudLoadBalancerMember.ProtocolPort)
+		assert.Equal(t, "192.0.2.16", payload.CloudLoadBalancerMember.Address)
 
 		resp := `
 {
@@ -673,7 +673,7 @@ func TestMemberCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	mcr := MemberCreateRequest{
+	mcr := CloudLoadBalancerCreateRequest{
 		Name:         "web-server-1",
 		Address:      "192.0.2.16",
 		ProtocolPort: 80,
@@ -744,12 +744,12 @@ func TestPoolCreate(t *testing.T) {
 	mux.HandleFunc(testlib.LoadBalancerURL(p.resourcePath("ae8e2072-31fb-464a-8285-bc2f2a6bab4d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
-			Pool *PoolCreateRequest `json:"pool"`
+			CloudLoadBalancerPool *CloudLoadBalancerPoolCreateRequest `json:"pool"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "Pool", *payload.Pool.Name)
-		assert.NotNil(t, payload.Pool.SessionPersistence)
-		assert.Equal(t, "ROUND_ROBIN", payload.Pool.LBAlgorithm)
+		assert.Equal(t, "CloudLoadBalancerPool", *payload.CloudLoadBalancerPool.Name)
+		assert.NotNil(t, payload.CloudLoadBalancerPool.SessionPersistence)
+		assert.Equal(t, "ROUND_ROBIN", payload.CloudLoadBalancerPool.LBAlgorithm)
 
 		resp := `
 {
@@ -809,8 +809,8 @@ func TestPoolCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	name := "Pool"
-	pool, err := client.CloudLoadBalancer.Pools().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &PoolCreateRequest{
+	name := "CloudLoadBalancerPool"
+	pool, err := client.CloudLoadBalancer.Pools().Create(ctx, "ae8e2072-31fb-464a-8285-bc2f2a6bab4d", &CloudLoadBalancerPoolCreateRequest{
 		LBAlgorithm: "ROUND_ROBIN",
 		Name:        &name,
 		SessionPersistence: &SessionPersistence{
@@ -902,18 +902,18 @@ func TestPoolUpdate(t *testing.T) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
-			Pool *PoolUpdateRequest `json:"pool"`
+			CloudLoadBalancerPool *CloudLoadBalancerPoolUpdateRequest `json:"pool"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "Test Update Pool", *payload.Pool.Description)
-		assert.Equal(t, "PoolUpdated", *payload.Pool.Name)
+		assert.Equal(t, "Test Update CloudLoadBalancerPool", *payload.CloudLoadBalancerPool.Description)
+		assert.Equal(t, "PoolUpdated", *payload.CloudLoadBalancerPool.Name)
 
 		resp := `
 {
     "pool": {
         "lb_algorithm": "LEAST_CONNECTIONS",
         "protocol": "HTTP",
-        "description": "Super Least Connections Pool",
+        "description": "Super Least Connections CloudLoadBalancerPool",
         "admin_state_up": true,
         "loadbalancers": [
             {
@@ -945,8 +945,8 @@ func TestPoolUpdate(t *testing.T) {
 	})
 
 	name := "PoolUpdated"
-	desc := "Test Update Pool"
-	_, err := client.CloudLoadBalancer.Pools().Update(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &PoolUpdateRequest{
+	desc := "Test Update CloudLoadBalancerPool"
+	_, err := client.CloudLoadBalancer.Pools().Update(ctx, "4029d267-3983-4224-a3d0-afb3fe16a2cd", &CloudLoadBalancerPoolUpdateRequest{
 		Name:        &name,
 		Description: &desc,
 	})
@@ -975,12 +975,12 @@ func TestHealthMonitorCreate(t *testing.T) {
 	mux.HandleFunc(testlib.LoadBalancerURL("/"+strings.Join([]string{"pool", poolID, "healthmonitor"}, "/")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
-			HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
+			CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitorCreateRequest `json:"healthmonitor"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "super-pool-health-monitor", payload.HealthMonitor.Name)
-		assert.Equal(t, "HTTP", payload.HealthMonitor.Type)
-		assert.Equal(t, "200", payload.HealthMonitor.ExpectedCodes)
+		assert.Equal(t, "super-pool-health-monitor", payload.CloudLoadBalancerHealthMonitor.Name)
+		assert.Equal(t, "HTTP", payload.CloudLoadBalancerHealthMonitor.Type)
+		assert.Equal(t, "200", payload.CloudLoadBalancerHealthMonitor.ExpectedCodes)
 
 		resp := `
 {
@@ -1015,7 +1015,7 @@ func TestHealthMonitorCreate(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	hmcr := HealthMonitorCreateRequest{
+	hmcr := CloudLoadBalancerHealthMonitorCreateRequest{
 		Name:           "super-pool-health-monitor",
 		Type:           "HTTP",
 		Delay:          10,
@@ -1087,10 +1087,10 @@ func TestHealthMonitorUpdate(t *testing.T) {
 		require.Equal(t, http.MethodPut, r.Method)
 
 		var payload struct {
-			HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
+			CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitorUpdateRequest `json:"healthmonitor"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "super-pool-health-monitor-updated", payload.HealthMonitor.Name)
+		assert.Equal(t, "super-pool-health-monitor-updated", payload.CloudLoadBalancerHealthMonitor.Name)
 
 		resp := `
 {
@@ -1126,7 +1126,7 @@ func TestHealthMonitorUpdate(t *testing.T) {
 	})
 
 	method := "HED"
-	_, err := client.CloudLoadBalancer.HealthMonitors().Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &HealthMonitorUpdateRequest{
+	_, err := client.CloudLoadBalancer.HealthMonitors().Update(ctx, "8ed3c5ac-6efa-420c-bedb-99ba14e58db5", &CloudLoadBalancerHealthMonitorUpdateRequest{
 		Name:       "super-pool-health-monitor-updated",
 		HTTPMethod: &method,
 	})
@@ -1151,16 +1151,16 @@ func TestBatchUpdateMember(t *testing.T) {
 	defer teardown()
 	var member cloudLoadBalancerMemberResource
 	mux.HandleFunc(testlib.LoadBalancerURL(member.resourcePath("06052618-d756-4cf4-8e68-cfe33151eab2")), func(w http.ResponseWriter, r *http.Request) {
-		var payload BatchMemberUpdateRequest
+		var payload CloudLoadBalancerBatchMemberUpdateRequest
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 
 		require.Equal(t, http.MethodPut, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
-	var members = BatchMemberUpdateRequest{
-		Members: []ExtendMemberUpdateRequest{
+	var members = CloudLoadBalancerBatchMemberUpdateRequest{
+		Members: []CloudLoadBalancerExtendMemberUpdateRequest{
 			{
-				MemberUpdateRequest: MemberUpdateRequest{
+				CloudLoadBalancerMemberUpdateRequest: CloudLoadBalancerMemberUpdateRequest{
 					Name:           "test_members1",
 					Weight:         1,
 					MonitorAddress: "12.12.123.1",
@@ -1171,7 +1171,7 @@ func TestBatchUpdateMember(t *testing.T) {
 				ProtocolPort: 111,
 			},
 			{
-				MemberUpdateRequest: MemberUpdateRequest{
+				CloudLoadBalancerMemberUpdateRequest: CloudLoadBalancerMemberUpdateRequest{
 					Name:           "test_member2",
 					Weight:         2,
 					MonitorAddress: "112.12.123.1",
@@ -1234,16 +1234,16 @@ func TestL7PolicyCreate(t *testing.T) {
 		Action:      "REDIRECT_TO_URL",
 		Name:        "ducnv",
 		Position:    "1",
-		RedirectUrl: "http://localhost.vn/api",
+		RedirectURL: "http://localhost.vn/api",
 		Rules:       rules,
 	}
 	resp, err := client.CloudLoadBalancer.L7Policies().Create(ctx, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", &createPolicyPayload)
 	require.NoError(t, err)
-	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.ID)
 	assert.Equal(t, "ducnv", resp.Name)
 	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
-	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
-	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerID)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectURL)
 	assert.Equal(t, 1, resp.Position)
 }
 
@@ -1283,11 +1283,11 @@ func TestL7PolicyGet(t *testing.T) {
 	})
 	resp, err := client.CloudLoadBalancer.L7Policies().Get(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
 	require.NoError(t, err)
-	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.ID)
 	assert.Equal(t, "ducnv", resp.Name)
 	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
-	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
-	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerID)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectURL)
 	assert.Equal(t, 1, resp.Position)
 }
 
@@ -1341,21 +1341,21 @@ func TestL7PolicyUpdate(t *testing.T) {
 		},
 	}
 	rules := []UpdateL7PolicyRuleRequest{rule}
-	redirectUrl := "http://localhost.vn/api"
+	redirectURL := "http://localhost.vn/api"
 	updatePolicyPayload := UpdateL7PolicyRequest{
 		Action:      "REDIRECT_TO_URL",
 		Name:        "ducnv-policy",
 		Position:    1,
-		RedirectUrl: &redirectUrl,
+		RedirectURL: &redirectURL,
 		Rules:       rules,
 	}
 	resp, err := client.CloudLoadBalancer.L7Policies().Update(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", &updatePolicyPayload)
 	require.NoError(t, err)
-	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.Id)
+	assert.Equal(t, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", resp.ID)
 	assert.Equal(t, "ducnv-policy", resp.Name)
 	assert.Equal(t, "REDIRECT_TO_URL", resp.Action)
-	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerId)
-	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectUrl)
+	assert.Equal(t, "33188fce-15a1-4ef5-8587-f1cc2e1e31de", resp.ListenerID)
+	assert.Equal(t, "http://localhost.vn/api", *resp.RedirectURL)
 	assert.Equal(t, 1, resp.Position)
 }
 
@@ -1409,7 +1409,7 @@ func TestL7PolicyRulesList(t *testing.T) {
 	resp, err := client.CloudLoadBalancer.L7Policies().ListL7PolicyRules(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8")
 	require.NoError(t, err)
 	firstRule := resp[0]
-	assert.Equal(t, "b575f1b7-ef8e-4eef-a2d9-b26addf266c0", firstRule.Id)
+	assert.Equal(t, "b575f1b7-ef8e-4eef-a2d9-b26addf266c0", firstRule.ID)
 	assert.Equal(t, "HOST_NAME", firstRule.Type)
 	assert.Equal(t, "EQUAL_TO", firstRule.CompareType)
 	assert.Equal(t, "localhost.vn", firstRule.Value)
@@ -1455,7 +1455,7 @@ func TestL7PolicyRuleCreate(t *testing.T) {
 	}
 	resp, err := client.CloudLoadBalancer.L7Policies().CreateL7PolicyRule(ctx, "00ec77c0-dd79-44cc-9476-9d2db4bfaef8", payload)
 	require.NoError(t, err)
-	assert.Equal(t, "a1509ea5-f4cc-4ae4-86f2-96cf0400a7d5", resp.Id)
+	assert.Equal(t, "a1509ea5-f4cc-4ae4-86f2-96cf0400a7d5", resp.ID)
 	assert.Equal(t, "HOST_NAME", resp.Type)
 	assert.Equal(t, "EQUAL_TO", resp.CompareType)
 	assert.Equal(t, "duc.nv", resp.Value)

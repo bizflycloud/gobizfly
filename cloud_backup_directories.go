@@ -13,7 +13,7 @@ type CloudBackupDirectory struct {
 	CreatedAt   string             `json:"created_at"`
 	Deleted     bool               `json:"deleted"`
 	Description string             `json:"description"`
-	Id          string             `json:"id"`
+	ID          string             `json:"id"`
 	Machine     CloudBackupMachine `json:"machine"`
 	Name        string             `json:"name"`
 	Path        string             `json:"path"`
@@ -29,9 +29,9 @@ type CloudBackupActionMultipleDirectoriesPayload struct {
 }
 
 // ActionDirectory performs an action on multiple directories
-func (cb *cloudBackupService) ActionDirectory(ctx context.Context, machineId string, payload *CloudBackupStateDirectoryAction) error {
+func (cb *cloudBackupService) ActionDirectory(ctx context.Context, machineID string, payload *CloudBackupStateDirectoryAction) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", "action"}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", "action"}, "/"), payload)
 	if err != nil {
 		return err
 	}
@@ -43,9 +43,9 @@ func (cb *cloudBackupService) ActionDirectory(ctx context.Context, machineId str
 }
 
 // ListMachineBackupDirectories - list all backup directories belonging to a machine
-func (cb *cloudBackupService) ListMachineBackupDirectories(ctx context.Context, machineId string) ([]*CloudBackupDirectory, error) {
+func (cb *cloudBackupService) ListMachineBackupDirectories(ctx context.Context, machineID string) ([]*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories"}, "/"), nil)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories"}, "/"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -64,9 +64,9 @@ func (cb *cloudBackupService) ListMachineBackupDirectories(ctx context.Context, 
 }
 
 // CreateBackupDirectory - create a backup directory
-func (cb *cloudBackupService) CreateBackupDirectory(ctx context.Context, machineId string, payload *CloudBackupCreateDirectoryPayload) (*CloudBackupDirectory, error) {
+func (cb *cloudBackupService) CreateBackupDirectory(ctx context.Context, machineID string, payload *CloudBackupCreateDirectoryPayload) (*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories"}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories"}, "/"), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -83,9 +83,9 @@ func (cb *cloudBackupService) CreateBackupDirectory(ctx context.Context, machine
 }
 
 // GetBackupDirectory - get a backup directory
-func (cb *cloudBackupService) GetBackupDirectory(ctx context.Context, machineId string, directoryId string) (*CloudBackupDirectory, error) {
+func (cb *cloudBackupService) GetBackupDirectory(ctx context.Context, machineID string, directoryID string) (*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId}, "/"), nil)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", directoryID}, "/"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -102,9 +102,9 @@ func (cb *cloudBackupService) GetBackupDirectory(ctx context.Context, machineId 
 }
 
 // PatchBackupDirectory - patch a backup directory
-func (cb *cloudBackupService) PatchBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupPatchDirectoryPayload) (*CloudBackupDirectory, error) {
+func (cb *cloudBackupService) PatchBackupDirectory(ctx context.Context, machineID string, directoryID string, payload *CloudBackupPatchDirectoryPayload) (*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", directoryID}, "/"), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -121,9 +121,9 @@ func (cb *cloudBackupService) PatchBackupDirectory(ctx context.Context, machineI
 }
 
 // DeleteBackupDirectory - delete a backup directory
-func (cb *cloudBackupService) DeleteBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupDeleteDirectoryPayload) error {
+func (cb *cloudBackupService) DeleteBackupDirectory(ctx context.Context, machineID string, directoryID string, payload *CloudBackupDeleteDirectoryPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", directoryID}, "/"), payload)
 	if err != nil {
 		return err
 	}
@@ -154,9 +154,9 @@ func (cb *cloudBackupService) ListTenantDirectories(ctx context.Context) ([]*Clo
 }
 
 // ActionBackupDirectory - perform an action on a backup directory
-func (cb *cloudBackupService) ActionBackupDirectory(ctx context.Context, machineId string, directoryId string, payload *CloudBackupActionDirectoryPayload) error {
+func (cb *cloudBackupService) ActionBackupDirectory(ctx context.Context, machineID string, directoryID string, payload *CloudBackupActionDirectoryPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId, "action"}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", directoryID, "action"}, "/"), payload)
 	if err != nil {
 		return err
 	}
@@ -168,9 +168,9 @@ func (cb *cloudBackupService) ActionBackupDirectory(ctx context.Context, machine
 }
 
 // DeleteMultipleDirectories - delete multiple backup directories
-func (cb *cloudBackupService) DeleteMultipleDirectories(ctx context.Context, machineId string, payload *CloudBackupDeleteMultipleDirectoriesPayload) error {
+func (cb *cloudBackupService) DeleteMultipleDirectories(ctx context.Context, machineID string, payload *CloudBackupDeleteMultipleDirectoriesPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", "action"}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", "action"}, "/"), payload)
 	if err != nil {
 		return err
 	}
@@ -182,9 +182,9 @@ func (cb *cloudBackupService) DeleteMultipleDirectories(ctx context.Context, mac
 }
 
 // ActionMultipleDirectories - perform an action on multiple backup directories
-func (cb *cloudBackupService) ActionMultipleDirectories(ctx context.Context, machineId string, payload *CloudBackupActionMultipleDirectoriesPayload) error {
+func (cb *cloudBackupService) ActionMultipleDirectories(ctx context.Context, machineID string, payload *CloudBackupActionMultipleDirectoriesPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", "action"}, "/"), payload)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", "action"}, "/"), payload)
 	if err != nil {
 		return err
 	}

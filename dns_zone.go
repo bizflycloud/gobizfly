@@ -28,7 +28,7 @@ type Zone struct {
 	Deleted    int      `json:"deleted"`
 	CreatedAt  string   `json:"created_at"`
 	UpdatedAt  string   `json:"updated_at"`
-	TenantId   string   `json:"tenant_id"`
+	TenantID   string   `json:"tenant_id"`
 	NameServer []string `json:"nameserver"`
 	TTL        int      `json:"ttl"`
 	Active     bool     `json:"active"`

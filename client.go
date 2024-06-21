@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	AppCredentialAuthType   = "application_credential"
+	appCredentialAuthType   = "application_credential"
 	accountName             = "bizfly_account"
 	authServiceName         = "auth"
 	autoScalingServiceName  = "auto_scaling"
@@ -85,8 +85,8 @@ type Client struct {
 // Option set Client specific attributes
 type Option func(c *Client) error
 
-// WithAPIUrl sets the API url option for Bizfly client.
-func WithAPIUrl(u string) Option {
+// WithAPIURL sets the API url option for Bizfly client.
+func WithAPIURL(u string) Option {
 	return func(c *Client) error {
 		var err error
 		c.apiURL, err = url.Parse(u)
@@ -119,7 +119,7 @@ func WithRegionName(region string) Option {
 	}
 }
 
-func WithProjectId(id string) Option {
+func WithProjectID(id string) Option {
 	return func(c *Client) error {
 		c.projectID = id
 		return nil
@@ -140,7 +140,7 @@ func NewClient(options ...Option) (*Client, error) {
 		userAgent:  ua,
 	}
 
-	err := WithAPIUrl(defaultAPIURL)(c)
+	err := WithAPIURL(defaultAPIURL)(c)
 	if err != nil {
 		return nil, err
 	}
@@ -168,12 +168,12 @@ func NewClient(options ...Option) (*Client, error) {
 	return c, nil
 }
 
-func (c *Client) GetServiceUrl(serviceName string) string {
+func (c *Client) GetServiceURL(serviceName string) string {
 	// If service name is auth, return auth url without checking catalog
 	if serviceName == authServiceName {
 		// create a copy of apiURL
 		apiURL := *c.apiURL
-		// if apiUrl doesn't end with /api, append it
+		// if apiURL doesn't end with /api, append it
 		if !strings.HasSuffix(apiURL.Path, "/api") {
 			apiURL.Path = path.Join(c.apiURL.Path, "/api")
 		}
@@ -181,7 +181,7 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 	}
 	for _, service := range c.services {
 		if service.CanonicalName == serviceName && service.Region == c.regionName {
-			return service.ServiceUrl
+			return service.ServiceURL
 		}
 	}
 	return defaultAPIURL
@@ -189,8 +189,8 @@ func (c *Client) GetServiceUrl(serviceName string) string {
 
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
-	serviceUrl := c.GetServiceUrl(serviceName)
-	url := serviceUrl + urlStr
+	serviceURL := c.GetServiceURL(serviceName)
+	url := serviceURL + urlStr
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
@@ -205,7 +205,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
-	req.Header.Add("X-Project-Id", c.projectID)
+	req.Header.Add("X-Project-ID", c.projectID)
 	req.Header.Add("Authorization", "Basic "+c.basicAuth)
 
 	if c.authType == "" {
@@ -217,8 +217,8 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 	}
 
 	req.Header.Add("X-Auth-Type", c.authType)
-	if c.authType == AppCredentialAuthType {
-		req.Header.Add("X-App-Credential-Id", c.appCredID)
+	if c.authType == appCredentialAuthType {
+		req.Header.Add("X-App-Credential-ID", c.appCredID)
 		req.Header.Add("X-App-Credential-Secret", c.appCredSecret)
 	}
 	return req, nil

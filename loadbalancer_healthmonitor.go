@@ -9,30 +9,30 @@ import (
 	"strings"
 )
 
-// HealthMonitor represent the load balancer health monitor information
-type HealthMonitor struct {
-	Name               string       `json:"name"`
-	Type               string       `json:"type"`
-	Delay              int          `json:"delay"`
-	MaxRetries         int          `json:"max_retries"`
-	MaxRetriesDown     int          `json:"max_retries_down"`
-	TimeOut            int          `json:"timeout"`
-	HTTPMethod         string       `json:"http_method"`
-	UrlPath            string       `json:"url_path"`
-	ExpectedCodes      string       `json:"expected_codes"`
-	HTTPVersion        float32      `json:"http_version"`
-	OperatingStatus    string       `json:"operating_status"`
-	ProvisioningStatus string       `json:"provisioning_status"`
-	DomainName         string       `json:"domain_name"`
-	ID                 string       `json:"id"`
-	CreatedAt          string       `json:"created_at"`
-	UpdatedAt          string       `json:"updated_at"`
-	TenantID           string       `json:"tenant_id"`
-	Pool               []resourceID `json:"pool"`
+// CloudLoadBalancerHealthMonitor represent the load balancer health monitor information
+type CloudLoadBalancerHealthMonitor struct {
+	Name                  string       `json:"name"`
+	Type                  string       `json:"type"`
+	Delay                 int          `json:"delay"`
+	MaxRetries            int          `json:"max_retries"`
+	MaxRetriesDown        int          `json:"max_retries_down"`
+	TimeOut               int          `json:"timeout"`
+	HTTPMethod            string       `json:"http_method"`
+	URLPath               string       `json:"url_path"`
+	ExpectedCodes         string       `json:"expected_codes"`
+	HTTPVersion           float32      `json:"http_version"`
+	OperatingStatus       string       `json:"operating_status"`
+	ProvisioningStatus    string       `json:"provisioning_status"`
+	DomainName            string       `json:"domain_name"`
+	ID                    string       `json:"id"`
+	CreatedAt             string       `json:"created_at"`
+	UpdatedAt             string       `json:"updated_at"`
+	TenantID              string       `json:"tenant_id"`
+	CloudLoadBalancerPool []resourceID `json:"pool"`
 }
 
-// HealthMonitorCreateRequest represent the request bodfor creating a health monitor
-type HealthMonitorCreateRequest struct {
+// CloudLoadBalancerHealthMonitorCreateRequest represent the request bodfor creating a health monitor
+type CloudLoadBalancerHealthMonitorCreateRequest struct {
 	Name           string  `json:"name"`
 	Type           string  `json:"type"`
 	TimeOut        int     `json:"timeout,omitempty"`
@@ -47,8 +47,8 @@ type HealthMonitorCreateRequest struct {
 	DomainName     string  `json:"domain_name,omitempty"`
 }
 
-// HealthMonitorUpdateRequest represent the request bodfor updating a health monitor
-type HealthMonitorUpdateRequest struct {
+// CloudLoadBalancerHealthMonitorUpdateRequest represent the request bodfor updating a health monitor
+type CloudLoadBalancerHealthMonitorUpdateRequest struct {
 	Name           string   `json:"name"`
 	TimeOut        *int     `json:"timeout,omitempty"`
 	Delay          *int     `json:"delay,omitempty"`
@@ -73,10 +73,10 @@ func (lbs *cloudLoadBalancerService) HealthMonitors() *cloudLoadBalancerHealthMo
 
 // HealthMonitorService is an interface to interact with Bizfly API Health Monitor endpoint.
 type HealthMonitorService interface {
-	Get(ctx context.Context, healthMonitorID string) (*HealthMonitor, error)
+	Get(ctx context.Context, healthMonitorID string) (*CloudLoadBalancerHealthMonitor, error)
 	Delete(ctx context.Context, healthMonitorID string) error
-	Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error)
-	Update(Ctx context.Context, healthMonitorID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error)
+	Create(ctx context.Context, poolID string, hmcr *CloudLoadBalancerHealthMonitorCreateRequest) (*CloudLoadBalancerHealthMonitor, error)
+	Update(Ctx context.Context, healthMonitorID string, hmur *CloudLoadBalancerHealthMonitorUpdateRequest) (*CloudLoadBalancerHealthMonitor, error)
 }
 
 func (h *cloudLoadBalancerHealthMonitorResource) itemPath(hmID string) string {
@@ -84,7 +84,7 @@ func (h *cloudLoadBalancerHealthMonitorResource) itemPath(hmID string) string {
 }
 
 // Get gets detail a health monitor
-func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID string) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID string) (*CloudLoadBalancerHealthMonitor, error) {
 	req, err := h.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, h.itemPath(hmID), nil)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID s
 	}
 	defer resp.Body.Close()
 
-	hm := &HealthMonitor{}
+	hm := &CloudLoadBalancerHealthMonitor{}
 	if err := json.NewDecoder(resp.Body).Decode(hm); err != nil {
 		return nil, err
 	}
@@ -103,12 +103,12 @@ func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID s
 }
 
 // Create creates a health monitor for a pool
-func (h *cloudLoadBalancerHealthMonitorResource) Create(ctx context.Context, poolID string, hmcr *HealthMonitorCreateRequest) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Create(ctx context.Context, poolID string, hmcr *CloudLoadBalancerHealthMonitorCreateRequest) (*CloudLoadBalancerHealthMonitor, error) {
 	var data struct {
-		HealthMonitor *HealthMonitorCreateRequest `json:"healthmonitor"`
+		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitorCreateRequest `json:"healthmonitor"`
 	}
 	hmcr.PoolID = poolID
-	data.HealthMonitor = hmcr
+	data.CloudLoadBalancerHealthMonitor = hmcr
 	req, err := h.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, "/"+strings.Join([]string{"pool", poolID, "healthmonitor"}, "/"), &data)
 	if err != nil {
 		return nil, err
@@ -120,12 +120,12 @@ func (h *cloudLoadBalancerHealthMonitorResource) Create(ctx context.Context, poo
 	defer resp.Body.Close()
 
 	var respData struct {
-		HealthMonitor *HealthMonitor `json:"healthmonitor"`
+		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.HealthMonitor, nil
+	return respData.CloudLoadBalancerHealthMonitor, nil
 }
 
 // Delete deletes a health monitor
@@ -144,11 +144,11 @@ func (h *cloudLoadBalancerHealthMonitorResource) Delete(ctx context.Context, hmI
 }
 
 // Update - updates a health monitor
-func (h *cloudLoadBalancerHealthMonitorResource) Update(ctx context.Context, hmID string, hmur *HealthMonitorUpdateRequest) (*HealthMonitor, error) {
+func (h *cloudLoadBalancerHealthMonitorResource) Update(ctx context.Context, hmID string, hmur *CloudLoadBalancerHealthMonitorUpdateRequest) (*CloudLoadBalancerHealthMonitor, error) {
 	var data struct {
-		HealthMonitor *HealthMonitorUpdateRequest `json:"healthmonitor"`
+		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitorUpdateRequest `json:"healthmonitor"`
 	}
-	data.HealthMonitor = hmur
+	data.CloudLoadBalancerHealthMonitor = hmur
 	req, err := h.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, h.itemPath(hmID), data)
 	if err != nil {
 		return nil, err
@@ -160,10 +160,10 @@ func (h *cloudLoadBalancerHealthMonitorResource) Update(ctx context.Context, hmI
 	defer resp.Body.Close()
 
 	var respData struct {
-		HealthMonitor *HealthMonitor `json:"healthmonitor"`
+		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.HealthMonitor, nil
+	return respData.CloudLoadBalancerHealthMonitor, nil
 }

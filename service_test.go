@@ -15,7 +15,7 @@ func TestServiceCatalogList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(serviceUrl, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(serviceURL, func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {

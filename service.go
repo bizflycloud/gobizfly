@@ -11,18 +11,18 @@ import (
 
 var _ ServiceInterface = (*service)(nil)
 
-const serviceUrl = "/api/auth/service"
+const serviceURL = "/api/auth/service"
 
 type Service struct {
 	Name          string `json:"name"`
 	Code          string `json:"code"`
 	CanonicalName string `json:"canonical_name"`
-	Id            int    `json:"id"`
+	ID            int    `json:"id"`
 	Region        string `json:"region"`
 	Icon          string `json:"icon"`
 	Description   string `json:"description"`
 	Enabled       bool   `json:"enabled"`
-	ServiceUrl    string `json:"service_url"`
+	ServiceURL    string `json:"service_url"`
 }
 
 type ServiceList struct {
@@ -39,7 +39,7 @@ type ServiceInterface interface {
 }
 
 func (s *service) List(ctx context.Context) ([]*Service, error) {
-	u, err := s.client.apiURL.Parse(serviceUrl)
+	u, err := s.client.apiURL.Parse(serviceURL)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (s *service) List(ctx context.Context) ([]*Service, error) {
 	req, err := http.NewRequest("GET", u.String(), buf)
 
 	if s.client.basicAuth != "" {
-		req.Header.Set("Authorization", "Basic " + s.client.basicAuth)
+		req.Header.Set("Authorization", "Basic "+s.client.basicAuth)
 	}
 	if err != nil {
 		return nil, err

@@ -23,76 +23,76 @@ func setup() {
 
 	var err error
 	testRegion := "HaNoi"
-	client, err = NewClient(WithAPIUrl(serverTest.URL), WithRegionName(testRegion))
+	client, err = NewClient(WithAPIURL(serverTest.URL), WithRegionName(testRegion))
 	services := []*Service{
 		{Name: "Cloud Server",
 			CanonicalName: serverServiceName,
-			ServiceUrl:    serverTest.URL + "/iaas-cloud/api",
+			ServiceURL:    serverTest.URL + "/iaas-cloud/api",
 			Region:        testRegion},
 		{
 			Name:          "Load Balancer",
 			CanonicalName: loadBalancerServiceName,
-			ServiceUrl:    serverTest.URL + "/api/loadbalancers",
+			ServiceURL:    serverTest.URL + "/api/loadbalancers",
 			Region:        testRegion,
 		},
 		{
 			Name:          "CloudWatcher",
 			CanonicalName: cloudwatcherServiceName,
-			ServiceUrl:    serverTest.URL + "/api/alert",
+			ServiceURL:    serverTest.URL + "/api/alert",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Auto Scaling",
 			CanonicalName: autoScalingServiceName,
-			ServiceUrl:    serverTest.URL + "/api/auto-scaling",
+			ServiceURL:    serverTest.URL + "/api/auto-scaling",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Accounts",
 			CanonicalName: accountName,
-			ServiceUrl:    serverTest.URL + "/api/account",
+			ServiceURL:    serverTest.URL + "/api/account",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Auth",
 			CanonicalName: authServiceName,
-			ServiceUrl:    serverTest.URL + "/api",
+			ServiceURL:    serverTest.URL + "/api",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Kubernetes",
 			CanonicalName: kubernetesServiceName,
-			ServiceUrl:    serverTest.URL + "/api/kubernetes-engine",
+			ServiceURL:    serverTest.URL + "/api/kubernetes-engine",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Container Registry",
 			CanonicalName: containerRegistryName,
-			ServiceUrl:    serverTest.URL + "/api/container-registry",
+			ServiceURL:    serverTest.URL + "/api/container-registry",
 			Region:        testRegion,
 		},
 		{
 			Name:          "CDN",
 			CanonicalName: cdnName,
-			ServiceUrl:    serverTest.URL + "/api/cdn",
+			ServiceURL:    serverTest.URL + "/api/cdn",
 			Region:        testRegion,
 		},
 		{
 			Name:          "DNS",
 			CanonicalName: dnsName,
-			ServiceUrl:    serverTest.URL + "/api/dns",
+			ServiceURL:    serverTest.URL + "/api/dns",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Cloud Backup",
 			CanonicalName: cloudBackupServiceName,
-			ServiceUrl:    serverTest.URL + "/api/cloud-backup",
+			ServiceURL:    serverTest.URL + "/api/cloud-backup",
 			Region:        testRegion,
 		},
 		{
 			Name:          "Database",
 			CanonicalName: databaseServiceName,
-			ServiceUrl:    serverTest.URL + "/api/cloud-database",
+			ServiceURL:    serverTest.URL + "/api/cloud-database",
 			Region:        testRegion,
 		},
 	}
