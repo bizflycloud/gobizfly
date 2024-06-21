@@ -642,12 +642,12 @@ func TestMemberCreate(t *testing.T) {
 	mux.HandleFunc(testlib.LoadBalancerURL(m.resourcePath("023f2e34-7806-443b-bfae-16c324569a3d")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload struct {
-			CloudLoadBalancerMember *CloudLoadBalancerCreateRequest `json:"member"`
+			Member *CloudLoadBalancerMemberCreateRequest `json:"member"`
 		}
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
-		assert.Equal(t, "web-server-1", payload.CloudLoadBalancerMember.Name)
-		assert.Equal(t, 80, payload.CloudLoadBalancerMember.ProtocolPort)
-		assert.Equal(t, "192.0.2.16", payload.CloudLoadBalancerMember.Address)
+		assert.Equal(t, "web-server-1", payload.Member.Name)
+		assert.Equal(t, 80, payload.Member.ProtocolPort)
+		assert.Equal(t, "192.0.2.16", payload.Member.Address)
 
 		resp := `
 {
@@ -673,7 +673,7 @@ func TestMemberCreate(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
-	mcr := CloudLoadBalancerCreateRequest{
+	mcr := CloudLoadBalancerMemberCreateRequest{
 		Name:         "web-server-1",
 		Address:      "192.0.2.16",
 		ProtocolPort: 80,

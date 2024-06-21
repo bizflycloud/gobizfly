@@ -53,46 +53,46 @@ type CloudLoadBalancerPoolMemberRequest struct {
 
 // CloudLoadBalancerPoolCreateRequest represents create new pool request payload.
 type CloudLoadBalancerPoolCreateRequest struct {
-	LBAlgorithm                    string                                     `json:"lb_algorithm"`
-	ListenerID                     string                                     `json:"listener_id,omitempty"`
-	Name                           *string                                    `json:"name,omitempty"`
-	Protocol                       string                                     `json:"protocol"`
-	SessionPersistence             *SessionPersistence                        `json:"session_persistence,omitempty"`
-	CloudLoadBalancerHealthMonitor *CloudLoadBalancerPoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
-	Members                        []CloudLoadBalancerPoolMemberRequest       `json:"members,omitempty"`
+	LBAlgorithm        string                                     `json:"lb_algorithm"`
+	ListenerID         string                                     `json:"listener_id,omitempty"`
+	Name               *string                                    `json:"name,omitempty"`
+	Protocol           string                                     `json:"protocol"`
+	SessionPersistence *SessionPersistence                        `json:"session_persistence,omitempty"`
+	HealthMonitor      *CloudLoadBalancerPoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
+	Members            []CloudLoadBalancerPoolMemberRequest       `json:"members,omitempty"`
 }
 
 // CloudLoadBalancerPoolUpdateRequest represents update pool request payload.
 type CloudLoadBalancerPoolUpdateRequest struct {
-	AdminStateUp                   *bool                                      `json:"admin_state_up,omitempty"`
-	Description                    *string                                    `json:"description,omitempty"`
-	LBAlgorithm                    *string                                    `json:"lb_algorithm,omitempty"`
-	Name                           *string                                    `json:"name,omitempty"`
-	SessionPersistence             *SessionPersistence                        `json:"session_persistence"`
-	Members                        []CloudLoadBalancerPoolMemberRequest       `json:"members,omitempty"`
-	CloudLoadBalancerHealthMonitor *CloudLoadBalancerPoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
+	AdminStateUp       *bool                                      `json:"admin_state_up,omitempty"`
+	Description        *string                                    `json:"description,omitempty"`
+	LBAlgorithm        *string                                    `json:"lb_algorithm,omitempty"`
+	Name               *string                                    `json:"name,omitempty"`
+	SessionPersistence *SessionPersistence                        `json:"session_persistence"`
+	Members            []CloudLoadBalancerPoolMemberRequest       `json:"members,omitempty"`
+	HealthMonitor      *CloudLoadBalancerPoolHealthMonitorRequest `json:"healthmonitor,omitempty"`
 }
 
 // CloudLoadBalancerPool contains pool information.
 type CloudLoadBalancerPool struct {
-	ID                             string                          `json:"id"`
-	TenandID                       string                          `json:"tenant_id"`
-	Description                    string                          `json:"description"`
-	LBAlgorithm                    string                          `json:"lb_algorithm"`
-	Name                           string                          `json:"name"`
-	CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`
-	UpdatedAt                      string                          `json:"updated_at"`
-	OperatingStatus                string                          `json:"operating_status"`
-	Listeners                      []resourceID                    `json:"listeners"`
-	SessionPersistence             *SessionPersistence             `json:"session_persistence"`
-	ProvisoningStatus              string                          `json:"provisioning_status"`
-	ProjectID                      string                          `json:"project_id"`
-	LoadBalancers                  []resourceID                    `json:"loadbalancers"`
-	AdminStateUp                   bool                            `json:"admin_state_up"`
-	Protocol                       string                          `json:"protocol"`
-	CreatedAt                      string                          `json:"created_at"`
-	HealthMonitorID                string                          `json:"healthmonitor_id"`
-	Members                        []CloudLoadBalancerMember       `json:"members"`
+	ID                 string                          `json:"id"`
+	TenandID           string                          `json:"tenant_id"`
+	Description        string                          `json:"description"`
+	LBAlgorithm        string                          `json:"lb_algorithm"`
+	Name               string                          `json:"name"`
+	HealthMonitor      *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`
+	UpdatedAt          string                          `json:"updated_at"`
+	OperatingStatus    string                          `json:"operating_status"`
+	Listeners          []resourceID                    `json:"listeners"`
+	SessionPersistence *SessionPersistence             `json:"session_persistence"`
+	ProvisoningStatus  string                          `json:"provisioning_status"`
+	ProjectID          string                          `json:"project_id"`
+	LoadBalancers      []resourceID                    `json:"loadbalancers"`
+	AdminStateUp       bool                            `json:"admin_state_up"`
+	Protocol           string                          `json:"protocol"`
+	CreatedAt          string                          `json:"created_at"`
+	HealthMonitorID    string                          `json:"healthmonitor_id"`
+	Members            []CloudLoadBalancerMember       `json:"members"`
 }
 
 type cloudLoadBalancerPoolResource struct {
