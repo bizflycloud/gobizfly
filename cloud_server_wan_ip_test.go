@@ -191,7 +191,7 @@ func TestWanIPAttachServer(t *testing.T) {
 		})
 	payload := ActionPublicNetworkInterfacePayload{
 		Action:   "attach_server",
-		ServerId: "123",
+		ServerID: "123",
 	}
 	err := client.CloudServer.PublicNetworkInterfaces().Action(ctx, "ceebf0de-1fc2-4a08-a200-1906a30abe7e", &payload)
 	require.NoError(t, err)

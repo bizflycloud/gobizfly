@@ -18,13 +18,13 @@ type CloudBackupCreatePolicyPayload struct {
 
 // CloudBackupPolicy represents a backup policy
 type CloudBackupPolicy struct {
-	Id              string `json:"id"`
+	ID              string `json:"id"`
 	Name            string `json:"name"`
 	SchedulePattern string `json:"schedule_pattern"`
 	RetentionDays   int    `json:"retention_days"`
 	CreatedAt       string `json:"created_at"`
 	UpdatedAt       string `json:"updated_at"`
-	TenantId        string `json:"tenant_id"`
+	TenantID        string `json:"tenant_id"`
 	Description     string `json:"description"`
 	LimitDownload   int    `json:"limit_download,omitempty"`
 	LimitUpload     int    `json:"limit_upload,omitempty"`
@@ -52,7 +52,7 @@ type CloudBackupFullPolicy struct {
 // CloudBackupActionPolicyDirectoryPayload represents the payload for creating a backup policy
 type CloudBackupActionPolicyDirectoryPayload struct {
 	Action      string `json:"action"`
-	DirectoryId string `json:"directory_id"`
+	DirectoryID string `json:"directory_id"`
 }
 
 // CreatePolicy creates a backup policy
@@ -75,9 +75,9 @@ func (cb *cloudBackupService) CreatePolicy(ctx context.Context, payload *CloudBa
 }
 
 // GetBackupDirectoryPolicy gets a backup policy
-func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, machineId string, directoryId string) (*CloudBackupPolicy, error) {
+func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, machineID string, directoryID string) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		strings.Join([]string{cb.itemMachinePath(machineId), "directories", directoryId, "policies"}, "/"), nil)
+		strings.Join([]string{cb.itemMachinePath(machineID), "directories", directoryID, "policies"}, "/"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,9 +94,9 @@ func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, mach
 }
 
 // GetPolicy gets a backup policy
-func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyId string) (*CloudBackupPolicy, error) {
+func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyID string) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		cb.itemPolicyPath(policyId), nil)
+		cb.itemPolicyPath(policyID), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -113,9 +113,9 @@ func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyId string) (*
 }
 
 // PatchPolicy patches a backup policy
-func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyId string, payload *CloudBackupPatchPolicyPayload) (*CloudBackupPolicy, error) {
+func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyID string, payload *CloudBackupPatchPolicyPayload) (*CloudBackupPolicy, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodPatch, cloudBackupServiceName,
-		cb.itemPolicyPath(policyId), payload)
+		cb.itemPolicyPath(policyID), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -132,9 +132,9 @@ func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyId string, 
 }
 
 // DeletePolicy deletes a backup policy
-func (cb *cloudBackupService) DeletePolicy(ctx context.Context, policyId string) error {
+func (cb *cloudBackupService) DeletePolicy(ctx context.Context, policyID string) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodDelete, cloudBackupServiceName,
-		cb.itemPolicyPath(policyId), nil)
+		cb.itemPolicyPath(policyID), nil)
 	if err != nil {
 		return err
 	}
@@ -146,9 +146,9 @@ func (cb *cloudBackupService) DeletePolicy(ctx context.Context, policyId string)
 }
 
 // ListAppliedPolicyDirectories lists the directories that have a backup policy applied
-func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, policyId string) ([]*CloudBackupDirectory, error) {
+func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, policyID string) ([]*CloudBackupDirectory, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		strings.Join([]string{cb.itemPolicyPath(policyId), "directories"}, "/"), nil)
+		strings.Join([]string{cb.itemPolicyPath(policyID), "directories"}, "/"), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +165,9 @@ func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, 
 }
 
 // ActionPolicyDirectory applies an action to a backup policy
-func (cb *cloudBackupService) ActionPolicyDirectory(ctx context.Context, policyId string, payload *CloudBackupActionPolicyDirectoryPayload) error {
+func (cb *cloudBackupService) ActionPolicyDirectory(ctx context.Context, policyID string, payload *CloudBackupActionPolicyDirectoryPayload) error {
 	req, err := cb.client.NewRequest(ctx, http.MethodPost, cloudBackupServiceName,
-		strings.Join([]string{cb.itemPolicyPath(policyId), "action"}, "/"), payload)
+		strings.Join([]string{cb.itemPolicyPath(policyID), "action"}, "/"), payload)
 	if err != nil {
 		return err
 	}

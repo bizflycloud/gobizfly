@@ -55,7 +55,7 @@ const (
 
 func main() {
 	client, err := gobizfly.NewClient(
-		gobizfly.WithAPIUrl(host),
+		gobizfly.WithAPIURL(host),
 	)
 	if err != nil {
 		log.Fatal(err)

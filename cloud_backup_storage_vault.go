@@ -13,20 +13,20 @@ type CloudBackupStorageVault struct {
 	DataUsage        string `json:"data_usage"`
 	Deleted          bool   `json:"deleted"`
 	EncryptionKey    string `json:"encryption_key"`
-	Id               string `json:"id"`
+	ID               string `json:"id"`
 	Name             string `json:"name"`
 	SecretRef        string `json:"secret_ref"`
 	StorageBucket    string `json:"storage_bucket"`
 	StorageVaultType string `json:"storage_vault_type"`
-	TenantId         string `json:"tenant_id"`
+	TenantID         string `json:"tenant_id"`
 	UpdatedAt        string `json:"updated_at"`
 }
 
 // CloudBackupCreateStorageVaultPayload represents the payload for creating a Cloud Backup Storage Vault.
 type CloudBackupCreateStorageVaultPayload struct {
-	AwsAccessKeyId     string `json:"aws_access_key_id"`
+	AwsAccessKeyID     string `json:"aws_access_key_id"`
 	AwsSecretAccessKey string `json:"aws_secret_access_key"`
-	EndpointUrl        string `json:"endpoint_url"`
+	EndpointURL        string `json:"endpoint_url"`
 	StorageVaultType   string `json:"storage_vault_type"`
 	Name               string `json:"name"`
 	StorageBucket      string `json:"storage_bucket"`
@@ -55,9 +55,9 @@ func (cb *cloudBackupService) ListStorageVaults(ctx context.Context) ([]*CloudBa
 }
 
 // GetStorageVault gets a Cloud Backup Storage Vault.
-func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutId string) (*CloudBackupStorageVault, error) {
+func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutID string) (*CloudBackupStorageVault, error) {
 	req, err := cb.client.NewRequest(ctx, http.MethodGet, cloudBackupServiceName,
-		cb.itemStorageVaultPath(valutId), nil)
+		cb.itemStorageVaultPath(valutID), nil)
 	if err != nil {
 		return nil, err
 	}

@@ -24,7 +24,7 @@ func (cs *cloudServerService) PublicNetworkInterfaces() *cloudServerPublicNetwor
 type CloudServerPublicNetworkInterfaceService interface {
 	Create(ctx context.Context, payload *CreatePublicNetworkInterfacePayload) (*CloudServerPublicNetworkInterface, error)
 	List(ctx context.Context) ([]*CloudServerPublicNetworkInterface, error)
-	Get(ctx context.Context, wanIPId string) (*CloudServerPublicNetworkInterface, error)
+	Get(ctx context.Context, wanIPID string) (*CloudServerPublicNetworkInterface, error)
 	Delete(ctx context.Context, publicNetworkInterfaceID string) error
 	Action(ctx context.Context, publicNetworkInterfaceID string, payload *ActionPublicNetworkInterfacePayload) error
 }
@@ -57,7 +57,7 @@ type CloudServerPublicNetworkInterface struct {
 	AvailabilityZone    string               `json:"availability_zone"`
 	IsMain              bool                 `json:"is_main"`
 	AttachedServer      Server               `json:"attached_server"`
-	IpAddress           string               `json:"ip_address"`
+	IPAddress           string               `json:"ip_address"`
 	IpVersion           int                  `json:"ip_version"`
 }
 
@@ -69,7 +69,7 @@ type CreatePublicNetworkInterfacePayload struct {
 
 type ActionPublicNetworkInterfacePayload struct {
 	Action   string `json:"action"`
-	ServerId string `json:"server_id,omitempty"`
+	ServerID string `json:"server_id,omitempty"`
 }
 
 func (w cloudServerPublicNetworkInterfaceResource) resourcePath() string {
@@ -106,6 +106,11 @@ func (w cloudServerPublicNetworkInterfaceResource) List(ctx context.Context) ([]
 	if err != nil {
 		return nil, err
 	}
+
+	params := req.URL.Query()
+	params.Add("detailed", "true")
+	req.URL.RawQuery = params.Encode()
+
 	var wanIps []*CloudServerPublicNetworkInterface
 	resp, err := w.client.Do(ctx, req)
 	if err != nil {

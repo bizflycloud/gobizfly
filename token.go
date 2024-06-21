@@ -68,7 +68,7 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 
 func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	var tok Token
-	if tcr.AuthType != AppCredentialAuthType {
+	if tcr.AuthType != appCredentialAuthType {
 		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
 		if err != nil {
 			return nil, err
@@ -104,7 +104,7 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 
 func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	var tok Token
-	if tcr.AuthType != AppCredentialAuthType {
+	if tcr.AuthType != appCredentialAuthType {
 		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
 		if err != nil {
 			return nil, err

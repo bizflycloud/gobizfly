@@ -65,7 +65,7 @@ type Flavor struct {
 
 // DeletedVolumes represent payload when delete server
 type DeletedVolumes struct {
-	Ids []string `json:"delete_volume"`
+	IDs []string `json:"delete_volume"`
 }
 
 // Server contains server information.
@@ -195,7 +195,7 @@ type ServerCreateRequest struct {
 	NetworkInterfaces []string      `json:"network_interfaces,omitempty"`
 	Firewalls         []string      `json:"firewalls,omitempty"`
 	NetworkPlan       string        `json:"network_plan,omitempty"`
-	VPCNetworkIds     []string      `json:"vpc_network_ids,omitempty"`
+	VPCNetworkIDs     []string      `json:"vpc_network_ids,omitempty"`
 	BillingPlan       string        `json:"billing_plan,omitempty"`
 	IPv6              bool          `json:"ipv6,omitempty"`
 	IsCreatedWan      *bool         `json:"is_created_wan,omitempty"`
@@ -284,7 +284,7 @@ func (s *cloudServerService) Get(ctx context.Context, id string) (*Server, error
 // Delete deletes a server.
 func (s *cloudServerService) Delete(ctx context.Context, id string, deletedRootDisk []string) (*ServerTask, error) {
 	deleteOpts := &DeletedVolumes{
-		Ids: deletedRootDisk,
+		IDs: deletedRootDisk,
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodDelete, serverServiceName, serverBasePath+"/"+id, deleteOpts)
 	if err != nil {
@@ -536,10 +536,10 @@ func (s cloudServerService) RemoveNetworkInterface(ctx context.Context, id strin
 }
 
 // AttachPublicNetworkInterface attach batch WAN IPs to the server
-func (s cloudServerService) AttachPublicNetworkInterface(ctx context.Context, id string, wanIpIds []string) error {
+func (s cloudServerService) AttachPublicNetworkInterface(ctx context.Context, id string, wanIpIDs []string) error {
 	payload := &ServerAction{
 		Action:       "attach_wan_ips",
-		AttachWanIPs: wanIpIds,
+		AttachWanIPs: wanIpIDs,
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, serverServiceName, s.itemActionPath(id), payload)
 	if err != nil {

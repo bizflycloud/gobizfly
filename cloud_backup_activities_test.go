@@ -57,5 +57,5 @@ func TestListActivities(t *testing.T) {
 	activities, err := client.CloudBackup.CloudBackupListActivities(ctx)
 	require.NoError(t, err)
 	require.Equal(t, 2, len(activities))
-	assert.Equal(t, activities[0].BackupDirectoryId, "326bf60e-7065-478a-b4b2-9d59cf8b63aa")
+	assert.Equal(t, activities[0].BackupDirectoryID, "326bf60e-7065-478a-b4b2-9d59cf8b63aa")
 }

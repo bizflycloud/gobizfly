@@ -158,7 +158,7 @@ func TestGetZone(t *testing.T) {
 	})
 	zone, err := client.DNS.GetZone(ctx, "81b3881a-5f11-432c-b4ec-2f57557d1c8c")
 	require.NoError(t, err)
-	assert.Equal(t, "333e2300b3c644cc93359a41a07c2321", zone.TenantId)
+	assert.Equal(t, "333e2300b3c644cc93359a41a07c2321", zone.TenantID)
 }
 
 func TestDeleteZone(t *testing.T) {

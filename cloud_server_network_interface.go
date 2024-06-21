@@ -65,6 +65,8 @@ type NetworkInterface struct {
 	Type                string               `json:"type"`
 	BillingType         string               `json:"billing_type"`
 	AttachedServer      struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
 	} `json:"attached_server"`
 	IPVersion int    `json:"ip_version"`
 	IPAddress string `json:"ip_address"`

@@ -31,7 +31,6 @@ type FirewallService interface {
 	RemoveServer(ctx context.Context, id string, rsfr *FirewallRemoveServerRequest) (*Firewall, error)
 	Update(ctx context.Context, id string, ufr *FirewallRequestPayload) (*FirewallDetail, error)
 	DeleteRule(ctx context.Context, id string) (*FirewallDeleteResponse, error)
-	CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error)
 }
 
 // BaseFirewall - contains base information fields of a firewall
@@ -87,16 +86,10 @@ type FirewallRule struct {
 
 // FirewallRuleCreateRequest - payload for creating a firewall rule
 type FirewallRuleCreateRequest struct {
-	Type      string `json:"type"`
-	Protocol  string `json:"protocol"`
-	PortRange string `json:"port_range"`
-	CIDR      string `json:"cidr"`
-}
-
-// FirewallSingleRuleCreateRequest - payload for creating a single direction firewall rule
-type FirewallSingleRuleCreateRequest struct {
-	FirewallRuleCreateRequest
-	Direction string `json:"direction"`
+	Type      interface{} `json:"type"`
+	Protocol  interface{} `json:"protocol"`
+	PortRange interface{} `json:"port_range"`
+	CIDR      string      `json:"cidr"`
 }
 
 // FirewallRequestPayload - payload for creating a firewall
@@ -142,6 +135,33 @@ func (f *cloudServerFirewallResource) List(ctx context.Context, opts *ListOption
 		return nil, err
 	}
 
+	for _, firewall := range firewalls {
+		for index, rule := range firewall.InBound {
+			if rule.CIDR != "" {
+				continue
+			}
+
+			if rule.EtherType == "IPv4" {
+				firewall.InBound[index].CIDR = "0.0.0.0/0"
+			}
+			if rule.EtherType == "IPv6" {
+				firewall.InBound[index].CIDR = "::/0"
+			}
+		}
+
+		for index, rule := range firewall.OutBound {
+			if rule.CIDR != "" {
+				continue
+			}
+
+			if rule.EtherType == "IPv4" {
+				firewall.OutBound[index].CIDR = "0.0.0.0/0"
+			}
+			if rule.EtherType == "IPv6" {
+				firewall.OutBound[index].CIDR = "::/0"
+			}
+		}
+	}
 	return firewalls, nil
 }
 
@@ -184,6 +204,32 @@ func (f *cloudServerFirewallResource) Get(ctx context.Context, id string) (*Fire
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
 		return nil, err
+	}
+
+	for index, rule := range firewall.InBound {
+		if rule.CIDR != "" {
+			continue
+		}
+
+		if rule.EtherType == "IPv4" {
+			firewall.InBound[index].CIDR = "0.0.0.0/0"
+		}
+		if rule.EtherType == "IPv6" {
+			firewall.InBound[index].CIDR = "::/0"
+		}
+	}
+
+	for index, rule := range firewall.OutBound {
+		if rule.CIDR != "" {
+			continue
+		}
+
+		if rule.EtherType == "IPv4" {
+			firewall.OutBound[index].CIDR = "0.0.0.0/0"
+		}
+		if rule.EtherType == "IPv6" {
+			firewall.OutBound[index].CIDR = "::/0"
+		}
 	}
 
 	return firewall, nil
@@ -278,26 +324,4 @@ func (f *cloudServerFirewallResource) DeleteRule(ctx context.Context, id string)
 	}
 
 	return dwr, nil
-}
-
-// CreateRule - create a new rule in a firewall
-func (f *cloudServerFirewallResource) CreateRule(ctx context.Context, fwID string, fsrcr *FirewallSingleRuleCreateRequest) (*FirewallRule, error) {
-	req, err := f.client.NewRequest(ctx, http.MethodPost, serverServiceName, strings.Join([]string{firewallBasePath, fwID, "rules"}, "/"), fsrcr)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := f.client.Do(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	var firewallRuleCreateResponse struct {
-		Rule *FirewallRule `json:"security_group_rule"`
-	}
-
-	if err := json.NewDecoder(resp.Body).Decode(&firewallRuleCreateResponse); err != nil {
-		return nil, err
-	}
-	return firewallRuleCreateResponse.Rule, nil
 }

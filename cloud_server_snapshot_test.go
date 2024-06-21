@@ -158,7 +158,7 @@ func TestSnapshotList(t *testing.T) {
 	require.NoError(t, err)
 	assert.Len(t, snapshots, 2)
 	snapshot := snapshots[0]
-	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", snapshot.Id)
+	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", snapshot.ID)
 	assert.Equal(t, "on_demand", snapshot.BillingPlan)
 }
 
@@ -261,7 +261,7 @@ func TestSnapshotGet(t *testing.T) {
 		})
 	snapshot, err := client.CloudServer.Snapshots().Get(ctx, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5")
 	require.NoError(t, err)
-	require.Equal(t, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5", snapshot.Id, "check snapshot id")
+	require.Equal(t, "d5d79b3f-d0cd-4535-b0d3-27d8ec2d62f5", snapshot.ID, "check snapshot id")
 	require.Equal(t, "ducpx-snapshot-test", snapshot.Name, "check snapshot name")
 	require.Equal(t, "on_demand", snapshot.BillingPlan)
 }
@@ -275,7 +275,7 @@ func TestSnapshotCreate(t *testing.T) {
 		require.NoError(t, json.NewDecoder(request.Body).Decode(&snapshot))
 		assert.Equal(t, "ducpx-test-create-snapshot", snapshot.Name)
 		assert.Equal(t, true, snapshot.Force)
-		assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeId)
+		assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeID)
 
 		resp := `
 {
@@ -348,15 +348,15 @@ func TestSnapshotCreate(t *testing.T) {
 
 	snapshot, err := client.CloudServer.Snapshots().Create(ctx, &SnapshotCreateRequest{
 		Name:     "ducpx-test-create-snapshot",
-		VolumeId: "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246",
+		VolumeID: "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246",
 		Force:    true,
 	})
 
 	require.NoError(t, err)
-	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", snapshot.Id)
+	assert.Equal(t, "586fd3ae-597c-4acc-aab0-713e80245b28", snapshot.ID)
 	assert.Equal(t, "ducpx-test-create-snapshot", snapshot.Name)
 	assert.Equal(t, 20, snapshot.Size)
-	assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeId)
+	assert.Equal(t, "c4e6bf65-32d8-4ef3-bbd3-3cc9676f8246", snapshot.VolumeID)
 }
 
 func TestSnapshotDelete(t *testing.T) {

@@ -9,19 +9,19 @@ import (
 // CloudBackupActivity represents a Cloud Backup Activity data.
 type CloudBackupActivity struct {
 	Action            string `json:"action"`
-	BackupDirectoryId string `json:"backup_directory_id"`
+	BackupDirectoryID string `json:"backup_directory_id"`
 	CreatedAt         string `json:"created_at"`
-	Id                string `json:"id"`
+	ID                string `json:"id"`
 	Extra             string `json:"extra,omitempty"`
-	MachineId         string `json:"machine_id"`
+	MachineID         string `json:"machine_id"`
 	Message           string `json:"message"`
-	PolicyId          string `json:"policy_id,omitempty"`
+	PolicyID          string `json:"policy_id,omitempty"`
 	Reason            string `json:"reason,omitempty"`
 	RecoveryPoint     string `json:"recovery_point,omitempty"`
 	Status            string `json:"status"`
-	TenantId          string `json:"tenant_id"`
+	TenantID          string `json:"tenant_id"`
 	UpdatedAt         string `json:"updated_at"`
-	UserId            string `json:"user_id"`
+	UserID            string `json:"user_id"`
 }
 
 // CloudBackupListActivities - List Cloud Backup Activities

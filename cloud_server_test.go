@@ -76,7 +76,7 @@ func TestServerList(t *testing.T) {
 		"config_drive": "",
 		"status": "ACTIVE",
 		"updated": "2020-04-08T09:36:26Z",
-		"hostId": "5af42401f6f37e199d7d73a6081a83bc49ee1859b6e836a7990c0907",
+		"hostID": "5af42401f6f37e199d7d73a6081a83bc49ee1859b6e836a7990c0907",
 		"OS-SRV-USG:terminated_at": null,
 		"key_name": "sapd1",
 		"name": "meeting-now-1",
@@ -389,7 +389,7 @@ func TestServerStart(t *testing.T) {
 	"config_drive": "",
 	"status": "SHUTOFF",
 	"updated": "2020-04-14T11:02:39Z",
-	"hostId": "74ca4ef173ad2fd2e875a30ee7f594072ba1367ac3d963532f2430a1",
+	"hostID": "74ca4ef173ad2fd2e875a30ee7f594072ba1367ac3d963532f2430a1",
 	"OS-SRV-USG:terminated_at": null,
 	"key_name": "sapd1",
 	"name": "sapd12345x",
@@ -479,7 +479,7 @@ func TestServerStop(t *testing.T) {
 	"config_drive": "",
 	"status": "SHUTOFF",
 	"updated": "2020-04-14T11:02:39Z",
-	"hostId": "74ca4ef173ad2fd2e875a30ee7f594072ba1367ac3d963532f2430a1",
+	"hostID": "74ca4ef173ad2fd2e875a30ee7f594072ba1367ac3d963532f2430a1",
 	"OS-SRV-USG:terminated_at": null,
 	"key_name": "sapd1",
 	"name": "sapd12345x",
@@ -763,7 +763,7 @@ func TestGetServerTaskResponseReady(t *testing.T) {
             "category": "premium",
             "os_type": "Ubuntu 18.04"
         },
-        "hostId": "8b22a6409fb25479713094dd4ebd424fdf237fb372fb38a2b5417e19",
+        "hostID": "8b22a6409fb25479713094dd4ebd424fdf237fb372fb38a2b5417e19",
         "flavor": {
             "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
             "name": "nix.2c_2g",
@@ -957,7 +957,7 @@ func TestServerAddVirtualPrivateNetwork(t *testing.T) {
         "category": "premium",
         "os_type": "CentOS-7.0[64-bit-version]"
     },
-    "hostId": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
+    "hostID": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
     "flavor": {
         "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
         "name": "2c_2g",
@@ -1193,7 +1193,7 @@ func TestServerRemoveNetworkInterface(t *testing.T) {
         "category": "premium",
         "os_type": "CentOS-7.0[64-bit-version]"
     },
-    "hostId": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
+    "hostID": "0829fc8b8e0750802ae393a41998c4ed2ed5068254c6a96e0571dbaf",
     "flavor": {
         "id": "be7dab73-2c87-4d59-a2fd-49e4f7845310",
         "name": "2c_2g",

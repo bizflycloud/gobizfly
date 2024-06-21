@@ -50,7 +50,7 @@ type Backup struct {
 type ExtendedBackup struct {
 	Backup
 	Snapshots []Snapshot `json:"snapshots"`
-	VolumeId  string     `json:"volume_id"`
+	VolumeID  string     `json:"volume_id"`
 	Volume    Volume     `json:"volume"`
 }
 

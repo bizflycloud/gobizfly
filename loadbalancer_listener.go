@@ -13,15 +13,15 @@ var _ CloudLoadBalancerListenerService = (*cloudLoadBalancerListenerResource)(ni
 
 // CloudLoadBalancerListenerService is an interface to interact with Bizfly API Listeners endpoint.
 type CloudLoadBalancerListenerService interface {
-	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*Listener, error)
-	Create(ctx context.Context, loadBalancerID string, req *ListenerCreateRequest) (*Listener, error)
-	Get(ctx context.Context, id string) (*Listener, error)
-	Update(ctx context.Context, id string, req *ListenerUpdateRequest) (*Listener, error)
+	List(ctx context.Context, loadBalancerID string, opts *ListOptions) ([]*CloudLoadBalancerListener, error)
+	Create(ctx context.Context, loadBalancerID string, req *CloudLoadBalancerListenerCreateRequest) (*CloudLoadBalancerListener, error)
+	Get(ctx context.Context, id string) (*CloudLoadBalancerListener, error)
+	Update(ctx context.Context, id string, req *CloudLoadBalancerListenerUpdateRequest) (*CloudLoadBalancerListener, error)
 	Delete(ctx context.Context, id string) error
 }
 
-// ListenerCreateRequest represents create new listener request payload.
-type ListenerCreateRequest struct {
+// CloudLoadBalancerListenerCreateRequest represents create new listener request payload.
+type CloudLoadBalancerListenerCreateRequest struct {
 	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
 	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
 	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
@@ -37,8 +37,8 @@ type ListenerCreateRequest struct {
 	DefaultPoolID          *string            `json:"default_pool_id,omitempty"`
 }
 
-// ListenerUpdateRequest represents update listener request payload.
-type ListenerUpdateRequest struct {
+// CloudLoadBalancerListenerUpdateRequest represents update listener request payload.
+type CloudLoadBalancerListenerUpdateRequest struct {
 	TimeoutTCPInspect      *int               `json:"timeout_tcp_inspect,omitempty"`
 	TimeoutMemberData      *int               `json:"timeout_member_data,omitempty"`
 	TimeoutMemberConnect   *int               `json:"timeout_member_connect,omitempty"`
@@ -53,8 +53,8 @@ type ListenerUpdateRequest struct {
 	AdminStateUp           *bool              `json:"admin_state_up,omitempty"`
 }
 
-// Listener contains listener information.
-type Listener struct {
+// CloudLoadBalancerListener contains listener information.
+type CloudLoadBalancerListener struct {
 	ID                     string            `json:"id"`
 	TimeoutClientData      int               `json:"timeout_client_data"`
 	Description            string            `json:"description"`
@@ -97,7 +97,7 @@ func (l *cloudLoadBalancerListenerResource) itemPath(id string) string {
 }
 
 // List returns a list of listeners' information.
-func (l *cloudLoadBalancerListenerResource) List(ctx context.Context, lbID string, opts *ListOptions) ([]*Listener, error) {
+func (l *cloudLoadBalancerListenerResource) List(ctx context.Context, lbID string, opts *ListOptions) ([]*CloudLoadBalancerListener, error) {
 	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.resourcePath(lbID), nil)
 	if err != nil {
 		return nil, err
@@ -109,7 +109,7 @@ func (l *cloudLoadBalancerListenerResource) List(ctx context.Context, lbID strin
 	defer resp.Body.Close()
 
 	var data struct {
-		Listeners []*Listener `json:"listeners"`
+		Listeners []*CloudLoadBalancerListener `json:"listeners"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -120,11 +120,11 @@ func (l *cloudLoadBalancerListenerResource) List(ctx context.Context, lbID strin
 }
 
 // Create - Create a new listener.
-func (l *cloudLoadBalancerListenerResource) Create(ctx context.Context, lbID string, lcr *ListenerCreateRequest) (*Listener, error) {
+func (l *cloudLoadBalancerListenerResource) Create(ctx context.Context, lbID string, lcr *CloudLoadBalancerListenerCreateRequest) (*CloudLoadBalancerListener, error) {
 	var data struct {
-		Listener *ListenerCreateRequest `json:"listener"`
+		CloudLoadBalancerListener *CloudLoadBalancerListenerCreateRequest `json:"listener"`
 	}
-	data.Listener = lcr
+	data.CloudLoadBalancerListener = lcr
 	req, err := l.client.NewRequest(ctx, http.MethodPost, loadBalancerServiceName, l.resourcePath(lbID), &data)
 	if err != nil {
 		return nil, err
@@ -136,16 +136,16 @@ func (l *cloudLoadBalancerListenerResource) Create(ctx context.Context, lbID str
 	defer resp.Body.Close()
 
 	var respData struct {
-		Listener *Listener `json:"listener"`
+		CloudLoadBalancerListener *CloudLoadBalancerListener `json:"listener"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Listener, err
+	return respData.CloudLoadBalancerListener, err
 }
 
 // Get - Get a listener's information
-func (l *cloudLoadBalancerListenerResource) Get(ctx context.Context, id string) (*Listener, error) {
+func (l *cloudLoadBalancerListenerResource) Get(ctx context.Context, id string) (*CloudLoadBalancerListener, error) {
 	req, err := l.client.NewRequest(ctx, http.MethodGet, loadBalancerServiceName, l.itemPath(id), nil)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (l *cloudLoadBalancerListenerResource) Get(ctx context.Context, id string) 
 	}
 	defer resp.Body.Close()
 
-	listener := &Listener{}
+	listener := &CloudLoadBalancerListener{}
 	if err := json.NewDecoder(resp.Body).Decode(listener); err != nil {
 		return nil, err
 	}
@@ -164,11 +164,11 @@ func (l *cloudLoadBalancerListenerResource) Get(ctx context.Context, id string) 
 }
 
 // Update - Update a listener's information.
-func (l *cloudLoadBalancerListenerResource) Update(ctx context.Context, id string, lur *ListenerUpdateRequest) (*Listener, error) {
+func (l *cloudLoadBalancerListenerResource) Update(ctx context.Context, id string, lur *CloudLoadBalancerListenerUpdateRequest) (*CloudLoadBalancerListener, error) {
 	var data struct {
-		Listener *ListenerUpdateRequest `json:"listener"`
+		CloudLoadBalancerListener *CloudLoadBalancerListenerUpdateRequest `json:"listener"`
 	}
-	data.Listener = lur
+	data.CloudLoadBalancerListener = lur
 	req, err := l.client.NewRequest(ctx, http.MethodPut, loadBalancerServiceName, l.itemPath(id), &data)
 	if err != nil {
 		return nil, err
@@ -180,12 +180,12 @@ func (l *cloudLoadBalancerListenerResource) Update(ctx context.Context, id strin
 	defer resp.Body.Close()
 
 	var respData struct {
-		Listener *Listener `json:"listener"`
+		CloudLoadBalancerListener *CloudLoadBalancerListener `json:"listener"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
 	}
-	return respData.Listener, nil
+	return respData.CloudLoadBalancerListener, nil
 }
 
 // Delete - Delete a listener

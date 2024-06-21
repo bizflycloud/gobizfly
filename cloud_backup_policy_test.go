@@ -326,7 +326,7 @@ func TestCloudBackupService_ActionPolicyDirectory(t *testing.T) {
 		})
 	err := client.CloudBackup.ActionPolicyDirectory(ctx, "123", &CloudBackupActionPolicyDirectoryPayload{
 		Action:      "apply_directory",
-		DirectoryId: "123123213123",
+		DirectoryID: "123123213123",
 	})
 	require.NoError(t, err)
 }

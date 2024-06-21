@@ -167,7 +167,7 @@ func TestFirewallGet(t *testing.T) {
                 "category": "dedicated",
                 "os_type": "Ubuntu 20.04 THOR_TRANSFER"
             },
-            "hostId": "ca09528b7a51ae54755143e60c57bdca5d68d3475d77f6759f728c9e",
+            "hostID": "ca09528b7a51ae54755143e60c57bdca5d68d3475d77f6759f728c9e",
             "flavor": {
                 "id": "d470460e-d803-41ff-998c-a013ded4a8c8",
                 "name": "2c_2g_dedicated",
@@ -250,7 +250,7 @@ func TestFirewallGet(t *testing.T) {
                 "category": "premium",
                 "os_type": "Ubuntu 20.04 THOR_TRANSFER"
             },
-            "hostId": "787f9ae05e40d07996722c23f3a7c0d6edc827f4ca2288343d5e4e45",
+            "hostID": "787f9ae05e40d07996722c23f3a7c0d6edc827f4ca2288343d5e4e45",
             "flavor": {
                 "id": "0c3a8e65-6653-4a99-851d-524f5d22950e",
                 "name": "nix.2c_4g",
@@ -472,7 +472,7 @@ func TestFirewallCreate(t *testing.T) {
                 "category": "premium",
                 "os_type": "Ubuntu 18.04"
             },
-            "hostId": "84bf6a43769bd4c041c75c1737c38d4b8df5faf6916f9f603b4702d8",
+            "hostID": "84bf6a43769bd4c041c75c1737c38d4b8df5faf6916f9f603b4702d8",
             "flavor": {
                 "id": "f4d23537-8a87-4c32-bb0b-60328e6f4374",
                 "name": "nix.4c_2g",
@@ -733,7 +733,7 @@ func TestUpdateFirewall(t *testing.T) {
                 "category": "dedicated",
                 "os_type": "Ubuntu 20.04 THOR_TRANSFER"
             },
-            "hostId": "ca09528b7a51ae54755143e60c57bdca5d68d3475d77f6759f728c9e",
+            "hostID": "ca09528b7a51ae54755143e60c57bdca5d68d3475d77f6759f728c9e",
             "flavor": {
                 "id": "d470460e-d803-41ff-998c-a013ded4a8c8",
                 "name": "2c_2g_dedicated",
@@ -876,50 +876,4 @@ func TestDeleteFirewallRule(t *testing.T) {
 	resp, err := client.CloudServer.Firewalls().DeleteRule(ctx, "48dc460b-3ea7-4cb3-bc5d-1d41f297dcd0")
 	require.NoError(t, err)
 	assert.Equal(t, "Deleted Firewall Rule", resp.Message)
-}
-
-func TestCreateFirewallRule(t *testing.T) {
-	setup()
-	defer teardown()
-	mux.HandleFunc(testlib.CloudServerURL(firewallBasePath+"/f09bfc4b-92a9-468a-b41d-6ba8d4bd7552/rules"), func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodPost, r.Method)
-		resp := `
-{
-    "security_group_rule": {
-        "id": "45c37e35-86ff-4fc6-9285-0bb9f5110db8",
-        "tenant_id": "a7d1e56edcac40d0896d2b97f414afc5",
-        "security_group_id": "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552",
-        "ethertype": "IPv4",
-        "direction": "ingress",
-        "protocol": "udp",
-        "port_range_min": 80,
-        "port_range_max": 90,
-        "remote_ip_prefix": "0.0.0.0/0",
-        "remote_group_id": null,
-        "description": "CUSTOM",
-        "created_at": "2020-09-11T07:27:21Z",
-        "updated_at": "2020-09-11T07:27:21Z",
-        "revision_number": 0,
-        "project_id": "a7d1e56edcac40d0896d2b97f414afc5"
-    }
-}
-`
-		_, _ = fmt.Fprint(w, resp)
-	})
-
-	var fsrcr = FirewallSingleRuleCreateRequest{
-		Direction: "ingress",
-		FirewallRuleCreateRequest: FirewallRuleCreateRequest{
-			CIDR:      "0.0.0.0/0",
-			Protocol:  "UDP",
-			Type:      "CUSTOM",
-			PortRange: "80-90",
-		},
-	}
-	resp, err := client.CloudServer.Firewalls().CreateRule(ctx, "f09bfc4b-92a9-468a-b41d-6ba8d4bd7552", &fsrcr)
-	require.NoError(t, err)
-	assert.Equal(t, "45c37e35-86ff-4fc6-9285-0bb9f5110db8", resp.ID)
-	assert.Equal(t, "ingress", resp.Direction)
-	assert.Equal(t, "IPv4", resp.EtherType)
-	assert.Equal(t, "udp", resp.Protocol)
 }
