@@ -114,6 +114,9 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 			return nil, err
 		}
 		defer resp.Body.Close()
+		if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
+			return nil, err
+		}
 	}
 
 	// Get new services catalog after create token
