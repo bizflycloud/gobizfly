@@ -55,3 +55,7 @@ func VPCURL(path string) string {
 func DatabaseURL(path string) string {
 	return "/api/cloud-database" + path
 }
+
+func KMSURL(path string) string {
+	return "/api/ssl" + path
+}

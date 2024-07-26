@@ -95,6 +95,12 @@ func setup() {
 			ServiceURL:    serverTest.URL + "/api/cloud-database",
 			Region:        testRegion,
 		},
+		{
+			Name:          "KMS",
+			CanonicalName: kmsServiceName,
+			ServiceURL:    serverTest.URL + "/api/ssl",
+			Region:        testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {
