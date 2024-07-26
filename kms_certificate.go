@@ -18,7 +18,7 @@ type kmsCertificateService struct {
 	client *Client
 }
 
-func (k *kmsService) Certificate() *kmsCertificateService {
+func (k *kmsService) Certificates() *kmsCertificateService {
 	return &kmsCertificateService{
 		client: k.client,
 	}

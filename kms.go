@@ -5,6 +5,6 @@ type kmsService struct {
 }
 
 type KMSService interface {
-	Certificate() *kmsCertificateService
-	Secret() *kmsSecretService
+	Certificates() *kmsCertificateService
+	Secrets() *kmsSecretService
 }

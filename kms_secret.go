@@ -13,7 +13,7 @@ type kmsSecretService struct {
 	client *Client
 }
 
-func (k *kmsService) Secret() *kmsSecretService {
+func (k *kmsService) Secrets() *kmsSecretService {
 	return &kmsSecretService{
 		client: k.client,
 	}

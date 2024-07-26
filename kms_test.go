@@ -47,7 +47,7 @@ func TestListKMSCertificates1(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cert, err := c.KMS.Certificate().List(ctx)
+	cert, err := c.KMS.Certificates().List(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestGetKMSCertificate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cert, err := c.KMS.Certificate().Get(ctx, "366991bc-4622-458a-bbf5-4341bef3837e")
+	cert, err := c.KMS.Certificates().Get(ctx, "366991bc-4622-458a-bbf5-4341bef3837e")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -79,7 +79,7 @@ func TestCreateKMSCertificate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cert, _ := c.KMS.Certificate().Create(ctx, &KMSCertificateContainerCreateRequest{
+	cert, _ := c.KMS.Certificates().Create(ctx, &KMSCertificateContainerCreateRequest{
 		CertContainer: KMSCertContainer{
 			Name: "test1",
 			Certificate: KMSCertificateCreateReqest{
@@ -160,7 +160,7 @@ func TestDeleteKMSCertificate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = c.KMS.Certificate().Delete(ctx, "35ad8118-7212-463f-8cab-c351a25ec632")
+	err = c.KMS.Certificates().Delete(ctx, "35ad8118-7212-463f-8cab-c351a25ec632")
 	if err != nil {
 		t.Fatal(err)
 	}
