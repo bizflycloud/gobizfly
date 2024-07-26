@@ -25,7 +25,7 @@ func (k *kmsService) Certificate() *kmsCertificateService {
 }
 
 type KMSCertificate struct {
-	ContainerId string `json:"container_id"`
+	ContainerID string `json:"container_id"`
 	Name        string `json:"name"`
 }
 
@@ -66,12 +66,12 @@ type KMSCertificateCreateResponse struct {
 }
 
 type KMSCertificateListResponse struct {
-	CertificateContrainer []*KMSCertificate `json:"certificate_container"`
-	Total                 int               `json:"total"`
+	CertificateContainer []*KMSCertificate `json:"certificate_container"`
+	Total                int               `json:"total"`
 }
 
 type KMSCertificateGetResponse struct {
-	ContainerId string `json:"container_id"`
+	ContainerID string `json:"container_id"`
 	Name        string `json:"name"`
 	Certificate string `json:"certificate"`
 }
@@ -98,7 +98,7 @@ func (c *kmsCertificateService) List(ctx context.Context) ([]*KMSCertificate, er
 		return nil, err
 	}
 
-	return respDecode.CertificateContrainer, nil
+	return respDecode.CertificateContainer, nil
 }
 
 func (c *kmsCertificateService) Get(ctx context.Context, id string) (*KMSCertificateGetResponse, error) {
