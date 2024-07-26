@@ -33,6 +33,7 @@ const (
 	iamServiceName          = "iam"
 	kubernetesServiceName   = "kubernetes_engine"
 	loadBalancerServiceName = "load_balancer"
+	kmsServiceName          = "key_management_service"
 	mediaType               = "application/json; charset=utf-8"
 	serverServiceName       = "cloud_server"
 	ua                      = "bizfly-client-go/" + version
@@ -80,6 +81,7 @@ type Client struct {
 	KubernetesEngine  KubernetesEngineService
 	Service           ServiceInterface
 	Token             TokenService
+	KMS               KMSService
 }
 
 // Option set Client specific attributes
@@ -165,6 +167,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
 	c.Service = &service{client: c}
 	c.Token = &token{client: c}
+	c.KMS = &kmsService{client: c}
 	return c, nil
 }
 
