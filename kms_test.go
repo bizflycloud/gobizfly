@@ -1,85 +1,88 @@
 package gobizfly
 
 import (
-	"context"
 	"fmt"
+	"net/http"
 	"testing"
 
+	"github.com/bizflycloud/gobizfly/testlib"
 	"github.com/stretchr/testify/require"
 )
 
-func ClientInit() (*Client, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	client, err := NewClient(
-		WithAPIURL(""),
-		WithProjectID(""),
-		WithRegionName(""),
-	)
-	if err != nil {
-		fmt.Printf("Failed to create Bizfly client: %v", err)
-		return nil, err
-	}
-
-	token, err := client.Token.Init(
-		ctx,
-		&TokenCreateRequest{
-			AuthMethod:    "application_credential",
-			Username:      "",
-			Password:      "",
-			AppCredID:     "",
-			AppCredSecret: "",
-		})
-
-	if err != nil {
-		fmt.Printf("Failed to create token: %v", err)
-		return nil, err
-	}
-	client.SetKeystoneToken(token)
-
-	return client, nil
-}
-
 func TestListKMSCertificates1(t *testing.T) {
-	c, err := ClientInit()
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(testlib.KMSURL(certificateServicePath), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+	"certificate_container": [
+		{
+			"container_id": "366991bc-4622-458a-bbf5-4341bef3837e",
+			"name": "test1"
+		}
+	],
+	"total": 1
+}
+		`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	cert, err := client.KMS.Certificates().List(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cert, err := c.KMS.Certificates().List(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	require.NotEmpty(t, cert)
+	require.NoError(t, err)
+	require.Equal(t, 1, len(cert))
+	require.Equal(t, "test1", cert[0].Name)
+	require.Equal(t, "366991bc-4622-458a-bbf5-4341bef3837e", cert[0].ContainerID)
 
 	t.Log(cert)
 }
 
 func TestGetKMSCertificate(t *testing.T) {
-	c, err := ClientInit()
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(testlib.KMSURL(certificateServicePath)+"/366991bc-4622-458a-bbf5-4341bef3837e", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+{
+		"container_id": "366991bc-4622-458a-bbf5-4341bef3837e",
+		"name" : "test1",
+		"certificate": "certificate"
+}
+		`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	cert, err := client.KMS.Certificates().Get(ctx, "366991bc-4622-458a-bbf5-4341bef3837e")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	cert, err := c.KMS.Certificates().Get(ctx, "366991bc-4622-458a-bbf5-4341bef3837e")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	require.NotEmpty(t, cert)
+	require.NoError(t, err)
+	require.Equal(t, "test1", cert.Name)
+	require.Equal(t, "366991bc-4622-458a-bbf5-4341bef3837e", cert.ContainerID)
+	require.Equal(t, "certificate", cert.Certificate)
 
 	t.Log(cert)
 }
 
 func TestCreateKMSCertificate(t *testing.T) {
-	c, err := ClientInit()
-	if err != nil {
-		t.Fatal(err)
-	}
+	setup()
+	defer teardown()
 
-	cert, _ := c.KMS.Certificates().Create(ctx, &KMSCertificateContainerCreateRequest{
+	mux.HandleFunc(testlib.KMSURL(certificateServicePath), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		resp := `
+{
+		"certificate_href": "/kms/certificate/366991bc-4622-458a-bbf5-4341bef3837e"
+}
+		`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	cert, err := client.KMS.Certificates().Create(ctx, &KMSCertificateContainerCreateRequest{
 		CertContainer: KMSCertContainer{
 			Name: "test1",
 			Certificate: KMSCertificateCreateReqest{
@@ -145,25 +148,22 @@ LhIhYpJ8UsCVt5snWo2N+M+6ANh5tpWdQnEK6zILh4tRbuzaiHgb
 			// Intermediates: KMSIntermediatesCreateReqest{},
 		},
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	require.NoError(t, err)
+	require.Equal(t, "/kms/certificate/366991bc-4622-458a-bbf5-4341bef3837e", cert.CertificateHref)
 
 	t.Log(cert)
 }
 
 func TestDeleteKMSCertificate(t *testing.T) {
-	c, err := ClientInit()
-	if err != nil {
-		t.Fatal(err)
-	}
+	setup()
+	defer teardown()
 
-	err = c.KMS.Certificates().Delete(ctx, "35ad8118-7212-463f-8cab-c351a25ec632")
-	if err != nil {
-		t.Fatal(err)
-	}
+	mux.HandleFunc(testlib.KMSURL(certificateServicePath)+"/35ad8118-7212-463f-8cab-c351a25ec632", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	err := client.KMS.Certificates().Delete(ctx, "35ad8118-7212-463f-8cab-c351a25ec632")
 
 	require.NoError(t, err)
 
