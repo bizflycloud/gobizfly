@@ -60,7 +60,7 @@ type KubernetesPackagesResponse struct {
 }
 
 type KubernetesPackage struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
@@ -125,7 +125,6 @@ func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context) (*Ku
 	}
 	return data, nil
 }
-
 
 // GetKubernetesVersion - Get Kubernetes Engine Package from the Kubernetes Engine API
 func (c *kubernetesEngineService) GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error) {
