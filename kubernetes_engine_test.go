@@ -681,3 +681,58 @@ func TestGetNodeEverywhereByUUID(t *testing.T) {
 	assert.Equal(t, "n5s4coxhy30zwa0r", cluster.Shoot)
 	assert.Equal(t, "6515297b220963774dd304b0", cluster.PoolID)
 }
+
+
+func TestPackageStandardList(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc(testlib.K8sURL("/package/"), func(writer http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		// Validate the query parameter
+		query := r.URL.Query()
+		specify := query.Get("specify")
+		require.Equal(t, "standard", specify, "The specify query parameter should be 'standard'")
+
+		resp := `
+{
+  "packages":[
+      {
+        "id":"6609972809ba00eb5adc95e6",
+        "name":"STANDARD - 1",
+        "max_nodes":50,
+        "memory":8,
+        "high_availability":true,
+        "sla":"99.99",
+        "price":{
+            "amount":1386000,
+            "billing_cycle":"month"
+        },
+        "specify":"standard"
+      },
+      {
+        "id":"65dd8d678de21c6b5c4da1e5",
+        "name":"STANDARD - 0",
+        "max_nodes":10,
+        "memory":2,
+        "high_availability":false,
+        "sla":"99.00",
+        "price":{
+            "amount":0,
+            "billing_cycle":"month"
+        },
+        "specify":"standard"
+      }
+  ],
+  "page":1,
+  "limit":10,
+  "total":2
+}
+`
+		_, _ = fmt.Fprint(writer, resp)
+	})
+	packages, err := client.KubernetesEngine.GetPackages(ctx, "standard")
+	require.NoError(t, err)
+	assert.Len(t, packages.Packages, 2)
+	assert.LessOrEqual(t, "6609972809ba00eb5adc95e6", packages.Packages[0].ID)
+}

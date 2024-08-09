@@ -27,15 +27,17 @@ type EverywhereNode struct {
 
 // ClusterCreateRequest represents the request body for creating a Kubernetes cluster
 type ClusterCreateRequest struct {
-	Name         string       `json:"name"                   yaml:"name"`
-	Version      string       `json:"version"                yaml:"version"`
-	AutoUpgrade  bool         `json:"auto_upgrade,omitempty" yaml:"auto_upgrade,omitempty"`
-	VPCNetworkID string       `json:"private_network_id"     yaml:"private_network_id"`
-	EnableCloud  bool         `json:"enable_cloud,omitempty" yaml:"enable_cloud,omitempty"`
-	Tags         []string     `json:"tags,omitempty"         yaml:"tags,omitempty"`
-	LocalDNS     bool         `json:"local_dns"`
-	CNIPlugin    string       `json:"cni_plugin,omitempty"`
-	WorkerPools  []WorkerPool `json:"worker_pools"           yaml:"worker_pools"`
+	Name          string       `json:"name"                       yaml:"name"`
+	Version       string       `json:"version"                    yaml:"version"`
+	ProvisionType string       `json:"provision_type,omitempty"   yaml:"provision_type,omitempty"`
+	Package       string       `json:"package,omitempty"          yaml:"package,omitempty"`
+	AutoUpgrade   bool         `json:"auto_upgrade,omitempty"     yaml:"auto_upgrade,omitempty"`
+	VPCNetworkID  string       `json:"private_network_id"         yaml:"private_network_id"`
+	EnableCloud   bool         `json:"enable_cloud,omitempty"     yaml:"enable_cloud,omitempty"`
+	Tags          []string     `json:"tags,omitempty"             yaml:"tags,omitempty"`
+	LocalDNS      bool         `json:"local_dns"`
+	CNIPlugin     string       `json:"cni_plugin,omitempty"`
+	WorkerPools   []WorkerPool `json:"worker_pools"           yaml:"worker_pools"`
 }
 
 // ControllerVersion represents the version of the controller
