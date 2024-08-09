@@ -18,6 +18,7 @@ const (
 	clusterInfo           = "/engine/cluster_info"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
 	nodeEverywhere        = "/_/node_everywhere"
+	k8sPackages           = "/package/"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -45,12 +46,22 @@ type KubernetesEngineService interface {
 	UpdateCluster(ctx context.Context, id string, payload *UpdateClusterRequest) (*ExtendedCluster, error)
 	UpgradeClusterVersion(ctx context.Context, id string, payload *UpgradeClusterVersionRequest) error
 	GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error)
+	GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
 type KubernetesVersionResponse struct {
 	ControllerVersions []ControllerVersion `json:"controller_versions"`
 	WorkerVersion      []string            `json:"worker_versions"`
+}
+
+type KubernetesPackagesResponse struct {
+	Packages []KubernetesPackage `json:"packages"`
+}
+
+type KubernetesPackage struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
 }
 
 func (c *kubernetesEngineService) resourcePath() string {
@@ -109,6 +120,30 @@ func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context) (*Ku
 	defer resp.Body.Close()
 
 	var data *KubernetesVersionResponse
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+
+// GetKubernetesVersion - Get Kubernetes Engine Package from the Kubernetes Engine API
+func (c *kubernetesEngineService) GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, k8sPackages, nil)
+	if err != nil {
+		return nil, err
+	}
+	params := req.URL.Query()
+	params.Add("specify", provisionType)
+
+	req.URL.RawQuery = params.Encode()
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data *KubernetesPackagesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
