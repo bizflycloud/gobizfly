@@ -32,6 +32,19 @@ func TestClusterList(t *testing.T) {
         "description": null,
         "kubernetes_version": "v1.18.6"
       },
+      "package": {
+        "id": "6609972809ba00eb5adc95e6",
+        "name": "STANDARD - 1",
+        "max_nodes": 50,
+        "memory": 8,
+        "high_availability": true,
+        "sla": "99.99",
+        "price": {
+            "amount": 1386000,
+            "billing_cycle": "month"
+        },
+        "specify": "standard"
+      },
       "auto_upgrade": true,
       "tags": [],
       "provision_status": "PROVISIONED",
@@ -66,6 +79,19 @@ func TestClusterGet(t *testing.T) {
     "name": "v1.18.6-5f7d3a91",
     "description": null,
     "kubernetes_version": "v1.18.6"
+  },
+  "package": {
+    "id": "6609972809ba00eb5adc95e6",
+    "name": "STANDARD - 1",
+    "max_nodes": 50,
+    "memory": 8,
+    "high_availability": true,
+    "sla": "99.99",
+    "price": {
+        "amount": 1386000,
+        "billing_cycle": "month"
+    },
+    "specify": "standard"
   },
   "auto_upgrade": true,
   "tags": [],
@@ -137,6 +163,19 @@ func TestClusterCreate(t *testing.T) {
       "name": "v1.18.6-bke-5f6425f3",
       "description": "Kubernetes v1.18.6 on Bizfly Cloud",
       "kubernetes_version": "v1.18.6"
+    },
+    "package": {
+      "id": "6609972809ba00eb5adc95e6",
+      "name": "STANDARD - 1",
+      "max_nodes": 50,
+      "memory": 8,
+      "high_availability": true,
+      "sla": "99.99",
+      "price": {
+          "amount": 1386000,
+          "billing_cycle": "month"
+      },
+      "specify": "standard"
     },
     "private_network_id": "727caa8c-1ed1-4302-b659-5a92864dcdef",
     "auto_upgrade": true,
@@ -243,6 +282,19 @@ func TestClusterUpdate(t *testing.T) {
           "cilium",
           "kube-router"
         ]
+      },
+      "package": {
+        "id": "6609972809ba00eb5adc95e6",
+        "name": "STANDARD - 1",
+        "max_nodes": 50,
+        "memory": 8,
+        "high_availability": true,
+        "sla": "99.99",
+        "price": {
+            "amount": 1386000,
+            "billing_cycle": "month"
+        },
+        "specify": "standard"
       },
       "provision_type": "standard",
       "private_network_id": "2d70b001-5634-4dbe-8c3e-fe75a742a1ec",
@@ -468,6 +520,19 @@ func TestGetClusterWorkerPool(t *testing.T) {
   "id": "5f959e0ac0b18944d0a4f13a",
   "name": "pool-curdcqn2",
   "version": "v1.18.6",
+  "package": {
+    "id": "6609972809ba00eb5adc95e6",
+    "name": "STANDARD - 1",
+    "max_nodes": 50,
+    "memory": 8,
+    "high_availability": true,
+    "sla": "99.99",
+    "price": {
+        "amount": 1386000,
+        "billing_cycle": "month"
+    },
+    "specify": "standard"
+  },
   "flavor": "3c_6g_enterprise",
   "flavor_detail": {
     "name": "3c_6g_enterprise",
