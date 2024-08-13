@@ -58,6 +58,7 @@ type Cluster struct {
 	UID              string            `json:"uid"                yaml:"uid"`
 	Name             string            `json:"name"               yaml:"name"`
 	Version          ControllerVersion `json:"version"            yaml:"version"`
+	ClusterPackage   KubernetesPackage `json:"package"            yaml:"package"`
 	VPCNetworkID     string            `json:"private_network_id" yaml:"private_network_id"`
 	SubnetID         string            `json:"private_subnet_id"`
 	AutoUpgrade      bool              `json:"auto_upgrade"       yaml:"auto_upgrade"`
