@@ -3,6 +3,7 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -212,6 +213,15 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(
 	PoolID string,
 	NodeID string,
 ) error {
+	//check provisioning status of cluster
+	pool, err := c.GetClusterWorkerPool(ctx, clusterUID, PoolID)
+	if err != nil || pool == nil {
+		return err
+	}
+	if pool.ProvisionStatus != "PROVISIONED" {
+		return errors.New("Pool" + PoolID + " is not provisioned")
+	}
+
 	req, err := c.client.NewRequest(
 		ctx,
 		http.MethodDelete,
