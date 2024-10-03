@@ -115,6 +115,13 @@ func (c *kubernetesEngineService) RecycleNode(
 	poolID string,
 	nodePhysicalID string,
 ) error {
+	pool, err := c.GetClusterWorkerPool(ctx, clusterUID, poolID)
+	if err != nil || pool == nil {
+		return err
+	}
+	if pool.ProvisionStatus != "PROVISIONED" {
+		return errors.New("Pool" + poolID + " is not provisioned")
+	}
 	req, err := c.client.NewRequest(
 		ctx,
 		http.MethodPut,
@@ -135,6 +142,14 @@ func (c *kubernetesEngineService) RecycleNode(
 
 // DeleteClusterWorkerPool - Delete a worker pool in the given cluster
 func (c *kubernetesEngineService) DeleteClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) error {
+	pool, err := c.GetClusterWorkerPool(ctx, clusterUID, PoolID)
+	if err != nil || pool == nil {
+		return err
+	}
+	if pool.ProvisionStatus != "PROVISIONED" {
+		return errors.New("Pool" + PoolID + " is not provisioned")
+	}
+
 	req, err := c.client.NewRequest(
 		ctx,
 		http.MethodDelete,
@@ -188,6 +203,14 @@ func (c *kubernetesEngineService) UpdateClusterWorkerPool(
 	PoolID string,
 	uwp *UpdateWorkerPoolRequest,
 ) error {
+	pool, err := c.GetClusterWorkerPool(ctx, clusterUID, PoolID)
+	if err != nil || pool == nil {
+		return err
+	}
+	if pool.ProvisionStatus != "PROVISIONED" {
+		return errors.New("Pool" + PoolID + " is not provisioned")
+	}
+
 	req, err := c.client.NewRequest(
 		ctx,
 		http.MethodPatch,
