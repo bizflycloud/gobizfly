@@ -35,6 +35,7 @@ type CloudLoadBalancerExtendMemberUpdateRequest struct {
 	CloudLoadBalancerMemberUpdateRequest
 	Address      string `json:"address"`
 	ProtocolPort int    `json:"protocol_port"`
+	SubnetID     string `json:"subnet_id,omitempty"`
 }
 
 // CloudLoadBalancerBatchMemberUpdateRequest represents batch update member request payload.
