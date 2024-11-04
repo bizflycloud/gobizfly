@@ -233,14 +233,6 @@ func (ins *cloudDatabaseInstances) ListBackupSchedules(ctx context.Context, inst
 
 // Create a new instances
 func (ins *cloudDatabaseInstances) Create(ctx context.Context, icr *CloudDatabaseInstanceCreate) (*CloudDatabaseInstance, error) {
-	if icr.Datastore.Type == mongoDB && icr.Replicas != nil {
-		return nil, ErrMongoDBReplicas
-	}
-
-	if icr.Datastore.Type == mariaDB && icr.Secondaries != nil && icr.Secondaries.Quantity > 1 {
-		return nil, ErrMariaDBSecondariesQuantity
-	}
-
 	req, err := ins.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cloudDatabaseInstancesResourcePath, &icr)
 	if err != nil {
 		return nil, err
@@ -261,14 +253,6 @@ func (ins *cloudDatabaseInstances) Create(ctx context.Context, icr *CloudDatabas
 
 // CreateSuggestion get suggestion when create a new instance
 func (ins *cloudDatabaseInstances) CreateSuggestion(ctx context.Context, icr *CloudDatabaseInstanceCreate) (*CloudDatabaseSuggestion, error) {
-	if icr.Datastore.Type == mongoDB && icr.Replicas != nil {
-		return nil, ErrMongoDBReplicas
-	}
-
-	if icr.Datastore.Type == mariaDB && icr.Secondaries != nil && icr.Secondaries.Quantity > 1 {
-		return nil, ErrMariaDBSecondariesQuantity
-	}
-
 	// set true for get suggestion
 	icr.Suggestion = true
 

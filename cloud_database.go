@@ -28,10 +28,6 @@ var (
 	ErrRequireFlavorName = errors.New("resize flavor require flavor_name")
 	// ErrRequireNewSize for resource resize volume
 	ErrRequireNewSize = errors.New("resize volume require new_size")
-	// ErrMongoDBReplicas for create resource datastore type mongodb
-	ErrMongoDBReplicas = errors.New("MongoDB can't have replica node")
-	// ErrMariaDBSecondariesQuantity for create resource datastore type mariadb
-	ErrMariaDBSecondariesQuantity = errors.New("MariaDB can't have more than one secondary node")
 	// ErrListOption for get resource with list option
 	ErrListOption = errors.New("can't determine resource list option")
 )
