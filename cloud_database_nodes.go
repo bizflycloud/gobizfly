@@ -379,7 +379,7 @@ func (no *cloudDatabaseNodes) ResizeVolumeSuggestion(ctx context.Context, nodeID
 
 // Restart with an instances.
 func (no *cloudDatabaseNodes) Restart(ctx context.Context, nodeID string) (*CloudDatabaseMessageResponse, error) {
-	var iar = CloudDatabaseAction{Action: restart}
+	var iar = CloudDatabaseConfigAction{Action: restart}
 
 	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, no.resourceActionPath(nodeID), &iar)
 	if err != nil {
