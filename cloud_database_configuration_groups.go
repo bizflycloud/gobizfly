@@ -153,7 +153,7 @@ func (cfg *cloudDatabaseConfigurations) Action(ctx context.Context, nodeID strin
 
 // Attach with a configurations to node.
 func (cfg *cloudDatabaseConfigurations) Attach(ctx context.Context, nodeID string, cfgID string, all bool) (*CloudDatabaseMessageResponse, error) {
-	var iar = CloudDatabaseAction{Action: attach, ActionAll: all}
+	var iar = CloudDatabaseConfigAction{Action: attach}
 
 	req, err := cfg.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cfg.resourceActionPath(nodeID, cfgID), &iar)
 	if err != nil {

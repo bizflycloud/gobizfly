@@ -98,6 +98,11 @@ type CloudDatabaseAction struct {
 	Suggestion   bool                   `json:"suggestion,omitempty"`
 }
 
+// CloudDatabaseConfigAction contains database instance action information.
+type CloudDatabaseConfigAction struct {
+	Action string `json:"action" validate:"required"`
+}
+
 // CloudDatabaseDBReq contains databases information to send API
 type CloudDatabaseDBReq struct {
 	Databases []*CloudDatabaseDB `json:"databases,omitempty" validate:"required"`
