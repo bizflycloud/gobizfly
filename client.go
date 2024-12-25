@@ -33,6 +33,7 @@ const (
 	iamServiceName          = "iam"
 	kubernetesServiceName   = "kubernetes_engine"
 	loadBalancerServiceName = "load_balancer"
+	simpleStorage           = "simple_storage"
 	kmsServiceName          = "key_management_service"
 	mediaType               = "application/json; charset=utf-8"
 	serverServiceName       = "cloud_server"
@@ -67,21 +68,22 @@ type Client struct {
 	httpClient *http.Client
 	services   []*Service
 
-	Account           AccountService
-	AutoScaling       AutoScalingService
-	CDN               CDNService
-	CloudBackup       CloudBackupService
-	CloudDatabase     CloudDatabaseService
-	CloudLoadBalancer LoadBalancerService
-	CloudServer       CloudServerService
-	CloudWatcher      CloudWatcherService
-	ContainerRegistry ContainerRegistryService
-	DNS               DNSService
-	IAM               IAMService
-	KubernetesEngine  KubernetesEngineService
-	Service           ServiceInterface
-	Token             TokenService
-	KMS               KMSService
+	Account                AccountService
+	AutoScaling            AutoScalingService
+	CDN                    CDNService
+	CloudBackup            CloudBackupService
+	CloudDatabase          CloudDatabaseService
+	CloudLoadBalancer      LoadBalancerService
+	CloudSimpleStoreBucket CloudSimpleStoreBucket
+	CloudServer            CloudServerService
+	CloudWatcher           CloudWatcherService
+	ContainerRegistry      ContainerRegistryService
+	DNS                    DNSService
+	IAM                    IAMService
+	KubernetesEngine       KubernetesEngineService
+	Service                ServiceInterface
+	Token                  TokenService
+	KMS                    KMSService
 }
 
 // Option set Client specific attributes
@@ -165,6 +167,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.IAM = &iamService{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
+	c.CloudSimpleStoreBucket = &cloudSimpleStoreBucketService{client: c}
 	c.Service = &service{client: c}
 	c.Token = &token{client: c}
 	c.KMS = &kmsService{client: c}
