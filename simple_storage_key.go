@@ -54,12 +54,12 @@ type key struct {
 	AccessKey string `json:"access_key"`
 }
 
-func (c *cloudSimpleStoreBucketService) SimpleStoreKey() *cloudSimpleStoreKeyService {
+func (c *cloudSimpleStoreService) SimpleStoreKey() *cloudSimpleStoreKeyService {
 	return &cloudSimpleStoreKeyService{client: c.client}
 }
 
 func (c cloudSimpleStoreKeyService) Create(ctx context.Context, dataCreatekey *KeyCreateRequest) (*ResponseKeyCreate, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorage, c.resourcePath(), &dataCreatekey)
+	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorageServiceName, c.resourcePath(), &dataCreatekey)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (c *cloudSimpleStoreKeyService) itemPath(id string) string {
 }
 
 func (c *cloudSimpleStoreKeyService) Delete(ctx context.Context, id string) error {
-	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorage, c.itemPath(id), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (c *cloudSimpleStoreKeyService) Delete(ctx context.Context, id string) erro
 }
 
 func (c *cloudSimpleStoreKeyService) Get(ctx context.Context, id string) (*dataKeys, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorage, c.itemPath(id), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.itemPath(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func (c *cloudSimpleStoreKeyService) Get(ctx context.Context, id string) (*dataK
 }
 
 func (c *cloudSimpleStoreKeyService) List(ctx context.Context, opts *ListOptions) ([]*key, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorage, c.resourcePath(), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}

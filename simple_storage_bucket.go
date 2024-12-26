@@ -15,25 +15,25 @@ import (
 )
 
 const (
-	simpleStorageBucketPath = "/simple-storage/_/"
+	simpleStoragePath = "/simple-storage/_/"
 )
 
-var _ CloudSimpleStoreBucket = (CloudSimpleStoreBucket)(nil)
+var _ SimpleStorageService = (*cloudSimpleStoreService)(nil)
 
-type CloudSimpleStoreBucket interface {
+type SimpleStorageService interface {
 	Create(ctx context.Context, s3cr *BucketCreateRequest) (*Bucket, error)
 	List(ctx context.Context, opts *ListOptions) ([]*Bucket, error)
 	ListWithBucketNameInfo(ctx context.Context, paramBucket ParamListWithBucketNameInfo) (*ResponseListBucketWithName, error)
 	Delete(ctx context.Context, id string) error
 
 	UpdateAcl(ctx context.Context, acl, bucketName string) (*ResponseUpdateACL, error)
-	UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*Versioning, error)
-	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*Cors, error)
+	UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*ResponseVersioning, error)
+	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
 
 	SimpleStoreKey() *cloudSimpleStoreKeyService
 }
-type cloudSimpleStoreBucketService struct {
+type cloudSimpleStoreService struct {
 	client *Client
 }
 
@@ -53,18 +53,7 @@ type Bucket struct {
 	DefaultStorageClass string    `json:"default_storage_class"`
 }
 
-type Statement struct {
-	User     string   `json:"user"`
-	TenantId string   `json:"tenant_id"`
-	Effect   string   `json:"effect"`
-	Actions  []string `json:"actions"`
-}
-
-type Policy struct {
-	Statements []Statement `json:"statements"`
-}
-
-type Acl struct {
+type ResponseAcl struct {
 	Message string `json:"message"`
 	Owner   struct {
 		Id          string `json:"id"`
@@ -83,7 +72,7 @@ type Acl struct {
 }
 
 type ResponseUpdateACL struct {
-	Acl Acl `json:"acl"`
+	Acl ResponseAcl `json:"acl"`
 }
 
 type Rules struct {
@@ -102,7 +91,7 @@ type ParamUpdateCors struct {
 	BucketName string  `json:"bucket_name"`
 }
 
-type Cors struct {
+type ResponseCors struct {
 	Message string `json:"message"`
 	Rules   []struct {
 		AllowedOrigin  string        `json:"allowed_origin"`
@@ -132,11 +121,9 @@ type ResponseWebsiteConfig struct {
 }
 
 type ResponseListBucketWithName struct {
-	Bucket Bucket `json:"bucket"`
-	Policy struct {
-	} `json:"policy"`
-	Acl  Acl `json:"acl"`
-	Cors struct {
+	Bucket Bucket      `json:"bucket"`
+	Acl    ResponseAcl `json:"acl"`
+	Cors   struct {
 		Rules []struct {
 			AllowedOrigin  string   `json:"allowed_origin"`
 			AllowedMethods []string `json:"allowed_methods"`
@@ -153,33 +140,6 @@ type ResponseListBucketWithName struct {
 		Index      string `json:"index"`
 		Error      string `json:"error"`
 	} `json:"website_config"`
-	LifecycleConfig struct {
-		Rules []struct {
-			ID         string `json:"ID"`
-			Status     string `json:"Status"`
-			Prefix     string `json:"Prefix"`
-			Expiration struct {
-				Date                      time.Time `json:"Date"`
-				Days                      int       `json:"Days"`
-				ExpiredObjectDeleteMarker bool      `json:"ExpiredObjectDeleteMarker"`
-			} `json:"Expiration"`
-			Transitions []struct {
-				Date         time.Time `json:"Date"`
-				Days         int       `json:"Days"`
-				StorageClass string    `json:"StorageClass"`
-			} `json:"Transitions"`
-			NoncurrentVersionTransitions []struct {
-				NoncurrentDays int    `json:"NoncurrentDays"`
-				StorageClass   string `json:"StorageClass"`
-			} `json:"NoncurrentVersionTransitions"`
-			NoncurrentVersionExpiration struct {
-				NoncurrentDays int `json:"NoncurrentDays"`
-			} `json:"NoncurrentVersionExpiration"`
-			AbortIncompleteMultipartUpload struct {
-				DaysAfterInitiation int `json:"DaysAfterInitiation"`
-			} `json:"AbortIncompleteMultipartUpload"`
-		} `json:"Rules"`
-	} `json:"lifecycle_config"`
 	Quota struct {
 		Enabled    bool `json:"enabled"`
 		MaxObjects int  `json:"max_objects"`
@@ -200,28 +160,14 @@ type ParamListWithBucketNameInfo struct {
 	BucketName      string `json:"bucket_name"`
 }
 
-type Versioning struct {
+type ResponseVersioning struct {
 	Message string `json:"message"`
 	Status  string `json:"status"`
 }
 
-type ParamObject struct {
-	BucketName string `json:"bucket_name"`
-	ObjectPath string `json:"object_path"`
-}
-
-type ResponseCreateObject struct {
-	Message string `json:"message"`
-	Object  struct {
-		Name string `json:"name"`
-		Type string `json:"type"`
-	}
-}
-
 func getQueryPaths(param interface{}) []string {
-	// Slice để chứa các phần của query string
 	queryParts := []string{}
-	// Sử dụng reflect để duyệt qua các trường trong struct
+	// Using reflect to iterate through fields in a struct
 	v := reflect.ValueOf(param)
 	t := v.Type()
 
@@ -233,7 +179,7 @@ func getQueryPaths(param interface{}) []string {
 			continue
 		}
 
-		// Chỉ thêm vào query nếu giá trị không rỗng
+		// Only add to the query if the value is not empty
 		if value.Kind() == reflect.String && value.String() != "" {
 			queryParts = append(queryParts, fmt.Sprintf("%s=%s", field.Tag.Get("json"), value.String()))
 		}
@@ -242,39 +188,27 @@ func getQueryPaths(param interface{}) []string {
 
 }
 
-func (c *cloudSimpleStoreBucketService) resourcePathWithBucketInfo(param ParamListWithBucketNameInfo) string {
-	// Slice để chứa các phần của query string
+func (c *cloudSimpleStoreService) resourcePathWithBucketInfo(param ParamListWithBucketNameInfo) string {
 	queryParts := getQueryPaths(param)
-
-	// Kết hợp query string
 	query := strings.Join(queryParts, "&")
 	bucketName := param.BucketName
-	// Kết hợp với bucketName để tạo đường dẫn đầy đủ
-
-	return fmt.Sprintf("%s%s?%s", simpleStorageBucketPath, bucketName, query)
+	return fmt.Sprintf("%s%s?%s", simpleStoragePath, bucketName, query)
 }
 
-func (c *cloudSimpleStoreBucketService) resourcePathObject(param ParamObject) string {
-
-	bucketName := param.BucketName
-	nameFolder := url.QueryEscape(param.ObjectPath)
-	return fmt.Sprintf("%s%s/%s", simpleStorageBucketPath, bucketName, nameFolder)
+func (c *cloudSimpleStoreService) resourcePathUpdateOption(bucketName, path string) string {
+	return fmt.Sprintf("%s%s?%s", simpleStoragePath, bucketName, path)
 }
 
-func (c *cloudSimpleStoreBucketService) resourcePathUpdateOption(bucketName, path string) string {
-	return fmt.Sprintf("%s%s?%s", simpleStorageBucketPath, bucketName, path)
+func (c *cloudSimpleStoreService) resourcePath() string {
+	return simpleStoragePath
 }
 
-func (c *cloudSimpleStoreBucketService) resourcePath() string {
-	return simpleStorageBucketPath
+func (c *cloudSimpleStoreService) itemPath(id string) string {
+	return strings.Join([]string{simpleStoragePath, id}, "/")
 }
 
-func (l *cloudSimpleStoreBucketService) itemPath(id string) string {
-	return strings.Join([]string{simpleStorageBucketPath, id}, "/")
-}
-
-func (c cloudSimpleStoreBucketService) Create(ctx context.Context, bucket *BucketCreateRequest) (*Bucket, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorage, c.resourcePath(), &bucket)
+func (c cloudSimpleStoreService) Create(ctx context.Context, bucket *BucketCreateRequest) (*Bucket, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorageServiceName, c.resourcePath(), &bucket)
 	if err != nil {
 		return nil, err
 	}
@@ -294,8 +228,8 @@ func (c cloudSimpleStoreBucketService) Create(ctx context.Context, bucket *Bucke
 	return respData.Buckets, nil
 }
 
-func (c *cloudSimpleStoreBucketService) List(ctx context.Context, opts *ListOptions) ([]*Bucket, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorage, c.resourcePath(), nil)
+func (c *cloudSimpleStoreService) List(ctx context.Context, opts *ListOptions) ([]*Bucket, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -315,11 +249,11 @@ func (c *cloudSimpleStoreBucketService) List(ctx context.Context, opts *ListOpti
 	return data.Buckets, nil
 }
 
-func (c *cloudSimpleStoreBucketService) ListWithBucketNameInfo(ctx context.Context, paramBucket ParamListWithBucketNameInfo) (*ResponseListBucketWithName, error) {
+func (c *cloudSimpleStoreService) ListWithBucketNameInfo(ctx context.Context, paramBucket ParamListWithBucketNameInfo) (*ResponseListBucketWithName, error) {
 	if paramBucket.BucketName == "" {
 		return nil, errors.New("InvalidBucketName")
 	}
-	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorage, c.resourcePathWithBucketInfo(paramBucket), nil)
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.resourcePathWithBucketInfo(paramBucket), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -337,8 +271,8 @@ func (c *cloudSimpleStoreBucketService) ListWithBucketNameInfo(ctx context.Conte
 	return &data, nil
 }
 
-func (c *cloudSimpleStoreBucketService) Delete(ctx context.Context, id string) error {
-	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorage, c.itemPath(id), nil)
+func (c *cloudSimpleStoreService) Delete(ctx context.Context, id string) error {
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.itemPath(id), nil)
 	if err != nil {
 		return err
 	}
@@ -351,7 +285,7 @@ func (c *cloudSimpleStoreBucketService) Delete(ctx context.Context, id string) e
 	return resp.Body.Close()
 }
 
-func (c *cloudSimpleStoreBucketService) UpdateAcl(ctx context.Context, acl, bucketName string) (*ResponseUpdateACL, error) {
+func (c *cloudSimpleStoreService) UpdateAcl(ctx context.Context, acl, bucketName string) (*ResponseUpdateACL, error) {
 	if bucketName == "" {
 		return nil, errors.New("InvalidBucketName")
 	}
@@ -360,7 +294,7 @@ func (c *cloudSimpleStoreBucketService) UpdateAcl(ctx context.Context, acl, buck
 	}{
 		Acl: acl,
 	}
-	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorage, c.resourcePathUpdateOption(bucketName, "acl"), &paramUpdateAcl)
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorageServiceName, c.resourcePathUpdateOption(bucketName, "acl"), &paramUpdateAcl)
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +312,7 @@ func (c *cloudSimpleStoreBucketService) UpdateAcl(ctx context.Context, acl, buck
 	return data, nil
 }
 
-func (c *cloudSimpleStoreBucketService) UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*Versioning, error) {
+func (c *cloudSimpleStoreService) UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*ResponseVersioning, error) {
 	if bucketName == "" {
 		return nil, errors.New("InvalidBucketName")
 	}
@@ -387,7 +321,7 @@ func (c *cloudSimpleStoreBucketService) UpdateVersioning(ctx context.Context, ve
 	}{
 		Versioning: versioning,
 	}
-	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorage, c.resourcePathUpdateOption(bucketName, "versioning"), &paramUpdateVersion)
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorageServiceName, c.resourcePathUpdateOption(bucketName, "versioning"), &paramUpdateVersion)
 	if err != nil {
 		return nil, err
 	}
@@ -397,7 +331,7 @@ func (c *cloudSimpleStoreBucketService) UpdateVersioning(ctx context.Context, ve
 	}
 	defer resp.Body.Close()
 
-	var data *Versioning
+	var data *ResponseVersioning
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -405,7 +339,7 @@ func (c *cloudSimpleStoreBucketService) UpdateVersioning(ctx context.Context, ve
 	return data, nil
 }
 
-func (c *cloudSimpleStoreBucketService) UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*Cors, error) {
+func (c *cloudSimpleStoreService) UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error) {
 	if paramUpdateCors.BucketName == "" {
 		return nil, errors.New("InvalidBucketName")
 	}
@@ -417,7 +351,7 @@ func (c *cloudSimpleStoreBucketService) UpdateCors(ctx context.Context, paramUpd
 		},
 	}
 
-	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorage, c.resourcePathUpdateOption(paramUpdateCors.BucketName, "cors"), &paramCors)
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorageServiceName, c.resourcePathUpdateOption(paramUpdateCors.BucketName, "cors"), &paramCors)
 	if err != nil {
 		return nil, err
 	}
@@ -428,7 +362,7 @@ func (c *cloudSimpleStoreBucketService) UpdateCors(ctx context.Context, paramUpd
 	defer resp.Body.Close()
 
 	var data struct {
-		Cors *Cors `json:"cors"`
+		Cors *ResponseCors `json:"cors"`
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -437,7 +371,7 @@ func (c *cloudSimpleStoreBucketService) UpdateCors(ctx context.Context, paramUpd
 	return data.Cors, nil
 }
 
-func (c *cloudSimpleStoreBucketService) UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error) {
+func (c *cloudSimpleStoreService) UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error) {
 	if paramUpdateWebsiteConfig.BucketName == "" {
 		return nil, errors.New("InvalidBucketName")
 	}
@@ -450,7 +384,7 @@ func (c *cloudSimpleStoreBucketService) UpdateWebsiteConfig(ctx context.Context,
 		},
 	}
 
-	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorage, c.resourcePathUpdateOption(paramUpdateWebsiteConfig.BucketName, "website_config"), &paramWeb)
+	req, err := c.client.NewRequest(ctx, http.MethodPatch, simpleStorageServiceName, c.resourcePathUpdateOption(paramUpdateWebsiteConfig.BucketName, "website_config"), &paramWeb)
 	if err != nil {
 		return nil, err
 	}
