@@ -10,11 +10,10 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 )
 
 const (
-	simpleStoragePath = "/simple-storage/_/"
+	simpleStoragePath = "/_/"
 )
 
 var _ SimpleStorageService = (*cloudSimpleStoreService)(nil)
@@ -44,12 +43,12 @@ type BucketCreateRequest struct {
 }
 
 type Bucket struct {
-	Name                string    `json:"name"`
-	CreatedAt           time.Time `json:"created_at"`
-	Location            string    `json:"location"`
-	SizeKb              int       `json:"size_kb"`
-	NumObjects          int       `json:"num_objects"`
-	DefaultStorageClass string    `json:"default_storage_class"`
+	Name                string `json:"name"`
+	CreatedAt           string `json:"created_at"`
+	Location            string `json:"location"`
+	SizeKb              int    `json:"size_kb"`
+	NumObjects          int    `json:"num_objects"`
+	DefaultStorageClass string `json:"default_storage_class"`
 }
 
 type ResponseAcl struct {
@@ -74,7 +73,7 @@ type ResponseUpdateACL struct {
 	Acl ResponseAcl `json:"acl"`
 }
 
-type Rules struct {
+type Rule struct {
 	AllowedOrigin  string   `json:"allowed_origin"`
 	AllowedMethods []string `json:"allowed_methods"`
 	AllowedHeaders []string `json:"allowed_headers"`
@@ -82,23 +81,17 @@ type Rules struct {
 }
 
 type ParamUpdateCorsRead struct {
-	Rules []Rules `json:"rules"`
+	Rules []Rule `json:"rules"`
 }
 
 type ParamUpdateCors struct {
-	Rules      []Rules `json:"rules"`
-	BucketName string  `json:"bucket_name"`
+	Rules      []Rule `json:"rules"`
+	BucketName string `json:"bucket_name"`
 }
 
 type ResponseCors struct {
 	Message string `json:"message"`
-	Rules   []struct {
-		AllowedOrigin  string        `json:"allowed_origin"`
-		AllowedMethods []string      `json:"allowed_methods"`
-		AllowedHeaders []interface{} `json:"allowed_headers"`
-		ExposedHeaders []interface{} `json:"exposed_headers"`
-		MaxAgeSeconds  int           `json:"max_age_seconds"`
-	} `json:"rules"`
+	Rules   []Rule `json:"rules"`
 }
 
 type ParamUpdateWebsiteConfig struct {
@@ -123,13 +116,7 @@ type ResponseListBucketWithName struct {
 	Bucket Bucket      `json:"bucket"`
 	Acl    ResponseAcl `json:"acl"`
 	Cors   struct {
-		Rules []struct {
-			AllowedOrigin  string   `json:"allowed_origin"`
-			AllowedMethods []string `json:"allowed_methods"`
-			AllowedHeaders []string `json:"allowed_headers"`
-			ExposedHeaders []string `json:"exposed_headers"`
-			MaxAgeSeconds  int      `json:"max_age_seconds"`
-		} `json:"rules"`
+		Rules []Rule `json:"rules"`
 	} `json:"cors"`
 	Versioning struct {
 		Status string `json:"status"`
@@ -139,13 +126,6 @@ type ResponseListBucketWithName struct {
 		Index      string `json:"index"`
 		Error      string `json:"error"`
 	} `json:"website_config"`
-	Quota struct {
-		Enabled    bool `json:"enabled"`
-		MaxObjects int  `json:"max_objects"`
-		MaxSize    int  `json:"max_size"`
-		MaxSizeKb  int  `json:"max_size_kb"`
-	} `json:"quota"`
-	Tags []string `json:"tags"`
 }
 
 type ParamListWithBucketNameInfo struct {
@@ -203,7 +183,7 @@ func (c *cloudSimpleStoreService) resourcePath() string {
 }
 
 func (c *cloudSimpleStoreService) itemPath(id string) string {
-	return strings.Join([]string{simpleStoragePath, id}, "/")
+	return strings.Join([]string{simpleStoragePath, id}, "")
 }
 
 func (c cloudSimpleStoreService) Create(ctx context.Context, bucket *BucketCreateRequest) (*Bucket, error) {
@@ -330,12 +310,14 @@ func (c *cloudSimpleStoreService) UpdateVersioning(ctx context.Context, versioni
 	}
 	defer resp.Body.Close()
 
-	var data *ResponseVersioning
+	var data struct {
+		Versioning *ResponseVersioning `json:"versioning"`
+	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return data.Versioning, nil
 }
 
 func (c *cloudSimpleStoreService) UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error) {
