@@ -18,26 +18,27 @@ import (
 )
 
 const (
-	appCredentialAuthType   = "application_credential"
-	accountName             = "bizfly_account"
-	authServiceName         = "auth"
-	autoScalingServiceName  = "auto_scaling"
-	cdnName                 = "cdn"
-	cloudBackupServiceName  = "cloud-backup"
-	cloudwatcherServiceName = "alert"
-	containerRegistryName   = "container_registry"
-	databaseServiceName     = "cloud_database"
-	defaultAPIURL           = "https://manage.bizflycloud.vn/api"
-	defaultAuthType         = "token"
-	dnsName                 = "dns"
-	iamServiceName          = "iam"
-	kubernetesServiceName   = "kubernetes_engine"
-	loadBalancerServiceName = "load_balancer"
-	kmsServiceName          = "key_management_service"
-	mediaType               = "application/json; charset=utf-8"
-	serverServiceName       = "cloud_server"
-	ua                      = "bizfly-client-go/" + version
-	version                 = "0.0.1"
+	appCredentialAuthType    = "application_credential"
+	accountName              = "bizfly_account"
+	authServiceName          = "auth"
+	autoScalingServiceName   = "auto_scaling"
+	cdnName                  = "cdn"
+	cloudBackupServiceName   = "cloud-backup"
+	cloudwatcherServiceName  = "alert"
+	containerRegistryName    = "container_registry"
+	databaseServiceName      = "cloud_database"
+	defaultAPIURL            = "https://manage.bizflycloud.vn/api"
+	defaultAuthType          = "token"
+	dnsName                  = "dns"
+	iamServiceName           = "iam"
+	kubernetesServiceName    = "kubernetes_engine"
+	loadBalancerServiceName  = "load_balancer"
+	simpleStorageServiceName = "simple_storage"
+	kmsServiceName           = "key_management_service"
+	mediaType                = "application/json; charset=utf-8"
+	serverServiceName        = "cloud_server"
+	ua                       = "bizfly-client-go/" + version
+	version                  = "0.0.1"
 )
 
 var (
@@ -67,21 +68,22 @@ type Client struct {
 	httpClient *http.Client
 	services   []*Service
 
-	Account           AccountService
-	AutoScaling       AutoScalingService
-	CDN               CDNService
-	CloudBackup       CloudBackupService
-	CloudDatabase     CloudDatabaseService
-	CloudLoadBalancer LoadBalancerService
-	CloudServer       CloudServerService
-	CloudWatcher      CloudWatcherService
-	ContainerRegistry ContainerRegistryService
-	DNS               DNSService
-	IAM               IAMService
-	KubernetesEngine  KubernetesEngineService
-	Service           ServiceInterface
-	Token             TokenService
-	KMS               KMSService
+	Account            AccountService
+	AutoScaling        AutoScalingService
+	CDN                CDNService
+	CloudBackup        CloudBackupService
+	CloudDatabase      CloudDatabaseService
+	CloudLoadBalancer  LoadBalancerService
+	CloudSimpleStorage SimpleStorageService
+	CloudServer        CloudServerService
+	CloudWatcher       CloudWatcherService
+	ContainerRegistry  ContainerRegistryService
+	DNS                DNSService
+	IAM                IAMService
+	KubernetesEngine   KubernetesEngineService
+	Service            ServiceInterface
+	Token              TokenService
+	KMS                KMSService
 }
 
 // Option set Client specific attributes
@@ -165,6 +167,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.IAM = &iamService{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
+	c.CloudSimpleStorage = &cloudSimpleStoreService{client: c}
 	c.Service = &service{client: c}
 	c.Token = &token{client: c}
 	c.KMS = &kmsService{client: c}

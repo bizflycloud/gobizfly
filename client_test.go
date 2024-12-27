@@ -36,6 +36,12 @@ func setup() {
 			Region:        testRegion,
 		},
 		{
+			Name:          "Simple Storage",
+			CanonicalName: simpleStorageServiceName,
+			ServiceURL:    serverTest.URL + "/api/simple-storage",
+			Region:        testRegion,
+		},
+		{
 			Name:          "CloudWatcher",
 			CanonicalName: cloudwatcherServiceName,
 			ServiceURL:    serverTest.URL + "/api/alert",

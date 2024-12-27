@@ -12,6 +12,10 @@ func LoadBalancerURL(path string) string {
 	return "/api/loadbalancers" + path
 }
 
+func SimpleStorageURL(path string) string {
+	return "/api/simple-storage" + path
+}
+
 func CloudWatcherURL(path string) string {
 	return "/api/alert" + path
 }
