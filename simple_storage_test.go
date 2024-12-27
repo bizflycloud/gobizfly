@@ -175,6 +175,7 @@ func TestSimpleStorageDelete(t *testing.T) {
 	setup()
 	defer teardown()
 
+
 	var c cloudSimpleStorageService
 	mux.HandleFunc(testlib.SimpleStorageURL(c.itemPath("testbucket")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
@@ -353,6 +354,7 @@ func TestSimpleStorageKeyList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
+
 	keyList, err := client.CloudSimpleStorage.SimpleStorageKey().List(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, "oked00e1f04d4a1a9dc72bd7447ee176:cuong01", keyList[0].User)
@@ -374,6 +376,7 @@ func TestSimpleStorageKeyGet(t *testing.T) {
 `
 		_, _ = fmt.Fprint(w, resp)
 	})
+
 
 	keyGet, err := client.CloudSimpleStorage.SimpleStorageKey().Get(ctx, "UITOU3XAR6TW1F2C3KYF")
 	require.NoError(t, err)
@@ -404,6 +407,7 @@ func TestSimpleStorageKeyCreate(t *testing.T) {
 		AccessKey: "okeQJF4UNILQHS8054GI",
 		SecretKey: "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5",
 	}
+
 	keyCreate, err := client.CloudSimpleStorage.SimpleStorageKey().Create(ctx, &cr)
 	require.NoError(t, err)
 	require.Equal(t, "okeQJF4UNILQHS8054GI", keyCreate.AccessKey)
