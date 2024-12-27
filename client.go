@@ -167,7 +167,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.IAM = &iamService{client: c}
 	c.KubernetesEngine = &kubernetesEngineService{client: c}
 	c.CloudLoadBalancer = &cloudLoadBalancerService{client: c}
-	c.CloudSimpleStorage = &cloudSimpleStoreService{client: c}
+	c.CloudSimpleStorage = &cloudSimpleStorageService{client: c}
 	c.Service = &service{client: c}
 	c.Token = &token{client: c}
 	c.KMS = &kmsService{client: c}
