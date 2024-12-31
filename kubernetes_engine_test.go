@@ -747,7 +747,6 @@ func TestGetNodeEverywhereByUUID(t *testing.T) {
 	assert.Equal(t, "6515297b220963774dd304b0", cluster.PoolID)
 }
 
-
 func TestPackageStandardList(t *testing.T) {
 	setup()
 	defer teardown()
