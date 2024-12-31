@@ -29,7 +29,7 @@ type SimpleStorageService interface {
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
 
-	SimpleStorageKey() *cloudSimpleStorageKeyService
+	SimpleStorageKey() *cloudSimpleStorageKeyResource
 }
 type cloudSimpleStorageService struct {
 	client *Client
