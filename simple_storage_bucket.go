@@ -384,3 +384,8 @@ func (c *cloudSimpleStorageService) UpdateWebsiteConfig(ctx context.Context, par
 	}
 	return data.WebsiteConfig, nil
 }
+
+
+func (c *cloudSimpleStorageService) SimpleStorageKey() *cloudSimpleStorageKeyResource {
+	return &cloudSimpleStorageKeyResource{client: c.client}
+}

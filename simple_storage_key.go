@@ -18,8 +18,8 @@ var _ SimpleStorageKeyService = (*cloudSimpleStorageKeyResource)(nil)
 
 
 type SimpleStorageKeyService interface {
-	Create(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSercret, error)
-	Get(ctx context.Context, id string) (*KeyHaveSercret, error)
+	Create(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSecret, error)
+	Get(ctx context.Context, id string) (*KeyHaveSecret, error)
 	Delete(ctx context.Context, id string) error
 	List(ctx context.Context, opts *ListOptions) ([]*KeyInList, error)
 }
@@ -30,7 +30,7 @@ type KeyCreateRequest struct {
 	SecretKey string `json:"secret_key"`
 }
 
-type KeyHaveSercret struct {
+type KeyHaveSecret struct {
 	AccessKey string `json:"access_key"`
 	SecretKey string `json:"secret_key"`
 }
@@ -45,11 +45,7 @@ type cloudSimpleStorageKeyResource struct {
 	client *Client
 }
 
-func (c *cloudSimpleStorageService) SimpleStorageKey() *cloudSimpleStorageKeyResource {
-	return &cloudSimpleStorageKeyResource{client: c.client}
-}
-
-func (c *cloudSimpleStorageKeyResource) Create(ctx context.Context, dataCreatekey *KeyCreateRequest) (*KeyHaveSercret, error) {
+func (c *cloudSimpleStorageKeyResource) Create(ctx context.Context, dataCreatekey *KeyCreateRequest) (*KeyHaveSecret, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorageServiceName, c.resourcePath(), &dataCreatekey)
 	if err != nil {
 		return nil, err
@@ -62,7 +58,7 @@ func (c *cloudSimpleStorageKeyResource) Create(ctx context.Context, dataCreateke
 
 	var respData struct {
 		Message string          `json:"message"`
-		Key     *KeyHaveSercret `json:"Key"`
+		Key     *KeyHaveSecret `json:"Key"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
 		return nil, err
@@ -95,7 +91,7 @@ func (c *cloudSimpleStorageKeyResource) Delete(ctx context.Context, id string) e
 	return resp.Body.Close()
 }
 
-func (c *cloudSimpleStorageKeyResource) Get(ctx context.Context, id string) (*KeyHaveSercret, error) {
+func (c *cloudSimpleStorageKeyResource) Get(ctx context.Context, id string) (*KeyHaveSecret, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.itemPath(id), nil)
 	if err != nil {
 		return nil, err
@@ -106,7 +102,7 @@ func (c *cloudSimpleStorageKeyResource) Get(ctx context.Context, id string) (*Ke
 	}
 	defer resp.Body.Close()
 
-	key := &KeyHaveSercret{}
+	key := &KeyHaveSecret{}
 	if err := json.NewDecoder(resp.Body).Decode(key); err != nil {
 		return nil, err
 	}
