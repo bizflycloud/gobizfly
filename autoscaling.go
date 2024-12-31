@@ -49,15 +49,15 @@ type autoscalingService struct {
 
 /*
 AutoScalingService is interface wrap others resource's interfaces. Includes:
-1. AutoScalingGroups: Provides function interact with an autoscaling group such as:
+ 1. AutoScalingGroups: Provides function interact with an autoscaling group such as:
     Create, Update, Delete
-2. Events: Provides function to list events of an autoscaling group
-3. LaunchConfigurations: Provides function to interact with launch configurations
-4. Nodes: Provides function to interact with members of autoscaling group
-5. Policies: Provides function to interact with autoscaling policies of autoscaling group
-6. Schedules: Provides function to interact with schedule for auto scaling
-7. Tasks: Provides function to get information of task
-8. Webhooks: Provides fucntion to list webhook triggers scale of autoscaling group
+ 2. Events: Provides function to list events of an autoscaling group
+ 3. LaunchConfigurations: Provides function to interact with launch configurations
+ 4. Nodes: Provides function to interact with members of autoscaling group
+ 5. Policies: Provides function to interact with autoscaling policies of autoscaling group
+ 6. Schedules: Provides function to interact with schedule for auto scaling
+ 7. Tasks: Provides function to get information of task
+ 8. Webhooks: Provides fucntion to list webhook triggers scale of autoscaling group
 */
 type AutoScalingService interface {
 	AutoScalingGroups() *autoScalingGroup

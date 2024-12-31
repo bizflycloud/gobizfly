@@ -404,6 +404,7 @@ func TestSimpleStorageKeyCreate(t *testing.T) {
 		AccessKey: "okeQJF4UNILQHS8054GI",
 		SecretKey: "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5",
 	}
+
 	keyCreate, err := client.CloudSimpleStorage.SimpleStorageKey().Create(ctx, &cr)
 	require.NoError(t, err)
 	require.Equal(t, "okeQJF4UNILQHS8054GI", keyCreate.AccessKey)
