@@ -392,7 +392,7 @@ var _ SimpleStorageKey = (*cloudSimpleStorageKeyResource)(nil)
 type SimpleStorageKey interface {
 	CreateAccessKey(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSecret, error)
 	GetAccessKey(ctx context.Context, id string) (*KeyHaveSecret, error)
-	DeleteAccessKey(ctx context.Context, id string) error
+	DeleteAccessKey(ctx context.Context, accessKey string) error
 	ListAccessKey(ctx context.Context, opts *ListOptions) ([]*KeyInList, error)
 }
 
@@ -452,8 +452,8 @@ func (c *cloudSimpleStorageKeyResource) keyItemPath(id string) string {
 	return strings.Join([]string{simpleStorageKeyPath, id}, "/")
 }
 
-func (c *cloudSimpleStorageKeyResource) DeleteAccessKey(ctx context.Context, id string) error {
-	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.keyItemPath(id), nil)
+func (c *cloudSimpleStorageKeyResource) DeleteAccessKey(ctx context.Context, accessKey string) error {
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.keyItemPath(accessKey), nil)
 	if err != nil {
 		return err
 	}
