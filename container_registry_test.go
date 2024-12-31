@@ -18,7 +18,7 @@ func TestReposList(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(testlib.RegistryURL(registryPath + "/"), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.RegistryURL(registryPath+"/"), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		resp := `
 {
@@ -45,7 +45,7 @@ func TestRepoCreate(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc(testlib.RegistryURL(registryPath + "/"), func(writer http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(testlib.RegistryURL(registryPath+"/"), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 		var payload *CreateRepositoryPayload
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))

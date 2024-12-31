@@ -14,10 +14,9 @@ const (
 	simpleStorageKeyPath = "/key"
 )
 
+var _ SimpleStorageKeyService = (*cloudSimpleStorageKeyService)(nil)
 
-var _ SimpleStorageKey = (*cloudSimpleStorageKeyService)(nil)
-
-type SimpleStorageKey interface {
+type SimpleStorageKeyService interface {
 	Create(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSercret, error)
 	Get(ctx context.Context, id string) (*KeyHaveSercret, error)
 	Delete(ctx context.Context, id string) error
@@ -44,7 +43,6 @@ type KeyInList struct {
 	AccessKey string `json:"access_key"`
 }
 
-
 func (c *cloudSimpleStorageService) SimpleStorageKey() *cloudSimpleStorageKeyService {
 	return &cloudSimpleStorageKeyService{client: c.client}
 }
@@ -70,7 +68,6 @@ func (c cloudSimpleStorageKeyService) Create(ctx context.Context, dataCreatekey 
 	return respData.Key, nil
 }
 
-
 func (c *cloudSimpleStorageKeyService) resourcePath() string {
 	return simpleStorageKeyPath
 }
@@ -81,7 +78,6 @@ func (c *cloudSimpleStorageKeyService) itemPath(id string) string {
 	}
 	return strings.Join([]string{simpleStorageKeyPath, id}, "/")
 }
-
 
 func (c *cloudSimpleStorageKeyService) Delete(ctx context.Context, id string) error {
 	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.itemPath(id), nil)
@@ -96,7 +92,6 @@ func (c *cloudSimpleStorageKeyService) Delete(ctx context.Context, id string) er
 
 	return resp.Body.Close()
 }
-
 
 func (c *cloudSimpleStorageKeyService) Get(ctx context.Context, id string) (*KeyHaveSercret, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.itemPath(id), nil)
@@ -115,7 +110,6 @@ func (c *cloudSimpleStorageKeyService) Get(ctx context.Context, id string) (*Key
 	}
 	return key, nil
 }
-
 
 func (c *cloudSimpleStorageKeyService) List(ctx context.Context, opts *ListOptions) ([]*KeyInList, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.resourcePath(), nil)

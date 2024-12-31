@@ -16,7 +16,6 @@ const (
 	simpleStoragePath = "/_/"
 )
 
-
 var _ SimpleStorageService = (*cloudSimpleStorageService)(nil)
 
 type SimpleStorageService interface {
@@ -29,8 +28,8 @@ type SimpleStorageService interface {
 	UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*ResponseVersioning, error)
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
-	
-  SimpleStorageKey() *cloudSimpleStorageKeyService
+
+	SimpleStorageKey() *cloudSimpleStorageKeyService
 }
 type cloudSimpleStorageService struct {
 	client *Client
@@ -168,14 +167,12 @@ func getQueryPaths(param interface{}) []string {
 
 }
 
-
 func (c *cloudSimpleStorageService) resourcePathWithBucketInfo(param ParamListWithBucketNameInfo) string {
 	queryParts := getQueryPaths(param)
 	query := strings.Join(queryParts, "&")
 	bucketName := param.BucketName
 	return fmt.Sprintf("%s%s?%s", simpleStoragePath, bucketName, query)
 }
-
 
 func (c *cloudSimpleStorageService) resourcePathUpdateOption(bucketName, path string) string {
 	return fmt.Sprintf("%s%s?%s", simpleStoragePath, bucketName, path)
@@ -231,7 +228,6 @@ func (c *cloudSimpleStorageService) List(ctx context.Context, opts *ListOptions)
 	return data.Buckets, nil
 }
 
-
 func (c *cloudSimpleStorageService) ListWithBucketNameInfo(ctx context.Context, paramBucket ParamListWithBucketNameInfo) (*ResponseListBucketWithName, error) {
 	if paramBucket.BucketName == "" {
 		return nil, errors.New("InvalidBucketName")
@@ -253,7 +249,6 @@ func (c *cloudSimpleStorageService) ListWithBucketNameInfo(ctx context.Context, 
 	}
 	return &data, nil
 }
-
 
 func (c *cloudSimpleStorageService) Delete(ctx context.Context, id string) error {
 	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.itemPath(id), nil)
@@ -296,7 +291,6 @@ func (c *cloudSimpleStorageService) UpdateAcl(ctx context.Context, acl, bucketNa
 	return data, nil
 }
 
-
 func (c *cloudSimpleStorageService) UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*ResponseVersioning, error) {
 	if bucketName == "" {
 		return nil, errors.New("InvalidBucketName")
@@ -325,7 +319,6 @@ func (c *cloudSimpleStorageService) UpdateVersioning(ctx context.Context, versio
 	}
 	return data.Versioning, nil
 }
-
 
 func (c *cloudSimpleStorageService) UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error) {
 	if paramUpdateCors.BucketName == "" {
@@ -358,7 +351,6 @@ func (c *cloudSimpleStorageService) UpdateCors(ctx context.Context, paramUpdateC
 	}
 	return data.Cors, nil
 }
-
 
 func (c *cloudSimpleStorageService) UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error) {
 	if paramUpdateWebsiteConfig.BucketName == "" {
