@@ -28,8 +28,8 @@ type SimpleStorageService interface {
 	UpdateVersioning(ctx context.Context, versioning bool, bucketName string) (*ResponseVersioning, error)
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
+	SimpleStorageKey() *cloudSimpleStorageKeyResource
 
-	SimpleStorageKey() *cloudSimpleStorageKeyService
 }
 type cloudSimpleStorageService struct {
 	client *Client
