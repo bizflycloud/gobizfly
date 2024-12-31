@@ -45,10 +45,6 @@ type cloudSimpleStorageKeyResource struct {
 	client *Client
 }
 
-func (c *cloudSimpleStorageService) SimpleStorageKey() *cloudSimpleStorageKeyResource {
-	return &cloudSimpleStorageKeyResource{client: c.client}
-}
-
 func (c *cloudSimpleStorageKeyResource) Create(ctx context.Context, dataCreatekey *KeyCreateRequest) (*KeyHaveSercret, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorageServiceName, c.resourcePath(), &dataCreatekey)
 	if err != nil {
