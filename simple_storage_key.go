@@ -16,6 +16,7 @@ const (
 
 var _ SimpleStorageKeyService = (*cloudSimpleStorageKeyResource)(nil)
 
+
 type SimpleStorageKeyService interface {
 	Create(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSercret, error)
 	Get(ctx context.Context, id string) (*KeyHaveSercret, error)
@@ -38,6 +39,7 @@ type KeyInList struct {
 	User      string `json:"user"`
 	AccessKey string `json:"access_key"`
 }
+
 
 type cloudSimpleStorageKeyResource struct {
 	client *Client
