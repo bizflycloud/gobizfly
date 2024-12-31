@@ -409,3 +409,15 @@ func TestSimpleStorageKeyCreate(t *testing.T) {
 	require.Equal(t, "okeQJF4UNILQHS8054GI", keyCreate.AccessKey)
 	require.Equal(t, "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5", keyCreate.SecretKey)
 }
+
+func TestSimpleStorageKeyDelete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var c cloudSimpleStorageKeyResource
+	mux.HandleFunc(testlib.SimpleStorageURL(c.keyItemPath("gggg")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	require.NoError(t, client.CloudSimpleStorage.SimpleStorageKey().DeleteAccessKey(ctx, "gggg"))
+}
