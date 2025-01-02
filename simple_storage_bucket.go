@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	simpleStoragePath = "/_/"
+	simpleStoragePath    = "/_/"
+	simpleStorageKeyPath = "/key"
 )
 
 var _ SimpleStorageService = (*cloudSimpleStorageService)(nil)
@@ -29,7 +30,6 @@ type SimpleStorageService interface {
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
 	SimpleStorageKey() *cloudSimpleStorageKeyResource
-
 }
 type cloudSimpleStorageService struct {
 	client *Client
@@ -385,7 +385,121 @@ func (c *cloudSimpleStorageService) UpdateWebsiteConfig(ctx context.Context, par
 	return data.WebsiteConfig, nil
 }
 
-
 func (c *cloudSimpleStorageService) SimpleStorageKey() *cloudSimpleStorageKeyResource {
 	return &cloudSimpleStorageKeyResource{client: c.client}
+}
+
+// file simple storage key
+
+var _ SimpleStorageKeyService = (*cloudSimpleStorageKeyResource)(nil)
+
+type SimpleStorageKeyService interface {
+	CreateAccessKey(ctx context.Context, s3cr *KeyCreateRequest) (*KeyHaveSecret, error)
+	GetAccessKey(ctx context.Context, id string) (*KeyHaveSecret, error)
+	DeleteAccessKey(ctx context.Context, id string) error
+	ListAccessKey(ctx context.Context, opts *ListOptions) ([]*KeyInList, error)
+}
+
+type KeyCreateRequest struct {
+	SubuserId string `json:"subuser_id"`
+	AccessKey string `json:"access_key"`
+	SecretKey string `json:"secret_key"`
+}
+
+type KeyHaveSecret struct {
+	AccessKey string `json:"access_key"`
+	SecretKey string `json:"secret_key"`
+}
+
+type KeyInList struct {
+	User      string `json:"user"`
+	AccessKey string `json:"access_key"`
+}
+
+type cloudSimpleStorageKeyResource struct {
+	client *Client
+}
+
+func (c *cloudSimpleStorageKeyResource) CreateAccessKey(ctx context.Context, dataCreatekey *KeyCreateRequest) (*KeyHaveSecret, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodPost, simpleStorageServiceName, c.keyResourcePath(), &dataCreatekey)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var respData struct {
+		Message string         `json:"message"`
+		Key     *KeyHaveSecret `json:"Key"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&respData); err != nil {
+		return nil, err
+	}
+	return respData.Key, nil
+}
+
+func (c *cloudSimpleStorageKeyResource) keyResourcePath() string {
+	return simpleStorageKeyPath
+}
+
+func (c *cloudSimpleStorageKeyResource) keyItemPath(id string) string {
+	if id == "" {
+		return simpleStorageKeyPath
+	}
+	return strings.Join([]string{simpleStorageKeyPath, id}, "/")
+}
+
+func (c *cloudSimpleStorageKeyResource) DeleteAccessKey(ctx context.Context, id string) error {
+	req, err := c.client.NewRequest(ctx, http.MethodDelete, simpleStorageServiceName, c.keyItemPath(id), nil)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+
+	return resp.Body.Close()
+}
+
+func (c *cloudSimpleStorageKeyResource) GetAccessKey(ctx context.Context, id string) (*KeyHaveSecret, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.keyItemPath(id), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	key := &KeyHaveSecret{}
+	if err := json.NewDecoder(resp.Body).Decode(key); err != nil {
+		return nil, err
+	}
+	return key, nil
+}
+
+func (c *cloudSimpleStorageKeyResource) ListAccessKey(ctx context.Context, opts *ListOptions) ([]*KeyInList, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, simpleStorageServiceName, c.keyResourcePath(), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var data struct {
+		Keys []*KeyInList `json:"keys"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return nil, err
+	}
+	return data.Keys, nil
 }

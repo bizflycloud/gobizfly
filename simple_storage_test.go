@@ -353,7 +353,7 @@ func TestSimpleStorageKeyList(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	keyList, err := client.CloudSimpleStorage.SimpleStorageKey().List(ctx, nil)
+	keyList, err := client.CloudSimpleStorage.SimpleStorageKey().ListAccessKey(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, "oked00e1f04d4a1a9dc72bd7447ee176:cuong01", keyList[0].User)
 	require.Equal(t, "okeJ8EG2V2PU9N1L3YGG", keyList[0].AccessKey)
@@ -375,7 +375,7 @@ func TestSimpleStorageKeyGet(t *testing.T) {
 		_, _ = fmt.Fprint(w, resp)
 	})
 
-	keyGet, err := client.CloudSimpleStorage.SimpleStorageKey().Get(ctx, "UITOU3XAR6TW1F2C3KYF")
+	keyGet, err := client.CloudSimpleStorage.SimpleStorageKey().GetAccessKey(ctx, "UITOU3XAR6TW1F2C3KYF")
 	require.NoError(t, err)
 	require.Equal(t, "okeOU3XAR6TW1F2C3KYF", keyGet.AccessKey)
 	require.Equal(t, "okeCGI1O8RprlGmysjudfzTU5ghLXML1CkBcwyo3", keyGet.SecretKey)
@@ -405,8 +405,21 @@ func TestSimpleStorageKeyCreate(t *testing.T) {
 		SecretKey: "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5",
 	}
 
-	keyCreate, err := client.CloudSimpleStorage.SimpleStorageKey().Create(ctx, &cr)
+	keyCreate, err := client.CloudSimpleStorage.SimpleStorageKey().CreateAccessKey(ctx, &cr)
+
 	require.NoError(t, err)
 	require.Equal(t, "okeQJF4UNILQHS8054GI", keyCreate.AccessKey)
 	require.Equal(t, "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5", keyCreate.SecretKey)
+}
+
+func TestSimpleStorageKeyDelete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var c cloudSimpleStorageKeyResource
+	mux.HandleFunc(testlib.SimpleStorageURL(c.keyItemPath("gggg")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+	require.NoError(t, client.CloudSimpleStorage.SimpleStorageKey().DeleteAccessKey(ctx, "gggg"))
 }
