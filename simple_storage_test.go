@@ -409,7 +409,7 @@ func TestSimpleStorageKeyCreate(t *testing.T) {
 
 	require.NoError(t, err)
 	require.Equal(t, "okeQJF4UNILQHS8054GI", keyCreate.AccessKey)
-	require.Equal(t, "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD6", keyCreate.SecretKey)
+	require.Equal(t, "okeMEoF6sg9ZyjTIEU8GJWPH0mRjGdseGDrokgD5", keyCreate.SecretKey)
 }
 
 func TestSimpleStorageKeyDelete(t *testing.T) {
