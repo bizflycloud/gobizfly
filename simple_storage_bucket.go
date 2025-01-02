@@ -30,6 +30,7 @@ type SimpleStorageService interface {
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
 	SimpleStorageKey() *cloudSimpleStorageKeyResource
+
 }
 type cloudSimpleStorageService struct {
 	client *Client
@@ -385,7 +386,6 @@ func (c *cloudSimpleStorageService) UpdateWebsiteConfig(ctx context.Context, par
 	return data.WebsiteConfig, nil
 }
 
-// =======================
 // file simple storage key
 var _ SimpleStorageKey = (*cloudSimpleStorageKeyResource)(nil)
 
