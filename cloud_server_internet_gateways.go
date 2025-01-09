@@ -71,7 +71,7 @@ type InterfaceInfo struct {
 
 type ExtendedInternetGateway struct {
 	InternetGateway `json:",inline"`
-	InterfaceInfos  []InterfaceInfo `json:"interfaces_info"`
+	InterfacesInfo  []InterfaceInfo `json:"interfaces_info"`
 }
 
 func (igw *cloudServerInternetGatewayResource) parsePath(igwID string) string {
