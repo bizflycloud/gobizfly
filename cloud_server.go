@@ -56,4 +56,5 @@ type CloudServerService interface {
 	SSHKeys() *cloudServerSSHKeyResource
 	Volumes() *cloudServerVolumeResource
 	VPCNetworks() *cloudServerVPCNetworkResource
+	InternetGateways() CloudServerInternetGatewayInterface
 }
