@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -39,7 +40,7 @@ type KubernetesEngineService interface {
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error)
-	GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error)
+	GetKubernetesVersion(ctx context.Context, opts GetKubernetesVersionOpts) (*KubernetesVersionResponse, error)
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)
 	AddClusterEverywhere(ctx context.Context, id string, cjer *ClusterJoinEverywhereRequest) (*ClusterJoinEverywhereResponse, error)
 	GetEverywhere(ctx context.Context, id string) (*EverywhereNode, error)
@@ -107,12 +108,22 @@ func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID 
 	return bodyString, nil
 }
 
+type GetKubernetesVersionOpts struct {
+	All *bool
+}
+
 // GetKubernetesVersion - Get Kubernetes version from the Kubernetes Engine API
-func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context) (*KubernetesVersionResponse, error) {
+func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context, opts GetKubernetesVersionOpts) (*KubernetesVersionResponse, error) {
 	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, k8sVersion, nil)
 	if err != nil {
 		return nil, err
 	}
+	q := req.URL.Query()
+	if opts.All != nil {
+		all := strconv.FormatBool(*opts.All)
+		q.Add("all", all)
+	}
+	req.URL.RawQuery = q.Encode()
 	resp, err := c.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
