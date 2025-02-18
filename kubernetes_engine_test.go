@@ -800,3 +800,98 @@ func TestPackageStandardList(t *testing.T) {
 	assert.Len(t, packages.Packages, 2)
 	assert.LessOrEqual(t, "6609972809ba00eb5adc95e6", packages.Packages[0].ID)
 }
+
+func TestGetDetailWorkerPool(t *testing.T) {
+	setup()
+	defer teardown()
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{workerPoolPath, "67b36fed16bd9672f0f01e78"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		resp := `
+    {
+      "id": "67b36fed16bd9672f0f01e78",
+      "name": "pool-69645",
+      "version": "v1.29.13",
+      "provision_type": "standard",
+      "flavor": "nix.2c_2g",
+      "profile_type": "premium",
+      "volume_type": "PREMIUM-HDD1",
+      "volume_size": 40,
+      "availability_zone": "HN1",
+      "desired_size": 2,
+      "enable_autoscaling": true,
+      "min_size": 2,
+      "max_size": 4,
+      "network_plan": "free_datatransfer",
+      "billing_plan": "on_demand",
+      "tags": [
+          "pool_tag",
+          ""
+      ],
+      "provision_status": "PROVISIONED",
+      "launch_config_id": "dde59999-2fa8-4463-9aa1-4896e5954344",
+      "autoscaling_group_id": "c97d5376-c668-4ef9-8de5-8a92c291aee8",
+      "created_at": "2025-02-17T17:20:45.405000",
+      "labels": {
+          "UpdateLabel": "UpdateLabelVal1"
+      },
+      "taints": [
+          {
+              "effect": "NoSchedule",
+              "key": "UpdateTaint1",
+              "value": "UpdateTaintVal1"
+          }
+      ],
+      "auto_repair": false,
+      "flavor_detail": {
+          "name": "nix.2c_2g",
+          "vcpus": 2,
+          "ram": 2048,
+          "gpu": null,
+          "category": "premium"
+      },
+      "nodes": [
+          {
+              "id": "e365b68a-a365-49a8-b5b0-2b1fcdb6e250",
+              "name": "pool-69645-x2d030sk95w69eia-node-Cv4N54hV",
+              "physical_id": "de9cb2f0-c8f0-4bf0-a6ea-cf83d6b55ef7",
+              "ip_addresses": [
+                  "10.20.2.149"
+              ],
+              "status": "ACTIVE",
+              "status_reason": "Creation succeeded"
+          },
+          {
+              "id": "92000ba7-fb0e-4ae3-91d5-94d23760bd99",
+              "name": "pool-69645-x2d030sk95w69eia-node-YPN8sXXf",
+              "physical_id": "bc98b260-e047-4fee-a1c0-4dcf5f3d794b",
+              "ip_addresses": [
+                  "10.20.2.224"
+              ],
+              "status": "ACTIVE",
+              "status_reason": "Creation succeeded"
+          }
+      ],
+      "everywhere_nodes": [],
+      "shoot_id": "x2d030sk95w69eia"
+  }
+`
+		_, _ = fmt.Fprint(w, resp)
+	})
+	workerpool, err := client.KubernetesEngine.GetDetailWorkerPool(ctx, "67b36fed16bd9672f0f01e78")
+	require.NoError(t, err)
+	assert.Equal(t, "pool-69645", workerpool.Name)
+	assert.Equal(t, "67b36fed16bd9672f0f01e78", workerpool.UID)
+	assert.Equal(t, "x2d030sk95w69eia", workerpool.ShootID)
+	assert.Equal(t, "PREMIUM-HDD1", workerpool.VolumeType)
+	assert.Equal(t, 40, workerpool.VolumeSize)
+	assert.Equal(t, 2, workerpool.MinSize)
+	assert.Equal(t, 4, workerpool.MaxSize)
+	assert.Equal(t, 2, workerpool.DesiredSize)
+	assert.Equal(t, "free_datatransfer", workerpool.NetworkPlan)
+	assert.Equal(t, "on_demand", workerpool.BillingPlan)
+	assert.Equal(t, "HN1", workerpool.AvailabilityZone)
+	assert.Equal(t, "premium", workerpool.ProfileType)
+	assert.Equal(t, "nix.2c_2g", workerpool.Flavor)
+	assert.Equal(t, "v1.29.13", workerpool.Version)
+	assert.Equal(t, "standard", workerpool.ProvisionType)
+}
