@@ -44,6 +44,7 @@ type ExtendedWorkerPool struct {
 	LaunchConfigID     string `json:"launch_config_id"     yaml:"launch_config_id"`
 	AutoScalingGroupID string `json:"autoscaling_group_id" yaml:"autoscaling_group_id"`
 	CreatedAt          string `json:"created_at"           yaml:"created_at"`
+	ShootID            string `json:"shoot_id" yaml:"shoot_id"`
 }
 
 // ExtendedWorkerPools is a list of ExtendedWorkerPool
@@ -228,4 +229,31 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(
 	}
 	_, _ = io.Copy(ioutil.Discard, resp.Body)
 	return resp.Body.Close()
+}
+
+// GetDetailWorkerPool - Get a cluster worker pool
+func (c *kubernetesEngineService) GetDetailWorkerPool(
+	ctx context.Context,
+	PoolID string,
+) (*WorkerPoolWithNodes, error) {
+	var pool *WorkerPoolWithNodes
+	req, err := c.client.NewRequest(
+		ctx,
+		http.MethodGet,
+		kubernetesServiceName,
+		strings.Join([]string{workerPoolPath, PoolID}, "/"),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
+		return nil, err
+	}
+	return pool, nil
 }

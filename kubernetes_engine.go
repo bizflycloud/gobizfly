@@ -20,6 +20,7 @@ const (
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
 	nodeEverywhere        = "/_/node_everywhere"
 	k8sPackages           = "/package/"
+	workerPoolPath        = "/worker_pool"
 )
 
 var _ KubernetesEngineService = (*kubernetesEngineService)(nil)
@@ -48,6 +49,7 @@ type KubernetesEngineService interface {
 	UpgradeClusterVersion(ctx context.Context, id string, payload *UpgradeClusterVersionRequest) error
 	GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error)
 	GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error)
+	GetDetailWorkerPool(ctx context.Context, PoolID string) (*WorkerPoolWithNodes, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
