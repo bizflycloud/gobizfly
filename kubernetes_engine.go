@@ -50,6 +50,8 @@ type KubernetesEngineService interface {
 	GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error)
 	GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error)
 	GetDetailWorkerPool(ctx context.Context, PoolID string) (*WorkerPoolWithNodes, error)
+	UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error
+	GetDashboardURL(ctx context.Context, id string) (string, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -67,6 +69,11 @@ type KubernetesPackage struct {
 	Name string `json:"name"`
 }
 
+// DashboardURLResponse đại diện cho response khi lấy URL của Kubernetes dashboard
+type DashboardURLResponse struct {
+	URL string `json:"url"`
+}
+
 func (c *kubernetesEngineService) resourcePath() string {
 	return clusterPath + "/"
 }
@@ -81,6 +88,10 @@ func (c *kubernetesEngineService) EverywherePath(id string) string {
 
 type GetKubeConfigOptions struct {
 	ExpiteTime string `json:"expire_time,omitempty"`
+}
+
+type UpgradePackageRequest struct {
+	NewPackage string `json:"new_package"`
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster
@@ -160,4 +171,38 @@ func (c *kubernetesEngineService) GetPackages(ctx context.Context, provisionType
 		return nil, err
 	}
 	return data, nil
+}
+
+func (c *kubernetesEngineService) UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error {
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, strings.Join([]string{c.itemPath(id), k8sPackages, "upgrade"}, "/"), payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *kubernetesEngineService) GetDashboardURL(ctx context.Context, id string) (string, error) {
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(id), "dashboard"}, "/"), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var data *DashboardURLResponse
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return "", err
+	}
+	return data.URL, nil
 }

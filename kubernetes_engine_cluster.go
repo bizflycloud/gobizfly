@@ -104,10 +104,10 @@ type FullCluster struct {
 
 // UpdateClusterRequest represents the request body for update a Kubernetes cluster
 type UpdateClusterRequest struct {
-	AccessPolicies *[]string              `json:"access_policies,omitempty"`
-	AutoUpgrade    *bool                  `json:"auto_upgrade,omitempty"`
-	BcrIntegrated  *bool                  `json:"bcr_integrated,omitempty"`
-	UpgradeTime    map[string]interface{} `json:"upgrade_time,omitempty"`
+	AccessPolicies *[]string          `json:"access_policies,omitempty"`
+	AutoUpgrade    *bool              `json:"auto_upgrade,omitempty"`
+	BcrIntegrated  *bool              `json:"bcr_integrated,omitempty"`
+	UpgradeTime    UpgradeVersionTime `json:"upgrade_time,omitempty"`
 }
 
 // UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
