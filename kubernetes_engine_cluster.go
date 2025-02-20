@@ -110,6 +110,12 @@ type UpdateClusterRequest struct {
 	UpgradeTime    UpgradeVersionTime `json:"upgrade_time,omitempty"`
 }
 
+type AddonStatusResponse struct {
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	Status  string `json:"status"`
+}
+
 // UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
 type UpgradeClusterVersionRequest struct {
 	ControlPlaneOnly string `json:"control_plane_only,omitempty"`
@@ -260,4 +266,56 @@ func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id 
 		return err
 	}
 	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) InstallAddon(ctx context.Context, id string, addonType string) error {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	payload := map[string]string{
+		"action": "install",
+	}
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (c *kubernetesEngineService) UninstallAddon(ctx context.Context, id string, addonType string) error {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	payload := map[string]string{
+		"action": "uninstall",
+	}
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (c *kubernetesEngineService) GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error) {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), getQueryPaths(map[string]string{"status_only": ""}))
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var addonStatus AddonStatusResponse
+	if err := json.NewDecoder(resp.Body).Decode(&addonStatus); err != nil {
+		return nil, err
+	}
+	return &addonStatus, nil
 }

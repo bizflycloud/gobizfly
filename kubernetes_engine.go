@@ -52,6 +52,9 @@ type KubernetesEngineService interface {
 	GetDetailWorkerPool(ctx context.Context, PoolID string) (*WorkerPoolWithNodes, error)
 	UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error
 	GetDashboardURL(ctx context.Context, id string) (string, error)
+	InstallAddon(ctx context.Context, id string, addonType string) error
+	UninstallAddon(ctx context.Context, id string, addonType string) error
+	GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
