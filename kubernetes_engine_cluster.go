@@ -268,6 +268,42 @@ func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id 
 	return resp.Body.Close()
 }
 
+func (c *kubernetesEngineService) UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error {
+	path := strings.Join([]string{id, "package", "upgrade"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *kubernetesEngineService) GetDashboardURL(ctx context.Context, id string) (string, error) {
+	path := strings.Join([]string{id, "dashboard"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var data *DashboardURLResponse
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return "", err
+	}
+	return data.URL, nil
+}
+
 func (c *kubernetesEngineService) InstallAddon(ctx context.Context, id string, addonType string) error {
 	path := strings.Join([]string{id, "add_ons", addonType}, "/")
 	payload := map[string]string{
@@ -303,8 +339,8 @@ func (c *kubernetesEngineService) UninstallAddon(ctx context.Context, id string,
 }
 
 func (c *kubernetesEngineService) GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error) {
-	path := strings.Join([]string{id, "add_ons", addonType}, "/")
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), getQueryPaths(map[string]string{"status_only": ""}))
+	path := strings.Join([]string{id, "add_ons", addonType}, "/") + "?status_only=true"
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
 	if err != nil {
 		return nil, err
 	}

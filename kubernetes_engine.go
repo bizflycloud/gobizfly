@@ -175,37 +175,3 @@ func (c *kubernetesEngineService) GetPackages(ctx context.Context, provisionType
 	}
 	return data, nil
 }
-
-func (c *kubernetesEngineService) UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error {
-	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, strings.Join([]string{c.itemPath(id), k8sPackages, "upgrade"}, "/"), payload)
-	if err != nil {
-		return err
-	}
-
-	resp, err := c.client.Do(ctx, req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	return nil
-}
-
-func (c *kubernetesEngineService) GetDashboardURL(ctx context.Context, id string) (string, error) {
-	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, strings.Join([]string{c.itemPath(id), "dashboard"}, "/"), nil)
-	if err != nil {
-		return "", err
-	}
-
-	resp, err := c.client.Do(ctx, req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	var data *DashboardURLResponse
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		return "", err
-	}
-	return data.URL, nil
-}
