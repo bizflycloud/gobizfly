@@ -104,10 +104,16 @@ type FullCluster struct {
 
 // UpdateClusterRequest represents the request body for update a Kubernetes cluster
 type UpdateClusterRequest struct {
-	AccessPolicies *[]string              `json:"access_policies,omitempty"`
-	AutoUpgrade    *bool                  `json:"auto_upgrade,omitempty"`
-	BcrIntegrated  *bool                  `json:"bcr_integrated,omitempty"`
-	UpgradeTime    map[string]interface{} `json:"upgrade_time,omitempty"`
+	AccessPolicies *[]string          `json:"access_policies,omitempty"`
+	AutoUpgrade    *bool              `json:"auto_upgrade,omitempty"`
+	BcrIntegrated  *bool              `json:"bcr_integrated,omitempty"`
+	UpgradeTime    UpgradeVersionTime `json:"upgrade_time,omitempty"`
+}
+
+type AddonStatusResponse struct {
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	Status  string `json:"status"`
 }
 
 // UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
@@ -260,4 +266,92 @@ func (c *kubernetesEngineService) UpgradeClusterVersion(ctx context.Context, id 
 		return err
 	}
 	return resp.Body.Close()
+}
+
+func (c *kubernetesEngineService) UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error {
+	path := strings.Join([]string{id, "package", "upgrade"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
+}
+
+func (c *kubernetesEngineService) GetDashboardURL(ctx context.Context, id string) (string, error) {
+	path := strings.Join([]string{id, "dashboard"}, "/")
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var data *DashboardURLResponse
+	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+		return "", err
+	}
+	return data.URL, nil
+}
+
+func (c *kubernetesEngineService) InstallAddon(ctx context.Context, id string, addonType string) error {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	payload := map[string]string{
+		"action": "install",
+	}
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (c *kubernetesEngineService) UninstallAddon(ctx context.Context, id string, addonType string) error {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	payload := map[string]string{
+		"action": "uninstall",
+	}
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	return nil
+}
+
+func (c *kubernetesEngineService) GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error) {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/") + "?status_only=true"
+	req, err := c.client.NewRequest(ctx, http.MethodGet, kubernetesServiceName, c.itemPath(path), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	var addonStatus AddonStatusResponse
+	if err := json.NewDecoder(resp.Body).Decode(&addonStatus); err != nil {
+		return nil, err
+	}
+	return &addonStatus, nil
 }

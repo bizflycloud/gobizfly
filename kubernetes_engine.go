@@ -50,6 +50,11 @@ type KubernetesEngineService interface {
 	GetUpgradeClusterVersion(ctx context.Context, id string) (*UpgradeClusterVersionResponse, error)
 	GetPackages(ctx context.Context, provisionType string) (*KubernetesPackagesResponse, error)
 	GetDetailWorkerPool(ctx context.Context, PoolID string) (*WorkerPoolWithNodes, error)
+	UpgradePackage(ctx context.Context, id string, payload *UpgradePackageRequest) error
+	GetDashboardURL(ctx context.Context, id string) (string, error)
+	InstallAddon(ctx context.Context, id string, addonType string) error
+	UninstallAddon(ctx context.Context, id string, addonType string) error
+	GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error)
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
@@ -67,6 +72,11 @@ type KubernetesPackage struct {
 	Name string `json:"name"`
 }
 
+// DashboardURLResponse đại diện cho response khi lấy URL của Kubernetes dashboard
+type DashboardURLResponse struct {
+	URL string `json:"url"`
+}
+
 func (c *kubernetesEngineService) resourcePath() string {
 	return clusterPath + "/"
 }
@@ -81,6 +91,10 @@ func (c *kubernetesEngineService) EverywherePath(id string) string {
 
 type GetKubeConfigOptions struct {
 	ExpiteTime string `json:"expire_time,omitempty"`
+}
+
+type UpgradePackageRequest struct {
+	NewPackage string `json:"new_package"`
 }
 
 // GetKubeConfig - Get Kubernetes config from the given cluster

@@ -895,3 +895,80 @@ func TestGetDetailWorkerPool(t *testing.T) {
 	assert.Equal(t, "v1.29.13", workerpool.Version)
 	assert.Equal(t, "standard", workerpool.ProvisionType)
 }
+
+func TestUpgradePackage(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/package/upgrade")),
+		func(w http.ResponseWriter, r *http.Request) {
+			require.Equal(t, http.MethodPost, r.Method)
+			var payload *UpgradePackageRequest
+			require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
+			assert.Equal(t, "v1.29.14", payload.NewPackage)
+			_, _ = fmt.Fprint(w, `{ "message": "success" }`)
+		},
+	)
+
+	err := client.KubernetesEngine.UpgradePackage(ctx, "67b36fed16bd9672f0f01e78", &UpgradePackageRequest{
+		NewPackage: "v1.29.14",
+	})
+	require.NoError(t, err)
+}
+
+func TestGetDashboardURL(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/dashboard")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"url": "https://console.bizflycloud.vn/kubernetes/clusters/67b36fed16bd9672f0f01e78/dashboard"}`)
+	})
+
+	url, err := client.KubernetesEngine.GetDashboardURL(ctx, "67b36fed16bd9672f0f01e78")
+	require.NoError(t, err)
+	assert.Equal(t, "https://console.bizflycloud.vn/kubernetes/clusters/67b36fed16bd9672f0f01e78/dashboard", url)
+}
+
+func TestInstallAddon(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/add_ons/nginx-ingress")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		_, _ = fmt.Fprint(w, `{}`)
+	})
+
+	err := client.KubernetesEngine.InstallAddon(ctx, "67b36fed16bd9672f0f01e78", "nginx-ingress")
+	require.NoError(t, err)
+}
+
+func TestUninstallAddon(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/add_ons/nginx-ingress")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		_, _ = fmt.Fprint(w, `{}`)
+	})
+
+	err := client.KubernetesEngine.UninstallAddon(ctx, "67b36fed16bd9672f0f01e78", "nginx-ingress")
+	require.NoError(t, err)
+}
+
+func TestGetAddonStatus(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/add_ons/nginx-ingress")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		_, _ = fmt.Fprint(w, `{"type": "nginx-ingress", "version": "v1.29.13", "status": "active"}`)
+	})
+
+	status, err := client.KubernetesEngine.GetAddonStatus(ctx, "67b36fed16bd9672f0f01e78", "nginx-ingress")
+	require.NoError(t, err)
+	assert.Equal(t, "nginx-ingress", status.Type)
+	assert.Equal(t, "v1.29.13", status.Version)
+	assert.Equal(t, "active", status.Status)
+}
