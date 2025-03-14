@@ -29,12 +29,13 @@ type ListProjectsOpts struct {
 }
 
 func (i *iamService) ListProjects(ctx context.Context, opts ListProjectsOpts) ([]*IAMProject, error) {
+	var convOpts map[string]interface{}
 	req, err := i.client.NewRequest(ctx, http.MethodGet, iamServiceName, i.projectResourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
 	q := req.URL.Query()
-	convOpts, err := utils.ConvDataWithJson[map[string]interface{}](opts)
+	err = utils.ConvDataWithJson(opts, &convOpts)
 	if err != nil {
 		return nil, err
 	}

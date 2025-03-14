@@ -2,15 +2,10 @@ package utils
 
 import "encoding/json"
 
-func ConvDataWithJson[T any](data interface{}) (T, error) {
-	var result T
+func ConvDataWithJson(data interface{}, result interface{}) error {
 	byteData, err := json.Marshal(data)
 	if err != nil {
-		return result, err
+		return err
 	}
-	err = json.Unmarshal(byteData, &result)
-	if err != nil {
-		return result, err
-	}
-	return result, nil
+	return json.Unmarshal(byteData, &result)
 }
