@@ -217,7 +217,7 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(
 		ctx,
 		http.MethodDelete,
 		kubernetesServiceName,
-		strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/")+"?force=true",
+		strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/"),
 		nil,
 	)
 	if err != nil {
