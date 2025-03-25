@@ -217,6 +217,31 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(
 		ctx,
 		http.MethodDelete,
 		kubernetesServiceName,
+		strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/"),
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	return resp.Body.Close()
+}
+
+// ForcedDeleteClusterWorkerPoolNode - Delete a node in the given worker pool
+func (c *kubernetesEngineService) ForcedDeleteClusterWorkerPoolNode(
+	ctx context.Context,
+	clusterUID string,
+	PoolID string,
+	NodeID string,
+) error {
+	req, err := c.client.NewRequest(
+		ctx,
+		http.MethodDelete,
+		kubernetesServiceName,
 		strings.Join([]string{clusterPath, clusterUID, PoolID, NodeID}, "/")+"?force=true",
 		nil,
 	)

@@ -40,6 +40,7 @@ type KubernetesEngineService interface {
 	GetClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string) (*WorkerPoolWithNodes, error)
 	UpdateClusterWorkerPool(ctx context.Context, clusterUID string, PoolID string, uwp *UpdateWorkerPoolRequest) error
 	DeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
+	ForcedDeleteClusterWorkerPoolNode(ctx context.Context, clusterUID string, PoolID string, NodeID string) error
 	GetKubeConfig(ctx context.Context, clusterUID string, opts *GetKubeConfigOptions) (string, error)
 	GetKubernetesVersion(ctx context.Context, opts GetKubernetesVersionOpts) (*KubernetesVersionResponse, error)
 	GetClusterInfo(ctx context.Context, pool_id string) (*ClusterInfoResponse, error)

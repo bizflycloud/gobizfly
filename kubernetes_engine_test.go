@@ -573,6 +573,17 @@ func TestDeleteClusterWorkerNode(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestForcedDeleteClusterWorkerNode(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(strings.Join([]string{c.itemPath("ji84wqtzr77ogo6b"), "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a"}, "/")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodDelete, r.Method)
+	})
+	err := client.KubernetesEngine.ForcedDeleteClusterWorkerPoolNode(ctx, "ji84wqtzr77ogo6b", "5f959e0ac0b18944d0a4f13a", "5f959e0ac0b18944d0a4f13a")
+	require.NoError(t, err)
+}
+
 func TestUpdateClusterWorkerPool(t *testing.T) {
 	setup()
 	defer teardown()
