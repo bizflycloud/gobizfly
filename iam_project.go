@@ -3,7 +3,10 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/bizflycloud/gobizfly/utils"
 )
 
 // IAMProject - contains the information of a IAM project
@@ -18,11 +21,28 @@ type IAMProject struct {
 	ShortUUID   string `json:"short_uuid"`
 }
 
-func (i *iamService) ListProjects(ctx context.Context) ([]*IAMProject, error) {
+// ListProjectsOpts params for list projects
+type ListProjectsOpts struct {
+	Limit *string `json:"limit,omitempty"`
+	Page  *string `json:"page,omitempty"`
+	Sort  *string `json:"sort,omitempty"`
+}
+
+func (i *iamService) ListProjects(ctx context.Context, opts ListProjectsOpts) ([]*IAMProject, error) {
+	var convOpts map[string]interface{}
 	req, err := i.client.NewRequest(ctx, http.MethodGet, iamServiceName, i.projectResourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
+	q := req.URL.Query()
+	err = utils.ConvDataWithJson(opts, &convOpts)
+	if err != nil {
+		return nil, err
+	}
+	for key, val := range convOpts {
+		q.Add(key, fmt.Sprintf("%v", val))
+	}
+	req.URL.RawQuery = q.Encode()
 	resp, err := i.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
