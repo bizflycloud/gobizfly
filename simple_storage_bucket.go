@@ -30,7 +30,6 @@ type SimpleStorageService interface {
 	UpdateCors(ctx context.Context, paramUpdateCors *ParamUpdateCors) (*ResponseCors, error)
 	UpdateWebsiteConfig(ctx context.Context, paramUpdateWebsiteConfig *ParamUpdateWebsiteConfig) (*ResponseWebsiteConfig, error)
 	SimpleStorageKey() *cloudSimpleStorageKeyResource
-
 }
 type cloudSimpleStorageService struct {
 	client *Client
@@ -44,12 +43,12 @@ type BucketCreateRequest struct {
 }
 
 type Bucket struct {
-	Name                string `json:"name"`
-	CreatedAt           string `json:"created_at"`
-	Location            string `json:"location"`
-	SizeKb              int    `json:"size_kb"`
-	NumObjects          int    `json:"num_objects"`
-	DefaultStorageClass string `json:"default_storage_class"`
+	Name                string  `json:"name"`
+	CreatedAt           string  `json:"created_at"`
+	Location            string  `json:"location"`
+	SizeKb              float64 `json:"size_kb"`
+	NumObjects          int     `json:"num_objects"`
+	DefaultStorageClass string  `json:"default_storage_class"`
 }
 
 type ResponseAcl struct {
