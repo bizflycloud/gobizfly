@@ -182,25 +182,27 @@ type ServerOS struct {
 
 // ServerCreateRequest represents create a new server payload.
 type ServerCreateRequest struct {
-	Name              string        `json:"name"`
-	FlavorName        string        `json:"flavor"`
-	SSHKey            string        `json:"sshkey,omitempty"`
-	Password          bool          `json:"password"`
-	RootDisk          *ServerDisk   `json:"rootdisk"`
-	DataDisks         []*ServerDisk `json:"datadisks,omitempty"`
-	Type              string        `json:"type"`
-	AvailabilityZone  string        `json:"availability_zone"`
-	OS                *ServerOS     `json:"os"`
-	Quantity          int           `json:"quantity,omitempty"`
-	NetworkInterfaces []string      `json:"network_interfaces,omitempty"`
-	Firewalls         []string      `json:"firewalls,omitempty"`
-	NetworkPlan       string        `json:"network_plan,omitempty"`
-	VPCNetworkIDs     []string      `json:"vpc_network_ids,omitempty"`
-	BillingPlan       string        `json:"billing_plan,omitempty"`
-	IPv6              bool          `json:"ipv6,omitempty"`
-	IsCreatedWan      *bool         `json:"is_created_wan,omitempty"`
-	UserData          string        `json:"user_data,omitempty"`
+	Name              string            `json:"name"`
+	FlavorName        string            `json:"flavor"`
+	SSHKey            string            `json:"sshkey,omitempty"`
+	Password          bool              `json:"password"`
+	RootDisk          *ServerDisk       `json:"rootdisk"`
+	DataDisks         []*ServerDisk     `json:"datadisks,omitempty"`
+	Type              string            `json:"type"`
+	AvailabilityZone  string            `json:"availability_zone"`
+	OS                *ServerOS         `json:"os"`
+	Quantity          int               `json:"quantity,omitempty"`
+	NetworkInterfaces []string          `json:"network_interfaces,omitempty"`
+	Firewalls         []string          `json:"firewalls,omitempty"`
+	NetworkPlan       string            `json:"network_plan,omitempty"`
+	VPCNetworkIDs     []string          `json:"vpc_network_ids,omitempty"`
+	BillingPlan       string            `json:"billing_plan,omitempty"`
+	IPv6              bool              `json:"ipv6,omitempty"`
+	IsCreatedWan      *bool             `json:"is_created_wan,omitempty"`
+	UserData          string            `json:"user_data,omitempty"`
+	Metadata          map[string]string `json:"metadata,omitempty"`
 }
+
 
 // itemActionPath return http path of server action
 func (s *cloudServerService) itemActionPath(id string) string {
