@@ -121,3 +121,41 @@ func (c *kubernetesEngineService) GetClusterInfo(ctx context.Context, pool_id st
 	}
 	return &clusterInfoResponse, nil
 }
+
+// ClusterLeave handles worker node leaving from a cluster
+func (k *kubernetesEngineService) ClusterLeave(ctx context.Context, clusterUID string, clusterToken string, req *ClusterLeaveRequest) (*ClusterLeaveResponse, error) {
+    // Input validation
+    if clusterUID == "" {
+        return nil, fmt.Errorf("cluster UID cannot be empty")
+    }
+    if clusterToken == "" {
+        return nil, fmt.Errorf("cluster token cannot be empty")
+    }
+    if req == nil {
+        return nil, fmt.Errorf("request cannot be nil")
+    }
+    if req.NodeName == "" {
+        return nil, fmt.Errorf("node name cannot be empty")
+    }
+
+    // Construct the correct API endpoint path
+    path := fmt.Sprintf("/engine/cluster_leave/%s", clusterUID)
+    
+    // Create HTTP request with proper error handling
+    httpReq, err := k.client.NewRequest(ctx, http.MethodPost, path, req)
+    if err != nil {
+        return nil, fmt.Errorf("failed to create request: %w", err)
+    }
+
+    // Set required authentication header
+    httpReq.Header.Set("X-Cluster-Token", clusterToken)
+
+    // Execute request with proper error wrapping
+    var resp ClusterLeaveResponse
+    _, err = k.client.Do(ctx, httpReq, &resp)
+    if err != nil {
+        return nil, fmt.Errorf("cluster leave request failed: %w", err)
+    }
+
+    return &resp, nil
+}

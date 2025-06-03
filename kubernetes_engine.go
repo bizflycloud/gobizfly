@@ -56,6 +56,17 @@ type KubernetesEngineService interface {
 	InstallAddon(ctx context.Context, id string, addonType string) error
 	UninstallAddon(ctx context.Context, id string, addonType string) error
 	GetAddonStatus(ctx context.Context, id string, addonType string) (*AddonStatusResponse, error)
+	ClusterLeave(ctx context.Context, clusterUID string, clusterToken string, req *ClusterLeaveRequest) (*ClusterLeaveResponse, error)
+}
+
+// ClusterLeaveRequest represents the request payload for worker leaving cluster
+type ClusterLeaveRequest struct {
+    NodeName string `json:"node_name"`
+}
+
+// ClusterLeaveResponse represents the response from cluster leave operation
+type ClusterLeaveResponse struct {
+    Message string `json:"message"`
 }
 
 // KubernetesVersionResponse represents the get versions from the Kubernetes Engine API
