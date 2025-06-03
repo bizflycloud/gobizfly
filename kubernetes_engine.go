@@ -18,6 +18,7 @@ const (
 	k8sVersion            = "/k8s_versions"
 	clusterInfo           = "/engine/cluster_info"
 	clusterJoinEverywhere = "/engine/cluster_join_everywhere"
+	clusterLeave          = "/engine/cluster_leave"
 	nodeEverywhere        = "/_/node_everywhere"
 	k8sPackages           = "/package/"
 	workerPoolPath        = "/worker_pool"
