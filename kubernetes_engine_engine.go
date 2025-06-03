@@ -1,11 +1,13 @@
 package gobizfly
 
 import (
-	"context"
-	"encoding/json"
-	"io"
-	"net/http"
+    "context"
+    "encoding/json"
+    "fmt"
+    "io"
+    "net/http"
 )
+
 
 type ClusterJoinEverywhereRequest struct {
 	PoolID          string                 `json:"pool_id" yaml:"pool_id"`
@@ -121,3 +123,61 @@ func (c *kubernetesEngineService) GetClusterInfo(ctx context.Context, pool_id st
 	}
 	return &clusterInfoResponse, nil
 }
+
+// ClusterLeave handles worker node leaving from a cluster
+// ClusterLeave handles worker node leaving from a cluster
+func (k *kubernetesEngineService) ClusterLeave(ctx context.Context, clusterUID string, clusterToken string, req *ClusterLeaveRequest) (*ClusterLeaveResponse, error) {
+    // Input validation
+    if clusterUID == "" {
+        return nil, fmt.Errorf("cluster UID cannot be empty")
+    }
+    if clusterToken == "" {
+        return nil, fmt.Errorf("cluster token cannot be empty")
+    }
+    if req == nil {
+        return nil, fmt.Errorf("request cannot be nil")
+    }
+    if req.NodeName == "" {
+        return nil, fmt.Errorf("node name cannot be empty")
+    }
+
+    // Construct path using constant
+    path := fmt.Sprintf("%s/%s", clusterLeave, clusterUID)
+    
+    // Create HTTP request using the library's standard pattern
+    httpReq, err := k.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, path, req)
+    if err != nil {
+        return nil, fmt.Errorf("failed to create request: %w", err)
+    }
+
+    // Set required authentication header
+    httpReq.Header.Set("X-Cluster-Token", clusterToken)
+
+    // Execute request
+    resp, err := k.client.Do(ctx, httpReq)
+    if err != nil {
+        return nil, fmt.Errorf("cluster leave request failed: %w", err)
+    }
+    defer resp.Body.Close()
+
+    // Read response body
+    body, err := io.ReadAll(resp.Body)
+    if err != nil {
+        return nil, fmt.Errorf("failed to read response body: %w", err)
+    }
+
+    // Handle different HTTP status codes
+    if resp.StatusCode >= 400 {
+        return nil, fmt.Errorf("cluster leave failed with status %d: %s", resp.StatusCode, string(body))
+    }
+
+    // Unmarshal successful response
+    var clusterLeaveResponse ClusterLeaveResponse
+    if err := json.Unmarshal(body, &clusterLeaveResponse); err != nil {
+        return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+    }
+
+    return &clusterLeaveResponse, nil
+}
+
+
