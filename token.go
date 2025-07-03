@@ -162,6 +162,9 @@ func (t *token) getUserInfo(ctx context.Context, token string) (*Token, error) {
 	var tok Token
 	t.client.keystoneToken = token
 	services, err := t.client.Service.List(ctx)
+	if err != nil {
+		return nil, err
+	}
 	t.client.services = services
 	user, err := t.client.Account.GetUserInfo(ctx)
 	if err != nil {
