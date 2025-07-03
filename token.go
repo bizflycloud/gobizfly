@@ -30,6 +30,7 @@ type TokenCreateRequest struct {
 	ProjectID     string `json:"project_id,omitempty"`
 	Username      string `json:"username,omitempty"`
 	AuthType      string `json:"auth_type,omitempty"`
+	Token         string `json:"token,omitempty"`
 }
 
 // Token contains token information.
@@ -69,25 +70,36 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	var tok Token
 	if tcr.AuthType != appCredentialAuthType {
-		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := t.client.Do(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
+		if tcr.Token != "" {
+			tokDto, err := t.getUserInfo(ctx, tcr.Token)
+			if err != nil {
+				return nil, err
+			}
+			tok = *tokDto
+		} else {
+			req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+			if err != nil {
+				return nil, err
+			}
+			resp, err := t.client.Do(ctx, req)
+			if err != nil {
+				return nil, err
+			}
+			defer resp.Body.Close()
 
-		if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
-			return nil, err
+			if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	// Get new services catalog after create token
-	services, err := t.client.Service.List(ctx)
-	if err != nil {
-		return nil, err
+	if len(t.client.services) == 0 {
+		// Get new services catalog after create token
+		services, err := t.client.Service.List(ctx)
+		if err != nil {
+			return nil, err
+		}
+		t.client.services = services
 	}
 
 	t.client.authMethod = tcr.AuthMethod
@@ -97,7 +109,6 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
 	t.client.authType = tcr.AuthType
-	t.client.services = services
 
 	return &tok, nil
 }
@@ -105,24 +116,35 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, error) {
 	var tok Token
 	if tcr.AuthType != appCredentialAuthType {
-		req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := t.client.DoInit(ctx, req)
-		if err != nil {
-			return nil, err
-		}
-		defer resp.Body.Close()
-		if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
-			return nil, err
+		if tcr.Token != "" {
+			tokDto, err := t.getUserInfo(ctx, tcr.Token)
+			if err != nil {
+				return nil, err
+			}
+			tok = *tokDto
+		} else {
+			req, err := t.client.NewRequest(ctx, http.MethodPost, authServiceName, tokenPath, tcr)
+			if err != nil {
+				return nil, err
+			}
+			resp, err := t.client.DoInit(ctx, req)
+			if err != nil {
+				return nil, err
+			}
+			defer resp.Body.Close()
+			if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
+				return nil, err
+			}
 		}
 	}
 
-	// Get new services catalog after create token
-	services, err := t.client.Service.List(ctx)
-	if err != nil {
-		return nil, err
+	if len(t.client.services) == 0 {
+		// Get new services catalog after create token
+		services, err := t.client.Service.List(ctx)
+		if err != nil {
+			return nil, err
+		}
+		t.client.services = services
 	}
 
 	t.client.authMethod = tcr.AuthMethod
@@ -132,7 +154,22 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 	t.client.appCredID = tcr.AppCredID
 	t.client.appCredSecret = tcr.AppCredSecret
 	t.client.authType = tcr.AuthType
-	t.client.services = services
 
+	return &tok, nil
+}
+
+func (t *token) getUserInfo(ctx context.Context, token string) (*Token, error) {
+	var tok Token
+	t.client.keystoneToken = token
+	services, err := t.client.Service.List(ctx)
+	t.client.services = services
+	user, err := t.client.Account.GetUserInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tok.ExpiresAt = user.Expires
+	tok.KeystoneToken = token
+	tok.ProjectID = user.TenantID
+	tok.ProjectName = user.TenantName
 	return &tok, nil
 }
