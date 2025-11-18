@@ -46,6 +46,7 @@ type ControllerVersion struct {
 	Name        string `json:"name,omitempty"     yaml:"name,omitempty"`
 	Description string `json:"description"        yaml:"description"`
 	K8SVersion  string `json:"kubernetes_version" yaml:"kubernetes_version"`
+	WorkerImageID string `json:"worker_image_id" yaml:"worker_image_id"`
 }
 
 // Clusters represents list of a Kubernetes clusters
