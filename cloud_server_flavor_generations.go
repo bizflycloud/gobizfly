@@ -36,32 +36,32 @@ type flavorGenerationsResponse struct {
     Data []FlavorGeneration `json:"data"`
 }
 
-// ListOption is a function type for optional parameters
+// ListOption is a function type for optional parameters.
 type ListOption func(*listOptions)
 
-// listOptions contains the optional filter parameters for List
+// listOptions contains the optional filter parameters for List.
 type listOptions struct {
     az       string
     category string
 }
 
-// WithAZ sets the availability zone filter
+// WithAZ sets the availability zone filter.
 func WithAZ(az string) ListOption {
     return func(opts *listOptions) {
         opts.az = az
     }
 }
 
-// WithCategory sets the category filter
+// WithCategory sets the category filter.
 func WithCategory(category string) ListOption {
     return func(opts *listOptions) {
         opts.category = category
     }
 }
 
-// FlavorGenerations returns a cloudFlavorGenerations client.
-func (c *Client) FlavorGenerations() *cloudFlavorGenerations {
-    return &cloudFlavorGenerations{client: c}
+// Only keep the resource accessor that's needed, e.g.:
+func (cs *cloudServerService) FlavorGenerations() *cloudFlavorGenerations {
+    return &cloudFlavorGenerations{client: cs.client}
 }
 
 // List fetches flavor generations with optional filters.
