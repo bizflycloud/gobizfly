@@ -6,6 +6,14 @@ import (
     "net/http"
 )
 
+// Do NOT define FlavorGeneration struct here—use the one from flavor_generation.go
+
+// FlavorGPU represents GPU information
+type FlavorGPU struct {
+    Name  string `json:"name"`
+    Count int    `json:"count"`
+}
+
 // ServerFlavorResponse represents a server flavor from the API
 type ServerFlavorResponse struct {
     ID           string           `json:"id"`
@@ -15,31 +23,11 @@ type ServerFlavorResponse struct {
     Swap         string           `json:"swap"`
     VCPUs        int              `json:"vcpus"`
     GenerationID string           `json:"generation_id"`
-    Generation   FlavorGeneration `json:"generation"`
+    Generation   FlavorGeneration `json:"generation"`     // <-- use the shared type
     Category     string           `json:"category"`      // premium, basic, enterprise, etc.
     GPU          *FlavorGPU       `json:"gpu"`           // Nullable
     BillingPlans []string         `json:"billing_plans"`
     IsNew        bool             `json:"is_new"`
-}
-
-// FlavorGeneration represents hardware generation information
-type FlavorGeneration struct {
-    ID                string   `json:"id"`
-    Name              string   `json:"name"`
-    Code              string   `json:"code"`
-    Category          string   `json:"category"`
-    Vendor            string   `json:"vendor"`
-    Model             string   `json:"model"`
-    Group             string   `json:"group"`
-    Description       string   `json:"description"`
-    AvailabilityZones []string `json:"availability_zones"`
-    Icon              string   `json:"icon"`
-}
-
-// FlavorGPU represents GPU information
-type FlavorGPU struct {
-    Name  string `json:"name"`
-    Count int    `json:"count"`
 }
 
 type cloudServerFlavorResource struct {
