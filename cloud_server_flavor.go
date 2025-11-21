@@ -33,7 +33,6 @@ type FlavorGeneration struct {
     Group             string   `json:"group"`
     Description       string   `json:"description"`
     AvailabilityZones []string `json:"availability_zones"`
-    Icon              string   `json:"icon"`
 }
 
 // FlavorGPU represents GPU information

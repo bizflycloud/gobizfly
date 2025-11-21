@@ -44,7 +44,7 @@ type CloudServerService interface {
 	Start(ctx context.Context, id string) (*Server, error)
 	Stop(ctx context.Context, id string) (*Server, error)
 	SwitchBillingPlan(ctx context.Context, id string, newBillingPlan string) error
-
+	FlavorGenerations() *cloudFlavorGenerations
 	CustomImages() *cloudServerCustomOSImageResource
 	Firewalls() *cloudServerFirewallResource
 	Flavors() *cloudServerFlavorResource
