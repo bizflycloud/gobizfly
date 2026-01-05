@@ -27,6 +27,32 @@ type CloudDatabaseNodeCreate struct {
 	Suggestion    bool                            `json:"suggestion,omitempty"`
 }
 
+// CloudDatabaseNodeCreateResponse contains response from Create Node API.
+// Flavor can be string or object depending on API version.
+type CloudDatabaseNodeCreateResponse struct {
+	ID               string                 `json:"id"`
+	Name             string                 `json:"name"`
+	Status           string                 `json:"status"`
+	OperatingStatus  string                 `json:"operating_status"`
+	Flavor           interface{}            `json:"flavor"` 
+	Datastore        CloudDatabaseDatastore `json:"datastore"`
+	Region           string                 `json:"region"`
+	Volume           CloudDatabaseVolume    `json:"volume"`
+	ReplicaOf        interface{}            `json:"replica_of"` 
+	CreatedAt        string                 `json:"created"`
+	UpdatedAt        string                 `json:"updated"`
+	TaskID           string                 `json:"task_id"`
+	Message          string                 `json:"message"`
+	AvailabilityZone string                 `json:"availability_zone"`
+	Description      string                 `json:"description"`
+	DNS              CloudDatabaseDNS       `json:"dns"`
+	EnableFailover   bool                   `json:"enable_failover"`
+	InstanceID       string                 `json:"instance_id"`
+	NodeType         string                 `json:"node_type"`
+	RegionName       string                 `json:"region_name"`
+	Role             string                 `json:"role"`
+}
+
 // CloudDatabaseNode contains detail of a database node.
 type CloudDatabaseNode struct {
 	Addresses        CloudDatabaseAddresses `json:"addresses"`
@@ -150,7 +176,7 @@ func (no *cloudDatabaseNodes) ListBackupSchedules(ctx context.Context, nodeID st
 }
 
 // Create a new replica or secondary nodes
-func (no *cloudDatabaseNodes) Create(ctx context.Context, icr *CloudDatabaseNodeCreate) (*CloudDatabaseNode, error) {
+func (no *cloudDatabaseNodes) Create(ctx context.Context, icr *CloudDatabaseNodeCreate) (*CloudDatabaseNodeCreateResponse, error) {
 	req, err := no.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cloudDatabaseNodesResourcePath, &icr)
 	if err != nil {
 		return nil, err
@@ -162,13 +188,13 @@ func (no *cloudDatabaseNodes) Create(ctx context.Context, icr *CloudDatabaseNode
 	}
 
 	defer resp.Body.Close()
-	var nodes *CloudDatabaseNode
+	var nodeResp *CloudDatabaseNodeCreateResponse
 
-	if err := json.NewDecoder(resp.Body).Decode(&nodes); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&nodeResp); err != nil {
 		return nil, err
 	}
 
-	return nodes, nil
+	return nodeResp, nil
 }
 
 // CreateSuggestion get suggestion when create a new replica or secondary nodes.
