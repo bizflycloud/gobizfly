@@ -13,7 +13,7 @@ type iamService struct {
 var _ IAMService = (*iamService)(nil)
 
 type IAMService interface {
-	ListProjects(ctx context.Context) ([]*IAMProject, error)
+	ListProjects(ctx context.Context, opts ListProjectsOpts) ([]*IAMProject, error)
 }
 
 func (i iamService) projectResourcePath() string {
