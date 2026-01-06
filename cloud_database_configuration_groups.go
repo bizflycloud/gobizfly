@@ -177,7 +177,7 @@ func (cfg *cloudDatabaseConfigurations) Attach(ctx context.Context, nodeID strin
 
 // Detach with a configurations to node.
 func (cfg *cloudDatabaseConfigurations) Detach(ctx context.Context, nodeID string, cfgID string, all bool) (*CloudDatabaseMessageResponse, error) {
-	var iar = CloudDatabaseAction{Action: detach, ActionAll: all}
+	var iar = CloudDatabaseConfigAction{Action: detach}
 
 	req, err := cfg.client.NewRequest(ctx, http.MethodPost, databaseServiceName, cfg.resourceActionPath(nodeID, cfgID), &iar)
 	if err != nil {
