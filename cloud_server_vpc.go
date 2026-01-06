@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/bizflycloud/gobizfly/utils"
 )
 
 const (
@@ -24,7 +26,7 @@ func (cs *cloudServerService) VPCNetworks() *cloudServerVPCNetworkResource {
 }
 
 type VPCNetworkService interface {
-	List(ctx context.Context) ([]*VPCNetwork, error)
+	List(ctx context.Context, opts ...ListVpcOpts) ([]*VPCNetwork, error)
 	Get(ctx context.Context, vpcID string) (*VPCNetwork, error)
 	Update(ctx context.Context, vpcID string, uvpl *UpdateVPCPayload) (*VPCNetwork, error)
 	Create(ctx context.Context, cvpl *CreateVPCPayload) (*VPCNetwork, error)
@@ -53,6 +55,7 @@ type VPCNetwork struct {
 	UpdatedAt             string   `json:"updated_at"`
 	RevisionNumber        int      `json:"revision_number"`
 	IsDefault             bool     `json:"is_default"`
+	InternetGateway       *string  `json:"internet_gateway"`
 }
 
 type Subnet struct {
@@ -111,11 +114,22 @@ func (v cloudServerVPCNetworkResource) itemPath(id string) string {
 	return strings.Join([]string{vpcPath, id}, "/")
 }
 
-func (v cloudServerVPCNetworkResource) List(ctx context.Context) ([]*VPCNetwork, error) {
+type ListVpcOpts struct {
+	IgwAttached *string `json:"igw_attached,omitempty"`
+}
+
+func (v cloudServerVPCNetworkResource) List(ctx context.Context, opts ...ListVpcOpts) ([]*VPCNetwork, error) {
+	var listOpts *ListVpcOpts
 	req, err := v.client.NewRequest(ctx, http.MethodGet, serverServiceName, v.resourcePath(), nil)
 	if err != nil {
 		return nil, err
 	}
+	for _, opt := range opts {
+		listOpts = &opt
+		break
+	}
+	utils.MergeQueries(req, listOpts)
+
 	var data []*VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
