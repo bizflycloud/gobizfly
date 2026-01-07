@@ -48,7 +48,9 @@ func (flv *cloudDatabaseFlavors) List(ctx context.Context) ([]*CloudDatabaseFlav
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var flavors []*CloudDatabaseFlavor
 
@@ -71,7 +73,9 @@ func (flv *cloudDatabaseFlavors) Get(ctx context.Context, datastore string, data
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var flavors []*CloudDatabaseFlavor
 
 	if err := json.NewDecoder(resp.Body).Decode(&flavors); err != nil {

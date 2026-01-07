@@ -53,7 +53,7 @@ func TestListStorageVault(t *testing.T) {
   "total": 1
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	vaults, err := client.CloudBackup.ListStorageVaults(ctx)
 	require.NoError(t, err)
@@ -95,7 +95,7 @@ func TestGetStorageVaults(t *testing.T) {
   "updated_at": "2021-10-29T02:09:53.356265+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	vault, err := client.CloudBackup.GetStorageVault(ctx, "123")
 	require.NoError(t, err)
@@ -137,7 +137,7 @@ func TestCreateStorageVault(t *testing.T) {
   "updated_at": "2021-10-29T02:09:53.356265+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	vault, err := client.CloudBackup.CreateStorageVault(ctx, &CloudBackupCreateStorageVaultPayload{
 		AwsAccessKeyID:     "key_id",

@@ -47,7 +47,9 @@ func (i *iamService) ListProjects(ctx context.Context, opts ListProjectsOpts) ([
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var respData struct {
 		Data []*IAMProject `json:"data"`
 	}

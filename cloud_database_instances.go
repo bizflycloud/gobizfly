@@ -146,7 +146,9 @@ func (ins *cloudDatabaseInstances) List(ctx context.Context, opts *CloudDatabase
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Instances []*CloudDatabaseInstance `json:"instances"`
 	}
@@ -172,7 +174,9 @@ func (ins *cloudDatabaseInstances) ListNodes(ctx context.Context, instanceID str
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Nodes []*CloudDatabaseNode `json:"nodes"`
 	}
@@ -198,7 +202,9 @@ func (ins *cloudDatabaseInstances) ListBackups(ctx context.Context, instanceID s
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Backups []*CloudDatabaseBackup `json:"backups"`
 	}
@@ -224,7 +230,9 @@ func (ins *cloudDatabaseInstances) ListBackupSchedules(ctx context.Context, inst
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		BackupSchedules []*CloudDatabaseBackupSchedule `json:"schedules"`
 	}
@@ -248,7 +256,9 @@ func (ins *cloudDatabaseInstances) Create(ctx context.Context, icr *CloudDatabas
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var instances *CloudDatabaseInstance
 	if err := json.NewDecoder(resp.Body).Decode(&instances); err != nil {
 		return nil, err
@@ -271,7 +281,9 @@ func (ins *cloudDatabaseInstances) CreateSuggestion(ctx context.Context, icr *Cl
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
 		return nil, err
@@ -291,7 +303,9 @@ func (ins *cloudDatabaseInstances) Get(ctx context.Context, instanceID string) (
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var instance *CloudDatabaseInstance
 
 	if err := json.NewDecoder(resp.Body).Decode(&instance); err != nil {
@@ -321,7 +335,9 @@ func (ins *cloudDatabaseInstances) Action(ctx context.Context, instanceID string
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -354,7 +370,9 @@ func (ins *cloudDatabaseInstances) ActionSuggestion(ctx context.Context, instanc
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -383,7 +401,9 @@ func (ins *cloudDatabaseInstances) ResizeFlavor(ctx context.Context, instanceID 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -407,7 +427,9 @@ func (ins *cloudDatabaseInstances) ResizeFlavorSuggestion(ctx context.Context, i
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -436,7 +458,9 @@ func (ins *cloudDatabaseInstances) ResizeVolume(ctx context.Context, instanceID 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -460,7 +484,9 @@ func (ins *cloudDatabaseInstances) ResizeVolumeSuggestion(ctx context.Context, i
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -482,7 +508,9 @@ func (ins *cloudDatabaseInstances) Delete(ctx context.Context, instanceID string
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -504,7 +532,9 @@ func (ins *cloudDatabaseInstances) ListDatabases(ctx context.Context, instanceID
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Databases []*CloudDatabaseDB `json:"databases"`
 	}
@@ -528,7 +558,9 @@ func (ins *cloudDatabaseInstances) CreateDatabases(ctx context.Context, instance
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }
@@ -545,7 +577,9 @@ func (ins *cloudDatabaseInstances) DeleteDatabases(ctx context.Context, instance
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }
@@ -562,7 +596,9 @@ func (ins *cloudDatabaseInstances) ListUsers(ctx context.Context, instanceID str
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Users []*CloudDatabaseUser `json:"users"`
 	}
@@ -586,7 +622,9 @@ func (ins *cloudDatabaseInstances) CreateUsers(ctx context.Context, instanceID s
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }
@@ -603,7 +641,9 @@ func (ins *cloudDatabaseInstances) ChangePasswordUsers(ctx context.Context, inst
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }
@@ -620,7 +660,9 @@ func (ins *cloudDatabaseInstances) DeleteUsers(ctx context.Context, instanceID s
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }

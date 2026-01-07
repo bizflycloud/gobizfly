@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -93,7 +92,9 @@ func (h *cloudLoadBalancerHealthMonitorResource) Get(ctx context.Context, hmID s
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	hm := &CloudLoadBalancerHealthMonitor{}
 	if err := json.NewDecoder(resp.Body).Decode(hm); err != nil {
@@ -117,7 +118,9 @@ func (h *cloudLoadBalancerHealthMonitorResource) Create(ctx context.Context, poo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`
@@ -138,7 +141,7 @@ func (h *cloudLoadBalancerHealthMonitorResource) Delete(ctx context.Context, hmI
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -157,7 +160,9 @@ func (h *cloudLoadBalancerHealthMonitorResource) Update(ctx context.Context, hmI
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerHealthMonitor *CloudLoadBalancerHealthMonitor `json:"healthmonitor"`

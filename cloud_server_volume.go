@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -173,7 +172,9 @@ func (v *cloudServerVolumeResource) List(ctx context.Context, opts *VolumeListOp
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var volumes []*Volume
 
 	if err := json.NewDecoder(resp.Body).Decode(&volumes); err != nil {
@@ -193,7 +194,9 @@ func (v *cloudServerVolumeResource) Create(ctx context.Context, vcr *VolumeCreat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var volumeRespData *Volume
 
@@ -216,7 +219,9 @@ func (v *cloudServerVolumeResource) Get(ctx context.Context, id string) (*Volume
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var volume *Volume
 
@@ -238,7 +243,7 @@ func (v *cloudServerVolumeResource) Delete(ctx context.Context, id string) error
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -286,7 +291,9 @@ func (v *cloudServerVolumeResource) ExtendVolume(ctx context.Context, id string,
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	t := &Task{}
 	if err := json.NewDecoder(resp.Body).Decode(t); err != nil {
@@ -311,7 +318,9 @@ func (v *cloudServerVolumeResource) Attach(ctx context.Context, id string, serve
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	volumeAttachResponse := &VolumeAttachDetachResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(volumeAttachResponse); err != nil {
@@ -336,7 +345,9 @@ func (v *cloudServerVolumeResource) Detach(ctx context.Context, id string, serve
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	r := &VolumeAttachDetachResponse{}
 	if err := json.NewDecoder(resp.Body).Decode(r); err != nil {
@@ -361,7 +372,9 @@ func (v *cloudServerVolumeResource) Restore(ctx context.Context, id string, snap
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	t := &Task{}
 	if err := json.NewDecoder(resp.Body).Decode(t); err != nil {
@@ -380,7 +393,9 @@ func (v *cloudServerVolumeResource) Patch(ctx context.Context, id string, bpr *V
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var volume *Volume
 	if err := json.NewDecoder(resp.Body).Decode(&volume); err != nil {
 		return nil, err
@@ -409,7 +424,9 @@ func (v *cloudServerVolumeResource) ListVolumeTypes(ctx context.Context, opts *L
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var volumeTypesResp struct {
 		VolumeTypes []*VolumeType `json:"volume_types"`
 	}

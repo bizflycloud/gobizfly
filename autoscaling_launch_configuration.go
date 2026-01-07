@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -47,7 +46,9 @@ func (lc *launchConfiguration) List(ctx context.Context, all bool) ([]*LaunchCon
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		LaunchConfigurations []*LaunchConfiguration `json:"profiles"`
@@ -80,7 +81,9 @@ func (lc *launchConfiguration) Get(ctx context.Context, profileID string) (*Laun
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	data := &LaunchConfiguration{}
 
@@ -109,7 +112,7 @@ func (lc *launchConfiguration) Delete(ctx context.Context, profileID string) err
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

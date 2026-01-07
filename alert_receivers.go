@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -75,7 +74,9 @@ func (r *receivers) List(ctx context.Context, filters *string) ([]*Receivers, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Receivers []*Receivers `json:"_items"`
@@ -98,7 +99,9 @@ func (r *receivers) Create(ctx context.Context, rcr *ReceiverCreateRequest) (*Re
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
@@ -117,7 +120,9 @@ func (r *receivers) Get(ctx context.Context, id string) (*Receivers, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	receiver := &Receivers{}
 	if err := json.NewDecoder(resp.Body).Decode(receiver); err != nil {
@@ -136,7 +141,9 @@ func (r *receivers) Update(ctx context.Context, id string, rur *ReceiverCreateRe
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	respData := &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
@@ -156,7 +163,7 @@ func (r *receivers) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -177,7 +184,7 @@ func (r *receivers) ResendVerificationLink(ctx context.Context, id string, rType
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

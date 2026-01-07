@@ -120,7 +120,9 @@ func (s *cloudServerCustomOSImageResource) List(ctx context.Context) ([]*CustomI
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -138,7 +140,9 @@ func (s *cloudServerCustomOSImageResource) Create(ctx context.Context, cipl *Cre
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -170,7 +174,9 @@ func (s *cloudServerCustomOSImageResource) Get(ctx context.Context, imageID stri
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}

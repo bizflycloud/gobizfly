@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -152,7 +151,9 @@ func (a *alarms) List(ctx context.Context, filters *string) ([]*Alarms, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Alarms []*Alarms `json:"_items"`
@@ -175,7 +176,9 @@ func (a *alarms) Create(ctx context.Context, acr *AlarmCreateRequest) (*Response
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
@@ -194,7 +197,9 @@ func (a *alarms) Get(ctx context.Context, id string) (*Alarms, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	alarm := &Alarms{}
 	if err := json.NewDecoder(resp.Body).Decode(alarm); err != nil {
@@ -229,7 +234,9 @@ func (a *alarms) Update(ctx context.Context, id string, aur *AlarmUpdateRequest)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	respData := &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
@@ -249,7 +256,7 @@ func (a *alarms) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

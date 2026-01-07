@@ -133,7 +133,9 @@ func (a accountService) ListRegion(ctx context.Context) (*Regions, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&regions); err != nil {
 		return nil, err
 	}
@@ -150,7 +152,9 @@ func (a accountService) GetRegion(ctx context.Context, regionName string) (*Regi
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&region); err != nil {
 		return nil, err
 	}
@@ -166,7 +170,9 @@ func (a accountService) GetUserInfo(ctx context.Context) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		User *User `json:"data"`
 	}

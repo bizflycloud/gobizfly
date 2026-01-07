@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -58,7 +57,7 @@ type AutoScalingSchedule struct {
 // List - list all cron triggers of a cluster
 func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSchedule, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, s.resourcePath(clusterID), nil)
@@ -69,7 +68,9 @@ func (s *schedule) List(ctx context.Context, clusterID string) ([]*AutoScalingSc
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		AutoScalingSchdeules []*AutoScalingSchedule `json:"cron_triggers"`
@@ -92,7 +93,9 @@ func (s *schedule) Get(ctx context.Context, clusterID, scheduleID string) (*Auto
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data = &AutoScalingSchedule{}
 
@@ -114,7 +117,7 @@ func (s *schedule) Delete(ctx context.Context, clusterID, scheduleID string) err
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

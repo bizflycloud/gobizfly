@@ -249,7 +249,9 @@ func (t *task) Get(ctx context.Context, taskID string) (*ASTask, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data = &ASTask{}
 

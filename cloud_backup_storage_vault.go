@@ -65,7 +65,9 @@ func (cb *cloudBackupService) GetStorageVault(ctx context.Context, valutID strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var vault *CloudBackupStorageVault
 	if err := json.NewDecoder(resp.Body).Decode(&vault); err != nil {
 		return nil, err
@@ -84,7 +86,9 @@ func (cb *cloudBackupService) CreateStorageVault(ctx context.Context, payload *C
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var vault *CloudBackupStorageVault
 	if err := json.NewDecoder(resp.Body).Decode(&vault); err != nil {
 		return nil, err

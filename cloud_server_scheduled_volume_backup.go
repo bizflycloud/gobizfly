@@ -87,7 +87,9 @@ func (b cloudServerScheduledVolumeBackupResource) Create(ctx context.Context, pa
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&dataResponse); err != nil {
 		return nil, err
 	}
@@ -104,7 +106,9 @@ func (b cloudServerScheduledVolumeBackupResource) Get(ctx context.Context, backu
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&backup); err != nil {
 		return nil, err
 	}
@@ -121,7 +125,9 @@ func (b cloudServerScheduledVolumeBackupResource) List(ctx context.Context) ([]*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
 		return nil, err
 	}
@@ -137,7 +143,9 @@ func (b cloudServerScheduledVolumeBackupResource) Delete(ctx context.Context, ba
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }
 
@@ -151,7 +159,9 @@ func (b cloudServerScheduledVolumeBackupResource) Update(ctx context.Context, ba
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&backup); err != nil {
 		return nil, err
 	}

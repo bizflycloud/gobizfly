@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -126,7 +125,9 @@ func (asg *autoScalingGroup) List(ctx context.Context, all bool) ([]*AutoScaling
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		AutoScalingGroups []*AutoScalingGroup `json:"clusters"`
@@ -149,7 +150,9 @@ func (asg *autoScalingGroup) Get(ctx context.Context, clusterID string) (*AutoSc
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	data := &AutoScalingGroup{}
 
@@ -170,7 +173,7 @@ func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -178,7 +181,7 @@ func (asg *autoScalingGroup) Delete(ctx context.Context, clusterID string) error
 // Create an autoscaling group
 func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupCreateRequest) (*AutoScalingGroup, error) {
 	if valid, _ := isValidQuotas(ctx, asg.client, "", ascr.ProfileID, ascr.DesiredCapacity, ascr.MaxSize); !valid {
-		return nil, errors.New("Not enough quotas to create new auto scaling group")
+		return nil, errors.New("not enough quotas to create new auto scaling group")
 	}
 	req, err := asg.client.NewRequest(ctx, http.MethodPost, autoScalingServiceName, asg.resourcePath(), &ascr)
 	if err != nil {
@@ -201,7 +204,7 @@ func (asg *autoScalingGroup) Create(ctx context.Context, ascr *AutoScalingGroupC
 // Update an autoscaling group
 func (asg *autoScalingGroup) Update(ctx context.Context, clusterID string, asur *AutoScalingGroupUpdateRequest) (*AutoScalingGroup, error) {
 	if valid, _ := isValidQuotas(ctx, asg.client, clusterID, asur.ProfileID, asur.DesiredCapacity, asur.MaxSize); !valid {
-		return nil, errors.New("Not enough quotas to update new auto scaling group")
+		return nil, errors.New("not enough quotas to update new auto scaling group")
 	}
 
 	req, err := asg.client.NewRequest(ctx, http.MethodPut, autoScalingServiceName, asg.itemPath(clusterID), &asur)

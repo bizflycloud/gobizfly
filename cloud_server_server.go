@@ -234,7 +234,9 @@ func (s *cloudServerService) List(ctx context.Context, opts *ServerListOptions) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var servers []*Server
 
 	if err := json.NewDecoder(resp.Body).Decode(&servers); err != nil {
@@ -256,7 +258,9 @@ func (s *cloudServerService) Create(ctx context.Context, scr *ServerCreateReques
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var task *ServerCreateResponse
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
 		return nil, err
@@ -274,7 +278,9 @@ func (s *cloudServerService) Get(ctx context.Context, id string) (*Server, error
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var svr *Server
 	if err := json.NewDecoder(resp.Body).Decode(&svr); err != nil {
@@ -296,7 +302,9 @@ func (s *cloudServerService) Delete(ctx context.Context, id string, deletedRootD
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var task *ServerTask
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
 		return nil, err
@@ -318,7 +326,9 @@ func (s *cloudServerService) Resize(ctx context.Context, id string, newFlavor st
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var task *ServerTask
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
@@ -338,7 +348,9 @@ func (s *cloudServerService) Start(ctx context.Context, id string) (*Server, err
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var svr *Server
 	if err := json.NewDecoder(resp.Body).Decode(&svr); err != nil {
@@ -358,7 +370,9 @@ func (s *cloudServerService) Stop(ctx context.Context, id string) (*Server, erro
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var svr *Server
 	if err := json.NewDecoder(resp.Body).Decode(&svr); err != nil {
@@ -378,7 +392,9 @@ func (s *cloudServerService) SoftReboot(ctx context.Context, id string) (*Server
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var srm *ServerMessageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&srm); err != nil {
@@ -398,7 +414,9 @@ func (s *cloudServerService) HardReboot(ctx context.Context, id string) (*Server
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var smr *ServerMessageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&smr); err != nil {
@@ -421,7 +439,9 @@ func (s *cloudServerService) Rebuild(ctx context.Context, id string, imageID str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var task *ServerTask
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {
@@ -443,7 +463,9 @@ func (s *cloudServerService) GetVNC(ctx context.Context, id string) (*ServerCons
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var respPayload struct {
 		Console *ServerConsoleResponse `json:"console"`
 	}
@@ -484,7 +506,9 @@ func (s cloudServerService) ChangeCategory(ctx context.Context, id string, newCa
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var svt *ServerTask
 	if err := json.NewDecoder(resp.Body).Decode(&svt); err != nil {
@@ -507,7 +531,9 @@ func (s cloudServerService) AddVirtualPrivateNetwork(ctx context.Context, id str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var server *Server
 	if err := json.NewDecoder(resp.Body).Decode(&server); err != nil {
 		return nil, err
@@ -529,7 +555,9 @@ func (s cloudServerService) RemoveNetworkInterface(ctx context.Context, id strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var server *Server
 	if err := json.NewDecoder(resp.Body).Decode(&server); err != nil {
 		return nil, err
@@ -563,7 +591,9 @@ func (s cloudServerService) ListServerTypes(ctx context.Context) ([]*ServerType,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var serverTypes struct {
 		ServerTypes []*ServerType `json:"server_types"`
 	}

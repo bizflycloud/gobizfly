@@ -66,7 +66,9 @@ func (cb *cloudBackupService) CreatePolicy(ctx context.Context, payload *CloudBa
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
@@ -85,7 +87,9 @@ func (cb *cloudBackupService) GetBackupDirectoryPolicy(ctx context.Context, mach
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
@@ -104,7 +108,9 @@ func (cb *cloudBackupService) GetPolicy(ctx context.Context, policyID string) (*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
@@ -123,7 +129,9 @@ func (cb *cloudBackupService) PatchPolicy(ctx context.Context, policyID string, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var policy *CloudBackupPolicy
 	if err := json.NewDecoder(resp.Body).Decode(&policy); err != nil {
 		return nil, err
@@ -156,7 +164,9 @@ func (cb *cloudBackupService) ListAppliedPolicyDirectories(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var directories []*CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directories); err != nil {
 		return nil, err

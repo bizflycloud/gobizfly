@@ -58,7 +58,9 @@ func (s *service) List(ctx context.Context) ([]*Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var services ServiceList
 
 	if err := json.NewDecoder(resp.Body).Decode(&services); err != nil {

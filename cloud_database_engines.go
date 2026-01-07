@@ -64,7 +64,9 @@ func (en *cloudDatabaseEngines) List(ctx context.Context) ([]*CloudDatabaseEngin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Engines []*CloudDatabaseEngine `json:"engines"`
 	}
@@ -88,7 +90,9 @@ func (en *cloudDatabaseEngineParameters) Get(ctx context.Context, datastore stri
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var engineParameters *CloudDatabaseEngineParameters
 
 	if err := json.NewDecoder(resp.Body).Decode(&engineParameters); err != nil {

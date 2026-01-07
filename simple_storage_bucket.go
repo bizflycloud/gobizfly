@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
@@ -195,7 +194,9 @@ func (c cloudSimpleStorageService) Create(ctx context.Context, bucket *BucketCre
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		Message string  `json:"message"`
@@ -216,7 +217,9 @@ func (c *cloudSimpleStorageService) List(ctx context.Context, opts *ListOptions)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Buckets []*Bucket `json:"buckets"`
@@ -240,7 +243,9 @@ func (c *cloudSimpleStorageService) ListWithBucketNameInfo(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data = ResponseListBucketWithName{}
 
@@ -259,7 +264,7 @@ func (c *cloudSimpleStorageService) Delete(ctx context.Context, id string) error
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -281,7 +286,9 @@ func (c *cloudSimpleStorageService) UpdateAcl(ctx context.Context, acl, bucketNa
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *ResponseUpdateACL
 
@@ -308,7 +315,9 @@ func (c *cloudSimpleStorageService) UpdateVersioning(ctx context.Context, versio
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Versioning *ResponseVersioning `json:"versioning"`
@@ -340,7 +349,9 @@ func (c *cloudSimpleStorageService) UpdateCors(ctx context.Context, paramUpdateC
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Cors *ResponseCors `json:"cors"`
@@ -373,7 +384,9 @@ func (c *cloudSimpleStorageService) UpdateWebsiteConfig(ctx context.Context, par
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		WebsiteConfig *ResponseWebsiteConfig `json:"website_config"`
@@ -429,7 +442,9 @@ func (c *cloudSimpleStorageKeyResource) CreateAccessKey(ctx context.Context, dat
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		Message string         `json:"message"`
@@ -461,7 +476,7 @@ func (c *cloudSimpleStorageKeyResource) DeleteAccessKey(ctx context.Context, id 
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -475,7 +490,9 @@ func (c *cloudSimpleStorageKeyResource) GetAccessKey(ctx context.Context, id str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	key := &KeyHaveSecret{}
 	if err := json.NewDecoder(resp.Body).Decode(key); err != nil {
@@ -493,7 +510,9 @@ func (c *cloudSimpleStorageKeyResource) ListAccessKey(ctx context.Context, opts 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Keys []*KeyInList `json:"keys"`

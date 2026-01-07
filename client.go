@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -43,11 +43,11 @@ const (
 
 var (
 	// ErrNotFound for resource not found status
-	ErrNotFound = errors.New("Resource not found")
+	ErrNotFound = errors.New("resource not found")
 	// ErrPermissionDenied for permission denied
-	ErrPermissionDenied = errors.New("You are not allowed to do this action")
+	ErrPermissionDenied = errors.New("you are not allowed to do this action")
 	// ErrCommon for common error
-	ErrCommon = errors.New("Error")
+	ErrCommon = errors.New("error")
 )
 
 // Client represents Bizfly API client.
@@ -242,8 +242,10 @@ func (c *Client) DoInit(ctx context.Context, req *http.Request) (resp *http.Resp
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		defer resp.Body.Close()
-		buf, _ := ioutil.ReadAll(resp.Body)
+		defer func() {
+			_ = resp.Body.Close()
+		}()
+		buf, _ := io.ReadAll(resp.Body)
 		err = errorFromStatus(resp.StatusCode, string(buf))
 
 	}
@@ -262,7 +264,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)
 		if tokErr != nil {
-			buf, _ := ioutil.ReadAll(resp.Body)
+			buf, _ := io.ReadAll(resp.Body)
 			err = fmt.Errorf("%s : %w", string(buf), tokErr)
 			return
 		}
@@ -271,8 +273,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 		resp, err = c.do(ctx, req)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		defer resp.Body.Close()
-		buf, _ := ioutil.ReadAll(resp.Body)
+		defer func() {
+			_ = resp.Body.Close()
+		}()
+		buf, _ := io.ReadAll(resp.Body)
 		err = errorFromStatus(resp.StatusCode, string(buf))
 	}
 	return

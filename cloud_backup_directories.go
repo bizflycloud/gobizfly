@@ -53,7 +53,9 @@ func (cb *cloudBackupService) ListMachineBackupDirectories(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Directories []*CloudBackupDirectory `json:"directories"`
 	}
@@ -74,7 +76,9 @@ func (cb *cloudBackupService) CreateBackupDirectory(ctx context.Context, machine
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var directory *CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directory); err != nil {
 		return nil, err
@@ -93,7 +97,9 @@ func (cb *cloudBackupService) GetBackupDirectory(ctx context.Context, machineID 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var directory *CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directory); err != nil {
 		return nil, err
@@ -112,7 +118,9 @@ func (cb *cloudBackupService) PatchBackupDirectory(ctx context.Context, machineI
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var directory *CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directory); err != nil {
 		return nil, err
@@ -145,7 +153,9 @@ func (cb *cloudBackupService) ListTenantDirectories(ctx context.Context) ([]*Clo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var directories []*CloudBackupDirectory
 	if err := json.NewDecoder(resp.Body).Decode(&directories); err != nil {
 		return nil, err

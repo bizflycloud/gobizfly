@@ -116,7 +116,7 @@ func TestListTenantPolicies(t *testing.T) {
   "total": 20
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	policies, err := client.CloudBackup.ListTenantPolicies(ctx)
 	require.NoError(t, err)
@@ -157,7 +157,7 @@ func TestCreatePolicy(t *testing.T) {
   "updated_at": "2021-12-30T08:39:48.636780+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		},
 	)
 	policy, err := client.CloudBackup.CreatePolicy(ctx, &CloudBackupCreatePolicyPayload{
@@ -205,7 +205,7 @@ func TestCloudBackupService_GetBackupDirectoryPolicy(t *testing.T) {
   "updated_at": "2021-12-30T08:39:48.636780+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	policy, err := client.CloudBackup.GetPolicy(ctx, "123")
 	require.NoError(t, err)
@@ -246,7 +246,7 @@ func TestPatchPolicy(t *testing.T) {
   "updated_at": "2021-12-30T08:39:48.636780+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	policy, err := client.CloudBackup.PatchPolicy(ctx, "123", &CloudBackupPatchPolicyPayload{
 		Name: "123213123",
@@ -309,7 +309,7 @@ func TestListAppliedPolicyDirectories(t *testing.T) {
   }
 
 ]`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	directories, err := client.CloudBackup.ListAppliedPolicyDirectories(ctx, "123")
 	require.NoError(t, err)

@@ -54,7 +54,7 @@ func TestListTenantRecoveryPoints(t *testing.T) {
 "updated_at": "2020-09-10T16:49:01.900761+07:00"
 }
 ]`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	recoveryPoints, err := client.CloudBackup.ListTenantRecoveryPoints(ctx)
 	require.NoError(t, err)
@@ -175,7 +175,7 @@ func TestListDirectoryRecoveryPoints(t *testing.T) {
 ],
     "total": 2
 }]`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	recoveryPoints, err := client.CloudBackup.ListDirectoryRecoveryPoints(ctx, "123", "456")
 	require.NoError(t, err)
@@ -259,7 +259,7 @@ func TestRecoveryPointAction(t *testing.T) {
   "updated_at": "2020-09-10T16:49:01.900761+07:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	recoveryPoint, err := client.CloudBackup.RecoveryPointAction(ctx, "123", &CloudBackupRecoveryPointActionPayload{
 		Action: "convert_to_manual_recovery_point",
@@ -345,7 +345,7 @@ func TestGetRecoveryPoint(t *testing.T) {
   "updated_at": "2020-09-10T16:49:01.900761+07:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	recoveryPoint, err := client.CloudBackup.GetRecoveryPoint(ctx, "123")
 	require.NoError(t, err)
@@ -455,7 +455,7 @@ func TestListMachineRecoveryPoints(t *testing.T) {
   "total": 80
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	recoveryPoints, err := client.CloudBackup.ListMachineRecoveryPoints(ctx, "123")
 	require.NoError(t, err)
@@ -571,7 +571,7 @@ func TestListRecoveryPointItems(t *testing.T) {
 
 }
 `
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	items, err := client.CloudBackup.ListRecoveryPointItems(ctx, "123")
 	require.NoError(t, err)

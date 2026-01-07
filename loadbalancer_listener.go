@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -106,7 +105,9 @@ func (l *cloudLoadBalancerListenerResource) List(ctx context.Context, lbID strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Listeners []*CloudLoadBalancerListener `json:"listeners"`
@@ -133,7 +134,9 @@ func (l *cloudLoadBalancerListenerResource) Create(ctx context.Context, lbID str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerListener *CloudLoadBalancerListener `json:"listener"`
@@ -154,7 +157,9 @@ func (l *cloudLoadBalancerListenerResource) Get(ctx context.Context, id string) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	listener := &CloudLoadBalancerListener{}
 	if err := json.NewDecoder(resp.Body).Decode(listener); err != nil {
@@ -177,7 +182,9 @@ func (l *cloudLoadBalancerListenerResource) Update(ctx context.Context, id strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerListener *CloudLoadBalancerListener `json:"listener"`
@@ -198,7 +205,7 @@ func (l *cloudLoadBalancerListenerResource) Delete(ctx context.Context, id strin
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

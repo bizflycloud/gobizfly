@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -138,7 +137,9 @@ func (c *kubernetesEngineService) List(ctx context.Context, opts *ListOptions) (
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Clusters []*Cluster `json:"clusters" yaml:"clusters"`
 	}
@@ -161,7 +162,9 @@ func (c *kubernetesEngineService) Create(ctx context.Context, clcr *ClusterCreat
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -179,7 +182,9 @@ func (c *kubernetesEngineService) Get(ctx context.Context, id string) (*FullClus
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&cluster); err != nil {
 		return nil, err
 	}
@@ -197,7 +202,7 @@ func (c *kubernetesEngineService) Delete(ctx context.Context, id string) error {
 		fmt.Println("error send req")
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -211,7 +216,9 @@ func (c *kubernetesEngineService) GetEverywhere(ctx context.Context, id string) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	if err := json.NewDecoder(resp.Body).Decode(&everywhereNode); err != nil {
 		return nil, err
@@ -229,7 +236,9 @@ func (c *kubernetesEngineService) UpdateCluster(ctx context.Context, id string, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&detailCluster); err != nil {
 		return nil, err
 	}
@@ -249,7 +258,9 @@ func (c *kubernetesEngineService) GetUpgradeClusterVersion(ctx context.Context, 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&upgradeClusterVersion); err != nil {
 		return nil, err
 	}
@@ -280,7 +291,9 @@ func (c *kubernetesEngineService) UpgradePackage(ctx context.Context, id string,
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	return nil
 }
@@ -296,7 +309,9 @@ func (c *kubernetesEngineService) GetDashboardURL(ctx context.Context, id string
 	if err != nil {
 		return "", err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *DashboardURLResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -318,7 +333,9 @@ func (c *kubernetesEngineService) InstallAddon(ctx context.Context, id string, a
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }
 
@@ -335,7 +352,9 @@ func (c *kubernetesEngineService) UninstallAddon(ctx context.Context, id string,
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }
 
@@ -349,7 +368,9 @@ func (c *kubernetesEngineService) GetAddonStatus(ctx context.Context, id string,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var addonStatus AddonStatusResponse
 	if err := json.NewDecoder(resp.Body).Decode(&addonStatus); err != nil {
 		return nil, err

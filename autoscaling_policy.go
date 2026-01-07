@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -140,7 +139,7 @@ type AutoScalingPolicies struct {
 // List autoscaling policies of the given cluster
 func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolicies, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 
 	req, err := p.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, p.resourcePath(clusterID), nil)
@@ -151,7 +150,9 @@ func (p *policy) List(ctx context.Context, clusterID string) (*AutoScalingPolici
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data = &AutoScalingPolicies{}
 
@@ -173,7 +174,7 @@ func (p *policy) Delete(ctx context.Context, clusterID, PolicyID string) error {
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

@@ -94,7 +94,9 @@ func (w cloudServerPublicNetworkInterfaceResource) Create(ctx context.Context, p
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIP); err != nil {
 		return nil, err
 	}
@@ -116,7 +118,9 @@ func (w cloudServerPublicNetworkInterfaceResource) List(ctx context.Context) ([]
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIps); err != nil {
 		return nil, err
 	}
@@ -133,7 +137,9 @@ func (w cloudServerPublicNetworkInterfaceResource) Get(ctx context.Context, id s
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&wanIp); err != nil {
 		return nil, err
 	}
@@ -161,6 +167,8 @@ func (w cloudServerPublicNetworkInterfaceResource) Action(ctx context.Context, i
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return err
 }

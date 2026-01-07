@@ -85,7 +85,9 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 			if err != nil {
 				return nil, err
 			}
-			defer resp.Body.Close()
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 
 			if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
 				return nil, err
@@ -131,7 +133,9 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 			if err != nil {
 				return nil, err
 			}
-			defer resp.Body.Close()
+			defer func() {
+				_ = resp.Body.Close()
+			}()
 			if err := json.NewDecoder(resp.Body).Decode(&tok); err != nil {
 				return nil, err
 			}

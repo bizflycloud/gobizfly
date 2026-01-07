@@ -101,7 +101,9 @@ func (cb *cloudBackupService) ListTenantMachines(ctx context.Context, listOption
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var machines []*CloudBackupMachine
 	if err := json.NewDecoder(resp.Body).Decode(&machines); err != nil {
 		return nil, err
@@ -120,7 +122,9 @@ func (cb *cloudBackupService) CreateMachine(ctx context.Context, payload *CloudB
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var machine *CloudBackupExtendedMachine
 	if err := json.NewDecoder(resp.Body).Decode(&machine); err != nil {
 		return nil, err
@@ -139,7 +143,9 @@ func (cb *cloudBackupService) GetMachine(ctx context.Context, machineID string) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var machine *CloudBackupMachine
 	if err := json.NewDecoder(resp.Body).Decode(&machine); err != nil {
 		return nil, err
@@ -158,7 +164,9 @@ func (cb *cloudBackupService) PatchMachine(ctx context.Context, machineID string
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var machine *CloudBackupMachine
 	if err := json.NewDecoder(resp.Body).Decode(&machine); err != nil {
 		return nil, err
@@ -223,7 +231,9 @@ func (cb *cloudBackupService) ListTenantPolicies(ctx context.Context) ([]*CloudB
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Policies []*CloudBackupPolicy `json:"policies"`
 	}

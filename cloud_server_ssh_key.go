@@ -67,7 +67,9 @@ func (s *cloudServerSSHKeyResource) List(ctx context.Context, opts *ListOptions)
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var sshKeys []*KeyPair
 
 	if err := json.NewDecoder(resp.Body).Decode(&sshKeys); err != nil {
@@ -85,7 +87,9 @@ func (s *cloudServerSSHKeyResource) Get(ctx context.Context, keyname string) (*S
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var sshKey *SSHKey
 	if err := json.NewDecoder(resp.Body).Decode(&sshKey); err != nil {
 		return nil, err
@@ -103,7 +107,9 @@ func (s *cloudServerSSHKeyResource) Create(ctx context.Context, scr *SSHKeyCreat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var sshKey *SSHKeyCreateResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&sshKey); err != nil {
@@ -122,7 +128,9 @@ func (s *cloudServerSSHKeyResource) Delete(ctx context.Context, keyname string) 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var response *SSHKeyDeleteResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&response); err != nil {

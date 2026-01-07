@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -100,7 +99,9 @@ func (m *cloudLoadBalancerMemberResource) List(ctx context.Context, poolID strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Members []*CloudLoadBalancerMember `json:"members"`
@@ -123,7 +124,9 @@ func (m *cloudLoadBalancerMemberResource) Get(ctx context.Context, poolID, id st
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	mb := &CloudLoadBalancerMember{}
 	if err := json.NewDecoder(resp.Body).Decode(mb); err != nil {
@@ -147,7 +150,9 @@ func (m *cloudLoadBalancerMemberResource) Update(ctx context.Context, poolID, id
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerMember *CloudLoadBalancerMember `json:"member"`
@@ -168,7 +173,9 @@ func (m *cloudLoadBalancerMemberResource) BatchUpdate(ctx context.Context, poolI
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }
 
@@ -182,7 +189,7 @@ func (m *cloudLoadBalancerMemberResource) Delete(ctx context.Context, poolID, id
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -201,7 +208,9 @@ func (m *cloudLoadBalancerMemberResource) Create(ctx context.Context, poolID str
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var response struct {
 		CloudLoadBalancerMember *CloudLoadBalancerMember `json:"member"`
 	}

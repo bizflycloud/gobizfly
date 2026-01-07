@@ -912,7 +912,7 @@ func TestGetServerTaskResponseReady(t *testing.T) {
 	resp, err := client.CloudServer.GetTask(ctx, "7b1759dd-6e52-4799-b1ed-6441cbec1efb")
 	require.NoError(t, err)
 	assert.Equal(t, true, resp.Ready)
-	assert.Equal(t, "366d5fa3-49d2-4c0d-bde5-f542bddb212a", resp.Result.Server.ID)
+	assert.Equal(t, "366d5fa3-49d2-4c0d-bde5-f542bddb212a", resp.Result.ID)
 }
 
 func TestServerChangeCategory(t *testing.T) {

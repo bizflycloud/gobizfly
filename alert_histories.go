@@ -68,7 +68,9 @@ func (h *histories) List(ctx context.Context, filters *string) ([]*Histories, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Histories []*Histories `json:"_items"`
