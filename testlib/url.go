@@ -63,3 +63,7 @@ func DatabaseURL(path string) string {
 func KMSURL(path string) string {
 	return "/api/ssl" + path
 }
+
+func KafkaURL(path string) string {
+	return "/api/kafka/v1" + path
+}

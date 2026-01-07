@@ -107,6 +107,12 @@ func setup() {
 			ServiceURL:    serverTest.URL + "/api/ssl",
 			Region:        testRegion,
 		},
+		{
+			Name:          "Kafka",
+			CanonicalName: kafkaServiceName,
+			ServiceURL:    serverTest.URL + "/api/kafka/v1",
+			Region:        testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {
