@@ -4,7 +4,7 @@ jobs:
   lint:
     strategy:
       matrix:
-        go-version: [1.16.x]
+        go-version: [1.24.x]
         platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -21,7 +21,7 @@ jobs:
   test-with-module:
     strategy:
       matrix:
-        go-version: [1.16.x]
+        go-version: [1.24.x]
         platform: [ubuntu-latest, macos-latest]
     env:
       GO111MODULE: on
@@ -61,7 +61,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.16
+          go-version: 1.24
       - name: Check out code
         uses: actions/checkout@v1
       - name: Build
