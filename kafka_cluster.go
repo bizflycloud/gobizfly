@@ -266,7 +266,9 @@ func (s *kafkaService) Resize(ctx context.Context, id string, reqBody *KafkaResi
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var resizeResp KafkaTaskResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&resizeResp); err != nil {
@@ -294,7 +296,9 @@ func (s *kafkaService) AddNode(ctx context.Context, id string, reqBody *KafkaAdd
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var addNodeResp KafkaTaskResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&addNodeResp); err != nil {

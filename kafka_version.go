@@ -46,7 +46,9 @@ func (s *kafkaService) ListVersion(ctx context.Context, opts *KafkaVersionListOp
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var versionsRes *ListKafkaVersionResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&versionsRes); err != nil {

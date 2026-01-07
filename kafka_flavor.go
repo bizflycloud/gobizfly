@@ -53,7 +53,9 @@ func (s *kafkaService) ListFlavor(ctx context.Context, opts *KafkaFlavorListOpti
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var flavorsRes *ListKafkaFlavorResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&flavorsRes); err != nil {
