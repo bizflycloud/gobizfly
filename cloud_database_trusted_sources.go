@@ -42,7 +42,9 @@ func (ts *cloudDatabaseTrustedSources) Get(ctx context.Context, nodeID string) (
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var trustedSources *CloudDatabaseTrustedSources
 
 	if err := json.NewDecoder(resp.Body).Decode(&trustedSources); err != nil {
@@ -64,7 +66,9 @@ func (ts *cloudDatabaseTrustedSources) Update(ctx context.Context, nodeID string
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var trustedSources *CloudDatabaseTrustedSources
 
 	if err := json.NewDecoder(resp.Body).Decode(&trustedSources); err != nil {

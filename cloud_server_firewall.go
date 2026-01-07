@@ -128,7 +128,9 @@ func (f *cloudServerFirewallResource) List(ctx context.Context, opts *ListOption
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var firewalls []*Firewall
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewalls); err != nil {
@@ -177,7 +179,9 @@ func (f *cloudServerFirewallResource) Create(ctx context.Context, fcr *FirewallR
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var firewall *FirewallDetail
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
@@ -199,7 +203,9 @@ func (f *cloudServerFirewallResource) Get(ctx context.Context, id string) (*Fire
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var firewall *FirewallDetail
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
@@ -248,7 +254,9 @@ func (f *cloudServerFirewallResource) RemoveServer(ctx context.Context, id strin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var firewall *Firewall
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
@@ -271,7 +279,9 @@ func (f *cloudServerFirewallResource) Update(ctx context.Context, id string, ufr
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var firewall *FirewallDetail
 
 	if err := json.NewDecoder(resp.Body).Decode(&firewall); err != nil {
@@ -294,7 +304,9 @@ func (f *cloudServerFirewallResource) Delete(ctx context.Context, id string) (*F
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dwr *FirewallDeleteResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dwr); err != nil {
@@ -316,7 +328,9 @@ func (f *cloudServerFirewallResource) DeleteRule(ctx context.Context, id string)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dwr *FirewallDeleteResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dwr); err != nil {

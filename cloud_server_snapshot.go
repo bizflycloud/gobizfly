@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -82,7 +81,9 @@ func (s *cloudServerSnapshotResource) Get(ctx context.Context, id string) (*Snap
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&snapshot); err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (s *cloudServerSnapshotResource) Delete(ctx context.Context, id string) err
 		fmt.Println("error send req")
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -119,7 +120,9 @@ func (s *cloudServerSnapshotResource) Create(ctx context.Context, scr *SnapshotC
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&snapshot); err != nil {
 		return nil, err
 	}
@@ -142,7 +145,9 @@ func (s *cloudServerSnapshotResource) List(ctx context.Context, opts *ListSnasph
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var snapshots []*Snapshot
 	if err := json.NewDecoder(resp.Body).Decode(&snapshots); err != nil {
 		return nil, err

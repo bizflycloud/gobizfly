@@ -34,7 +34,9 @@ func (cb *cloudBackupService) CloudBackupListActivities(ctx context.Context) ([]
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		ActivityData []*CloudBackupActivity `json:"activities"`
 	}

@@ -68,7 +68,9 @@ func (d *dnsService) ListZones(ctx context.Context, opts *ListOptions) (*ListZon
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *ListZoneResp
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -89,7 +91,9 @@ func (d *dnsService) CreateZone(ctx context.Context, czpl *CreateZonePayload) (*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *ExtendedZone
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -108,7 +112,9 @@ func (d *dnsService) GetZone(ctx context.Context, zoneID string) (*ExtendedZone,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}

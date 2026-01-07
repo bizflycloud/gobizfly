@@ -142,7 +142,9 @@ func (bk *cloudDatabaseBackups) List(ctx context.Context, resource *CloudDatabas
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Backups []*CloudDatabaseBackup `json:"backups"`
 	}
@@ -165,7 +167,9 @@ func (bk *cloudDatabaseBackups) Create(ctx context.Context, resourceType string,
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var backups *CloudDatabaseBackup
 
 	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
@@ -187,7 +191,9 @@ func (bk *cloudDatabaseBackups) Get(ctx context.Context, backupID string) (*Clou
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var backups *CloudDatabaseBackup
 
 	if err := json.NewDecoder(resp.Body).Decode(&backups); err != nil {
@@ -209,7 +215,9 @@ func (bk *cloudDatabaseBackups) Delete(ctx context.Context, backupID string) (*C
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -246,7 +254,9 @@ func (sc *cloudDatabaseBackupSchedules) List(ctx context.Context, resource *Clou
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		BackupSchedules []*CloudDatabaseBackupSchedule `json:"schedules"`
 	}
@@ -272,7 +282,9 @@ func (sc *cloudDatabaseBackupSchedules) ListBackups(ctx context.Context, schedul
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Backups []*CloudDatabaseBackup `json:"backups"`
 	}
@@ -296,7 +308,9 @@ func (sc *cloudDatabaseBackupSchedules) Create(ctx context.Context, nodeID strin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var schedules *CloudDatabaseBackupSchedule
 
 	if err := json.NewDecoder(resp.Body).Decode(&schedules); err != nil {
@@ -318,7 +332,9 @@ func (sc *cloudDatabaseBackupSchedules) Get(ctx context.Context, scheduleID stri
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var schedules *CloudDatabaseBackupSchedule
 
 	if err := json.NewDecoder(resp.Body).Decode(&schedules); err != nil {
@@ -340,7 +356,9 @@ func (sc *cloudDatabaseBackupSchedules) Delete(ctx context.Context, scheduleID s
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {

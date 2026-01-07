@@ -65,7 +65,9 @@ func (au *cloudDatabaseAutoScalings) Create(ctx context.Context, instanceID stri
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
 		return nil, err
@@ -85,7 +87,9 @@ func (au *cloudDatabaseAutoScalings) Update(ctx context.Context, instanceID stri
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -107,7 +111,9 @@ func (au *cloudDatabaseAutoScalings) Delete(ctx context.Context, instanceID stri
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {

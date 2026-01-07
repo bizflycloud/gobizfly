@@ -51,7 +51,9 @@ func (ta *cloudDatabaseTasks) Get(ctx context.Context, taskID string) (*CloudDat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var task *CloudDatabaseTask
 
 	if err := json.NewDecoder(resp.Body).Decode(&task); err != nil {

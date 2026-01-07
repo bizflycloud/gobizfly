@@ -125,7 +125,9 @@ func (p *cloudLoadBalancerL7PolicyResource) Create(ctx context.Context, listener
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		L7Policy DetailL7Policy `json:"l7policy"`
 	}
@@ -146,7 +148,9 @@ func (p *cloudLoadBalancerL7PolicyResource) Get(ctx context.Context, policyID st
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data DetailL7Policy
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -167,7 +171,9 @@ func (p *cloudLoadBalancerL7PolicyResource) Update(ctx context.Context, policyID
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		L7Policy DetailL7Policy `json:"l7policy"`
 	}
@@ -201,7 +207,9 @@ func (p *cloudLoadBalancerL7PolicyResource) ListL7PolicyRules(ctx context.Contex
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Rules []DetailL7PolicyRule `json:"rules"`
 	}
@@ -224,7 +232,9 @@ func (p *cloudLoadBalancerL7PolicyResource) CreateL7PolicyRule(ctx context.Conte
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Rule DetailL7PolicyRule `json:"rule"`
 	}

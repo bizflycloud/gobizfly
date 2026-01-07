@@ -111,7 +111,9 @@ func (no *cloudDatabaseNodes) List(ctx context.Context, opts *CloudDatabaseListO
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Nodes []*CloudDatabaseNode `json:"nodes"`
 	}
@@ -137,7 +139,9 @@ func (no *cloudDatabaseNodes) ListBackups(ctx context.Context, nodeID string, op
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Backups []*CloudDatabaseBackup `json:"backups"`
 	}
@@ -163,7 +167,9 @@ func (no *cloudDatabaseNodes) ListBackupSchedules(ctx context.Context, nodeID st
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		BackupSchedules []*CloudDatabaseBackupSchedule `json:"schedules"`
 	}
@@ -187,7 +193,9 @@ func (no *cloudDatabaseNodes) Create(ctx context.Context, icr *CloudDatabaseNode
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var nodeResp *CloudDatabaseNodeCreateResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&nodeResp); err != nil {
@@ -212,7 +220,9 @@ func (no *cloudDatabaseNodes) CreateSuggestion(ctx context.Context, icr *CloudDa
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -234,7 +244,9 @@ func (no *cloudDatabaseNodes) Get(ctx context.Context, nodeID string) (*CloudDat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var nodes *CloudDatabaseNode
 
 	if err := json.NewDecoder(resp.Body).Decode(&nodes); err != nil {
@@ -264,7 +276,9 @@ func (no *cloudDatabaseNodes) Action(ctx context.Context, nodeID string, nar *Cl
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -297,7 +311,9 @@ func (no *cloudDatabaseNodes) ActionSuggestion(ctx context.Context, nodeID strin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -321,7 +337,9 @@ func (no *cloudDatabaseNodes) ResizeFlavor(ctx context.Context, nodeID string, f
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -345,7 +363,9 @@ func (no *cloudDatabaseNodes) ResizeFlavorSuggestion(ctx context.Context, nodeID
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -369,7 +389,9 @@ func (no *cloudDatabaseNodes) ResizeVolume(ctx context.Context, nodeID string, n
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -393,7 +415,9 @@ func (no *cloudDatabaseNodes) ResizeVolumeSuggestion(ctx context.Context, nodeID
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var suggestions *CloudDatabaseSuggestion
 
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
@@ -417,7 +441,9 @@ func (no *cloudDatabaseNodes) Restart(ctx context.Context, nodeID string) (*Clou
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -441,7 +467,9 @@ func (no *cloudDatabaseNodes) DetachReplica(ctx context.Context, nodeID string) 
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -465,7 +493,9 @@ func (no *cloudDatabaseNodes) EnableRoot(ctx context.Context, nodeID string) (*C
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -487,7 +517,9 @@ func (no *cloudDatabaseNodes) Delete(ctx context.Context, nodeID string, idr *Cl
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {

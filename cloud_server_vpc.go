@@ -128,14 +128,18 @@ func (v cloudServerVPCNetworkResource) List(ctx context.Context, opts ...ListVpc
 		listOpts = &opt
 		break
 	}
-	utils.MergeQueries(req, listOpts)
+	if err := utils.MergeQueries(req, listOpts); err != nil {
+		return nil, err
+	}
 
 	var data []*VPCNetwork
 	resp, err := v.client.Do(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -152,7 +156,9 @@ func (v cloudServerVPCNetworkResource) Get(ctx context.Context, vpcID string) (*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -169,7 +175,9 @@ func (v cloudServerVPCNetworkResource) Update(ctx context.Context, vpcID string,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -186,7 +194,9 @@ func (v cloudServerVPCNetworkResource) Create(ctx context.Context, cvpl *CreateV
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}

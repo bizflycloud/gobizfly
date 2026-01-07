@@ -75,7 +75,9 @@ func (cfg *cloudDatabaseConfigurations) List(ctx context.Context, opts *CloudDat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Configurations []*CloudDatabaseConfiguration `json:"configurations"`
 	}
@@ -99,7 +101,9 @@ func (cfg *cloudDatabaseConfigurations) Create(ctx context.Context, cr *CloudDat
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var configuration *CloudDatabaseConfiguration
 	if err := json.NewDecoder(resp.Body).Decode(&configuration); err != nil {
 		return nil, err
@@ -119,7 +123,9 @@ func (cfg *cloudDatabaseConfigurations) Get(ctx context.Context, cfgID string) (
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var configuration *CloudDatabaseConfiguration
 
 	if err := json.NewDecoder(resp.Body).Decode(&configuration); err != nil {
@@ -141,7 +147,9 @@ func (cfg *cloudDatabaseConfigurations) Action(ctx context.Context, nodeID strin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -165,7 +173,9 @@ func (cfg *cloudDatabaseConfigurations) Attach(ctx context.Context, nodeID strin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -189,7 +199,9 @@ func (cfg *cloudDatabaseConfigurations) Detach(ctx context.Context, nodeID strin
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -211,7 +223,9 @@ func (cfg *cloudDatabaseConfigurations) Update(ctx context.Context, cfgID string
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {
@@ -233,7 +247,9 @@ func (cfg *cloudDatabaseConfigurations) Delete(ctx context.Context, cfgID string
 		return nil, err
 	}
 
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var dmr *CloudDatabaseMessageResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&dmr); err != nil {

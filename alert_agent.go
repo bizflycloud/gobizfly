@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -46,7 +45,9 @@ func (a *agents) List(ctx context.Context, filters *string) ([]*Agents, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Agents []*Agents `json:"_items"`
@@ -69,7 +70,9 @@ func (a *agents) Get(ctx context.Context, id string) (*Agents, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	agent := &Agents{}
 	if err := json.NewDecoder(resp.Body).Decode(agent); err != nil {
@@ -89,7 +92,7 @@ func (a *agents) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

@@ -18,7 +18,7 @@ type AutoScalingWebhook struct {
 // List of all available webhooks
 func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWebhook, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 
 	req, err := wh.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, wh.resourcePath(clusterID), nil)
@@ -29,7 +29,9 @@ func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWe
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data []*AutoScalingWebhook
 
@@ -43,7 +45,7 @@ func (wh *webhook) List(ctx context.Context, clusterID string) ([]*AutoScalingWe
 // Get information of a webhook
 func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string) (*AutoScalingWebhook, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 	if _, ok := SliceContains(actionTypeSupportedWebhooks, ActionType); !ok {
 		return nil, errors.New("UNSUPPORTED action type")
@@ -56,7 +58,9 @@ func (wh *webhook) Get(ctx context.Context, clusterID string, ActionType string)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data []*AutoScalingWebhook
 

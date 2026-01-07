@@ -5,7 +5,7 @@ package gobizfly
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -128,8 +128,10 @@ func (c *kubernetesEngineService) GetKubeConfig(ctx context.Context, clusterUID 
 	if err != nil {
 		return "", nil
 	}
-	defer resp.Body.Close()
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -157,7 +159,9 @@ func (c *kubernetesEngineService) GetKubernetesVersion(ctx context.Context, opts
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *KubernetesVersionResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -180,7 +184,9 @@ func (c *kubernetesEngineService) GetPackages(ctx context.Context, provisionType
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *KubernetesPackagesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {

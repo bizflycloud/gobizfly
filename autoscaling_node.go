@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -29,7 +28,7 @@ type AutoScalingNodesDelete struct {
 // List nodes of the given cluster
 func (n *node) List(ctx context.Context, clusterID string, all bool) ([]*AutoScalingNode, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 
 	req, err := n.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, n.resourcePath(clusterID), nil)
@@ -47,7 +46,9 @@ func (n *node) List(ctx context.Context, clusterID string, all bool) ([]*AutoSca
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		AutoScalingNodes []*AutoScalingNode `json:"nodes"`
@@ -71,7 +72,7 @@ func (n *node) Delete(ctx context.Context, clusterID string, asnd *AutoScalingNo
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

@@ -109,7 +109,9 @@ func (d *dnsService) CreateRecord(ctx context.Context, zoneID string, crpl inter
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *struct {
 		Record *Record `json:"record"`
 	}
@@ -129,7 +131,9 @@ func (d *dnsService) GetRecord(ctx context.Context, recordID string) (*Record, e
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *struct {
 		Record *Record `json:"record"`
 	}
@@ -152,7 +156,9 @@ func (d *dnsService) UpdateRecord(ctx context.Context, recordID string, urpl int
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *Record
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err

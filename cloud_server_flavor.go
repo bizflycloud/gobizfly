@@ -53,7 +53,9 @@ func (s *cloudServerFlavorResource) List(ctx context.Context) ([]*ServerFlavorRe
     if err != nil {
         return nil, err
     }
-    defer resp.Body.Close()
+    defer func() {
+		_ = resp.Body.Close()
+	}()
     
     var flavors []*ServerFlavorResponse
     if err := json.NewDecoder(resp.Body).Decode(&flavors); err != nil {

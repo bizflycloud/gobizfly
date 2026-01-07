@@ -28,7 +28,7 @@ type AutoScalingEvent struct {
 // List autoscaling events of a cluster
 func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]*AutoScalingEvent, error) {
 	if clusterID == "" {
-		return nil, errors.New("Auto Scaling Group ID is required")
+		return nil, errors.New("auto scaling group ID is required")
 	}
 
 	req, err := e.client.NewRequest(ctx, http.MethodGet, autoScalingServiceName, e.resourcePath(clusterID, page, total), nil)
@@ -46,7 +46,9 @@ func (e *event) List(ctx context.Context, clusterID string, page, total int) ([]
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		AutoScalingEvents []*AutoScalingEvent `json:"events"`

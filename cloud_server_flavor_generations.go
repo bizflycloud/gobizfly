@@ -96,7 +96,9 @@ func (fg *cloudFlavorGenerations) List(ctx context.Context, opts ...ListOption) 
     if err != nil {
         return nil, err
     }
-    defer resp.Body.Close()
+    defer func() {
+		_ = resp.Body.Close()
+	}()
 
     var r flavorGenerationsResponse
     if err := json.NewDecoder(resp.Body).Decode(&r); err != nil {

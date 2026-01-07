@@ -94,7 +94,9 @@ func (igw *cloudServerInternetGatewayResource) Create(ctx context.Context, paylo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var igwData *ExtendedInternetGateway
 	if err := json.NewDecoder(resp.Body).Decode(&igwData); err != nil {
 		return nil, err
@@ -147,7 +149,9 @@ func (igw *cloudServerInternetGatewayResource) List(ctx context.Context, opts Li
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *ListInternetGatewaysResult
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -166,7 +170,9 @@ func (igw *cloudServerInternetGatewayResource) Get(ctx context.Context, internet
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *ExtendedInternetGateway
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -191,7 +197,9 @@ func (igw *cloudServerInternetGatewayResource) Update(ctx context.Context, inter
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *ExtendedInternetGateway
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
@@ -210,6 +218,8 @@ func (igw *cloudServerInternetGatewayResource) Delete(ctx context.Context, inter
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }

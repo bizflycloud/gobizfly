@@ -141,7 +141,9 @@ func (cb *cloudBackupService) ListTenantRecoveryPoints(ctx context.Context) ([]*
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var recoveryPoints []*CloudBackupMachineRecoveryPoint
 	if err := json.NewDecoder(resp.Body).Decode(&recoveryPoints); err != nil {
 		return nil, err
@@ -159,7 +161,9 @@ func (cb *cloudBackupService) DeleteMultipleRecoveryPoints(ctx context.Context, 
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	return nil
 }
 
@@ -174,7 +178,9 @@ func (cb *cloudBackupService) ListDirectoryRecoveryPoints(ctx context.Context, m
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		RecoveryPoints []*CloudBackupMachineRecoveryPoint `json:"recovery_points"`
 	}
@@ -195,7 +201,9 @@ func (cb *cloudBackupService) ListRecoveryPointFiles(ctx context.Context, recove
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var files []*CloudBackupFile
 	if err := json.NewDecoder(resp.Body).Decode(&files); err != nil {
 		return nil, err
@@ -214,7 +222,9 @@ func (cb *cloudBackupService) RecoveryPointAction(ctx context.Context, recoveryP
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var recoveryPoint *CloudBackupMachineRecoveryPoint
 	if err = json.NewDecoder(resp.Body).Decode(&recoveryPoint); err != nil {
 		return nil, err
@@ -233,7 +243,9 @@ func (cb *cloudBackupService) ListMachineRecoveryPoints(ctx context.Context, mac
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var recoveryPoints struct {
 		RecoveryPoints []*CloudBackupExtendedRecoveryPoint `json:"recovery_points"`
 	}
@@ -254,7 +266,9 @@ func (cb *cloudBackupService) GetRecoveryPoint(ctx context.Context, recoveryPoin
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var recoveryPoint *CloudBackupMachineRecoveryPoint
 	if err := json.NewDecoder(resp.Body).Decode(&recoveryPoint); err != nil {
 		return nil, err
@@ -287,7 +301,9 @@ func (cb *cloudBackupService) ListRecoveryPointItems(ctx context.Context, recove
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Items []*CloudBackupRecoveryPointItem `json:"items"`
 	}

@@ -6,7 +6,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -131,7 +130,9 @@ func (c *containerRegistry) List(ctx context.Context, opts *ListOptions) ([]*Rep
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data struct {
 		Repositories []*Repository `json:"repositories"`
 	}
@@ -164,7 +165,7 @@ func (c *containerRegistry) Delete(ctx context.Context, repositoryName string) e
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -179,7 +180,9 @@ func (c *containerRegistry) GetTags(ctx context.Context, repositoryName string) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -231,7 +234,9 @@ func (c *containerRegistry) GetTag(ctx context.Context, repositoryName string, t
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err
 	}
@@ -248,7 +253,9 @@ func (c *containerRegistry) GenerateToken(ctx context.Context, gtpl *GenerateTok
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var data *TokenResp
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
 		return nil, err

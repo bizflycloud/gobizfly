@@ -120,7 +120,7 @@ func TestListMachineBackupDirectories(t *testing.T) {
   "total": 2
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machines, err := client.CloudBackup.ListMachineBackupDirectories(ctx, "123")
 	require.NoError(t, err)
@@ -173,7 +173,7 @@ func TestCreateBackupDirectory(t *testing.T) {
 
 }`
 
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	directory, err := client.CloudBackup.CreateBackupDirectory(ctx, "123", &CloudBackupCreateDirectoryPayload{
 		Name: "test",
@@ -251,7 +251,7 @@ func TestGetBackupDirectory(t *testing.T) {
   "updated_at": "2021-12-03T08:23:05.122373+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	directory, err := client.CloudBackup.GetBackupDirectory(ctx, "123", "456")
 	require.NoError(t, err)
@@ -289,7 +289,7 @@ func TestCloudBackupService_PatchBackupDirectory(t *testing.T) {
   "updated_at": "2020-06-16T15:1"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	directory, err := client.CloudBackup.PatchBackupDirectory(ctx, "123", "456", &CloudBackupPatchDirectoryPayload{
 		Name: "test_123",
@@ -371,7 +371,7 @@ func TestCloudBackupService_ListTenantDirectories(t *testing.T) {
   }
 
 ]`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	directories, err := client.CloudBackup.ListTenantDirectories(ctx)
 	require.NoError(t, err)

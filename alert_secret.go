@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -54,7 +53,9 @@ func (s *secrets) List(ctx context.Context, filters *string) ([]*Secrets, error)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Secrets []*Secrets `json:"_items"`
@@ -77,7 +78,9 @@ func (s *secrets) Create(ctx context.Context, scr *SecretsCreateRequest) (*Respo
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData = &ResponseRequest{}
 	if err := json.NewDecoder(resp.Body).Decode(respData); err != nil {
@@ -96,7 +99,9 @@ func (s *secrets) Get(ctx context.Context, id string) (*Secrets, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	secret := &Secrets{}
 	if err := json.NewDecoder(resp.Body).Decode(secret); err != nil {
@@ -115,7 +120,7 @@ func (s *secrets) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

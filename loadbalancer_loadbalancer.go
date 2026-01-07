@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -129,7 +128,9 @@ func (l *cloudLoadBalancerService) List(ctx context.Context, opts *ListOptions) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		LoadBalancers []*LoadBalancer `json:"loadbalancers"`
@@ -156,7 +157,9 @@ func (l *cloudLoadBalancerService) Create(ctx context.Context, lbcr *LoadBalance
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		LoadBalancer *LoadBalancer `json:"loadbalancer"`
@@ -177,7 +180,9 @@ func (l *cloudLoadBalancerService) Get(ctx context.Context, id string) (*LoadBal
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	lb := &LoadBalancer{}
 	if err := json.NewDecoder(resp.Body).Decode(lb); err != nil {
@@ -200,7 +205,9 @@ func (l *cloudLoadBalancerService) Update(ctx context.Context, id string, lbur *
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		LoadBalancer *LoadBalancer `json:"loadbalancer"`
@@ -221,7 +228,7 @@ func (l *cloudLoadBalancerService) Delete(ctx context.Context, lbdr *LoadBalance
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }
@@ -239,6 +246,6 @@ func (l *cloudLoadBalancerService) Resize(ctx context.Context, id string, newTyp
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }

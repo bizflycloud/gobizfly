@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -121,7 +120,9 @@ func (p *cloudLoadBalancerPoolResource) List(ctx context.Context, lbID string, o
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data struct {
 		Pools []*CloudLoadBalancerPool `json:"pools"`
@@ -148,7 +149,9 @@ func (p *cloudLoadBalancerPoolResource) Create(ctx context.Context, lbID string,
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerPool *CloudLoadBalancerPool `json:"pool"`
@@ -169,7 +172,9 @@ func (p *cloudLoadBalancerPoolResource) Get(ctx context.Context, id string) (*Cl
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	pool := &CloudLoadBalancerPool{}
 	if err := json.NewDecoder(resp.Body).Decode(pool); err != nil {
@@ -192,7 +197,9 @@ func (p *cloudLoadBalancerPoolResource) Update(ctx context.Context, id string, p
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respData struct {
 		CloudLoadBalancerPool *CloudLoadBalancerPool `json:"pool"`
@@ -213,7 +220,7 @@ func (p *cloudLoadBalancerPoolResource) Delete(ctx context.Context, id string) e
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 
 	return resp.Body.Close()
 }

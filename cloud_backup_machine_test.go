@@ -56,7 +56,7 @@ func TestListTenantMachine(t *testing.T) {
   }
 
 ]`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machines, err := client.CloudBackup.ListTenantMachines(ctx, &CloudBackupListMachineParams{})
 	require.NoError(t, err)
@@ -114,7 +114,7 @@ func TestCreateMachine(t *testing.T) {
   }
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machine, err := client.CloudBackup.CreateMachine(ctx, &CloudBackupCreateMachinePayload{
 		Name:         "machine_name",
@@ -166,7 +166,7 @@ func TestGetMachine(t *testing.T) {
       "updated_at": "2021-12-27T08:37:35.061792+00:00"
 
     },}`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machine, err := client.CloudBackup.GetMachine(ctx, "123")
 	require.NoError(t, err)
@@ -212,7 +212,7 @@ func TestPatchMachine(t *testing.T) {
   "updated_at": "2022-01-12T08:57:47.961537+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machine, err := client.CloudBackup.PatchMachine(ctx, "123", &CloudBackupPatchMachinePayload{
 		Name:         "Nginx Server",
@@ -309,7 +309,7 @@ func TestResetMachineSecretKey(t *testing.T) {
   "updated_at": "2022-01-12T09:24:18.129449+00:00"
 
 }`
-			fmt.Fprint(writer, resp)
+			_, _ = fmt.Fprint(writer, resp)
 		})
 	machine, err := client.CloudBackup.ResetMachineSecretKey(ctx, "123")
 	require.NoError(t, err)

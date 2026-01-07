@@ -91,7 +91,9 @@ func (c *kmsCertificateService) List(ctx context.Context) ([]*KMSCertificate, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var respDecode KMSCertificateListResponse
 	if err := json.NewDecoder(resp.Body).Decode(&respDecode); err != nil {
@@ -111,7 +113,9 @@ func (c *kmsCertificateService) Get(ctx context.Context, id string) (*KMSCertifi
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *KMSCertificateGetResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
@@ -131,7 +135,9 @@ func (c *kmsCertificateService) Create(ctx context.Context, payload *KMSCertific
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	var data *KMSCertificateCreateResponse
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {

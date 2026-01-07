@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -98,7 +97,9 @@ func (c *kubernetesEngineService) AddWorkerPools(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var respData struct {
 		Pools []*ExtendedWorkerPool `json:"worker_pools" yaml:"worker_pools"`
 	}
@@ -129,7 +130,7 @@ func (c *kubernetesEngineService) RecycleNode(
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -149,7 +150,7 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPool(ctx context.Context, c
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -174,7 +175,9 @@ func (c *kubernetesEngineService) GetClusterWorkerPool(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
 		return nil, err
 	}
@@ -202,7 +205,7 @@ func (c *kubernetesEngineService) UpdateClusterWorkerPool(
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -227,7 +230,7 @@ func (c *kubernetesEngineService) DeleteClusterWorkerPoolNode(
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -252,7 +255,7 @@ func (c *kubernetesEngineService) ForcedDeleteClusterWorkerPoolNode(
 	if err != nil {
 		return err
 	}
-	_, _ = io.Copy(ioutil.Discard, resp.Body)
+	_, _ = io.Copy(io.Discard, resp.Body)
 	return resp.Body.Close()
 }
 
@@ -276,7 +279,9 @@ func (c *kubernetesEngineService) GetDetailWorkerPool(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	if err := json.NewDecoder(resp.Body).Decode(&pool); err != nil {
 		return nil, err
 	}

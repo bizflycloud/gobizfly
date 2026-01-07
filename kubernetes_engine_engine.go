@@ -74,7 +74,9 @@ func (c *kubernetesEngineService) AddClusterEverywhere(ctx context.Context, id s
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	err = json.Unmarshal(body, &joinEverywhereResponse)
 	if err != nil {
@@ -112,7 +114,9 @@ func (c *kubernetesEngineService) GetClusterInfo(ctx context.Context, pool_id st
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -158,7 +162,9 @@ func (k *kubernetesEngineService) ClusterLeave(ctx context.Context, clusterUID s
     if err != nil {
         return nil, fmt.Errorf("cluster leave request failed: %w", err)
     }
-    defer resp.Body.Close()
+    defer func() {
+        _ = resp.Body.Close()
+    }()
 
     // Read response body
     body, err := io.ReadAll(resp.Body)
