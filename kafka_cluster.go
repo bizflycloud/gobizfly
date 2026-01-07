@@ -160,7 +160,9 @@ func (s *kafkaService) List(ctx context.Context, opts *KafkaClusterListOptions) 
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var clustersRes *ListClusterResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&clustersRes); err != nil {
@@ -181,7 +183,9 @@ func (s *kafkaService) Get(ctx context.Context, id string) (*ClusterResponse, er
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var clusterRes GetClusterResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&clusterRes); err != nil {
@@ -202,7 +206,9 @@ func (s *kafkaService) Delete(ctx context.Context, id string) (*KafkaTaskRespons
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var deleteRes KafkaTaskResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&deleteRes); err != nil {
@@ -223,7 +229,9 @@ func (s *kafkaService) Create(ctx context.Context, reqBody *KafkaInitClusterRequ
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	var createRes KafkaTaskResponse
 
 	if err := json.NewDecoder(resp.Body).Decode(&createRes); err != nil {
@@ -239,14 +247,14 @@ func (s *kafkaService) Resize(ctx context.Context, id string, reqBody *KafkaResi
 	switch reqBody.Type {
 	case "flavor":
 		if reqBody.Flavor == "" {
-			return nil, errors.New("Missing required field: Flavor for type 'flavor'")
+			return nil, errors.New("missing required field: Flavor for type 'flavor'")
 		}
 	case "volume":
 		if reqBody.VolumeSize < 10 {
-			return nil, errors.New("VolumeSize must be at least 10 GB")
+			return nil, errors.New("volume_size must be at least 10 GB")
 		}
 	default:
-		return nil, errors.New("Invalid Type field: must be 'flavor' or 'volume'")
+		return nil, errors.New("invalid Type field: must be 'flavor' or 'volume'")
 	}
 
 	req, err := s.client.NewRequest(ctx, http.MethodPut, kafkaServiceName, strings.Join([]string{kafkaClusterPath, id}, "/"), reqBody)
@@ -272,10 +280,10 @@ func (s *kafkaService) Resize(ctx context.Context, id string, reqBody *KafkaResi
 func (s *kafkaService) AddNode(ctx context.Context, id string, reqBody *KafkaAddNodeRequest) (*KafkaTaskResponse, error) {
 	// validate the request body
 	if reqBody.Nodes <= 0 {
-		return nil, errors.New("Number of nodes to add must be greater than 0")
+		return nil, errors.New("number of nodes to add must be greater than 0")
 	}
 	if reqBody.Type != "increase" {
-		return nil, errors.New("Invalid Type field: only 'increase' is supported")
+		return nil, errors.New("invalid Type field: only 'increase' is supported")
 	}
 	req, err := s.client.NewRequest(ctx, http.MethodPost, kafkaServiceName, strings.Join([]string{kafkaClusterPath, id, "resize"}, "/"), reqBody)
 	if err != nil {
