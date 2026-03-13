@@ -44,7 +44,7 @@ const (
 
 var (
 	// ErrNotFound for resource not found status
-	ErrNotFound = errors.New("resource not found")
+	ErrNotFound = errors.New("Resource not found") //nolint
 	// ErrPermissionDenied for permission denied
 	ErrPermissionDenied = errors.New("you are not allowed to do this action")
 	// ErrCommon for common error
