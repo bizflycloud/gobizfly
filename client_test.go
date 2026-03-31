@@ -113,6 +113,12 @@ func setup() {
 			ServiceURL:    serverTest.URL + "/api/kafka/v1",
 			Region:        testRegion,
 		},
+		{
+			Name:          "File Storage",
+			CanonicalName: fileStorageServiceName,
+			ServiceURL:    serverTest.URL + "/api/filestorage",
+			Region:        testRegion,
+		},
 	}
 	client.services = services
 	if err != nil {

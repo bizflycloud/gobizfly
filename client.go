@@ -38,6 +38,7 @@ const (
 	mediaType                = "application/json; charset=utf-8"
 	serverServiceName        = "cloud_server"
 	kafkaServiceName         = "kafka"
+	fileStorageServiceName   = "file_storage"
 	ua                       = "bizfly-client-go/" + version
 	version                  = "0.0.1"
 )
@@ -86,6 +87,7 @@ type Client struct {
 	Token              TokenService
 	KMS                KMSService
 	Kafka              KafkaService
+	FileStorage        FileStorageService
 }
 
 // Option set Client specific attributes
@@ -174,6 +176,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Token = &token{client: c}
 	c.KMS = &kmsService{client: c}
 	c.Kafka = &kafkaService{client: c}
+	c.FileStorage = &fileStorageService{client: c}
 	return c, nil
 }
 
