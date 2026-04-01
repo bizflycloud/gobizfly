@@ -192,11 +192,25 @@ func (c *Client) GetServiceURL(serviceName string) string {
 		return apiURL.String()
 	}
 	for _, service := range c.services {
-		if service.CanonicalName == serviceName && service.Region == c.regionName {
+		if service.CanonicalName == serviceName && c.matchRegion(service.Region) {
 			return service.ServiceURL
 		}
 	}
 	return defaultAPIURL
+}
+
+// matchRegion checks if a service catalog region matches the client's region.
+// The service catalog may use inconsistent region formats (e.g. "HN", "HaNoi", "hn")
+// while the client's regionName is already normalized via ParseRegionName.
+func (c *Client) matchRegion(catalogRegion string) bool {
+	if catalogRegion == c.regionName {
+		return true
+	}
+	normalized, err := utils.ParseRegionName(catalogRegion)
+	if err != nil {
+		return false
+	}
+	return normalized == c.regionName
 }
 
 // NewRequest creates an API request.
