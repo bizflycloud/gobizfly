@@ -18,7 +18,7 @@ func TestShareList(t *testing.T) {
 	defer teardown()
 	mux.HandleFunc(testlib.FileStorageURL("/_"), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
-		resp := `[
+		resp := `{"filestorages": [
   {
     "id": "share-1111-2222-3333",
     "name": "my-share",
@@ -30,11 +30,11 @@ func TestShareList(t *testing.T) {
     "share_type": "default",
     "zone": "HN1",
     "status": "available",
-    "export_location": "10.0.0.1:/share-1111",
+    "export_locations": ["10.0.0.1:/share-1111"],
     "created_at": "2025-01-01 00:00:00",
     "updated_at": "2025-01-01 00:00:00"
   }
-]`
+]}`
 		_, _ = fmt.Fprint(writer, resp)
 	})
 	shares, err := client.FileStorage.List(ctx)
@@ -55,7 +55,7 @@ func TestShareCreate(t *testing.T) {
 		assert.Equal(t, "new-share", payload.Name)
 		assert.Equal(t, 50, payload.Size)
 		writer.WriteHeader(http.StatusAccepted)
-		resp := `{
+		resp := `{"filestorage": {
   "id": "share-new-1111-2222",
   "name": "new-share",
   "size": 50,
@@ -64,7 +64,7 @@ func TestShareCreate(t *testing.T) {
   "status": "creating",
   "created_at": "2025-01-02 00:00:00",
   "updated_at": "2025-01-02 00:00:00"
-}`
+}}`
 		_, _ = fmt.Fprint(writer, resp)
 	})
 	share, err := client.FileStorage.Create(ctx, &CreateShareRequest{
@@ -83,7 +83,7 @@ func TestShareGet(t *testing.T) {
 	var fs fileStorageService
 	mux.HandleFunc(testlib.FileStorageURL(fs.shareItemPath("share-1111-2222-3333")), func(writer http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
-		resp := `{
+		resp := `{"filestorage": {
   "id": "share-1111-2222-3333",
   "name": "my-share",
   "size": 100,
@@ -91,10 +91,10 @@ func TestShareGet(t *testing.T) {
   "description": "test share",
   "zone": "HN1",
   "status": "available",
-  "export_location": "10.0.0.1:/share-1111",
+  "export_locations": ["10.0.0.1:/share-1111"],
   "created_at": "2025-01-01 00:00:00",
   "updated_at": "2025-01-01 00:00:00"
-}`
+}}`
 		_, _ = fmt.Fprint(writer, resp)
 	})
 	share, err := client.FileStorage.Get(ctx, "share-1111-2222-3333")
@@ -136,14 +136,14 @@ func TestShareResize(t *testing.T) {
 		require.NoError(t, json.NewDecoder(r.Body).Decode(&payload))
 		assert.Equal(t, 200, payload.NewSize)
 		writer.WriteHeader(http.StatusAccepted)
-		resp := `{
+		resp := `{"filestorage": {
   "id": "share-1111-2222-3333",
   "name": "my-share",
   "size": 200,
   "status": "resizing",
   "created_at": "2025-01-01 00:00:00",
   "updated_at": "2025-01-03 00:00:00"
-}`
+}}`
 		_, _ = fmt.Fprint(writer, resp)
 	})
 	share, err := client.FileStorage.Resize(ctx, "share-1111-2222-3333", &ResizeShareRequest{

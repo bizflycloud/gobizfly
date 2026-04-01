@@ -216,8 +216,11 @@ func (c *Client) matchRegion(catalogRegion string) bool {
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
 	serviceURL := strings.TrimRight(c.GetServiceURL(serviceName), "/")
+	if !strings.HasPrefix(urlStr, "/") && urlStr != "" && !strings.HasPrefix(urlStr, "?") {
+		urlStr = "/" + urlStr
+	}
 	url := serviceURL + urlStr
-	fmt.Printf("[gobizfly] %s %s (service=%s, serviceURL=%s, region=%s)\n", method, url, serviceName, serviceURL, c.regionName)
+	fmt.Printf("[gobizfly] %s %s (service=%s, serviceURL=%s, region=%s)\n", method, url, serviceName, c.GetServiceURL(serviceName), c.regionName)
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
