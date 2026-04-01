@@ -217,6 +217,7 @@ func (c *Client) matchRegion(catalogRegion string) bool {
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
 	serviceURL := strings.TrimRight(c.GetServiceURL(serviceName), "/")
 	url := serviceURL + urlStr
+	fmt.Printf("[gobizfly] %s %s (service=%s, serviceURL=%s, region=%s)\n", method, url, serviceName, serviceURL, c.regionName)
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
