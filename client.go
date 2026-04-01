@@ -280,6 +280,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if err != nil {
 		return
 	}
+	fmt.Printf("[gobizfly] Response: %d %s (token=%s, projectID=%s)\n", resp.StatusCode, req.URL.String(), req.Header.Get("X-Auth-Token")[:20]+"...", req.Header.Get("X-Project-ID"))
 
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
