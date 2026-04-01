@@ -21,7 +21,7 @@ type Share struct {
 	ShareType     string            `json:"share_type"`
 	Zone          string            `json:"zone"`
 	Status        string            `json:"status"`
-	ExportLocation string           `json:"export_location"`
+	ExportLocations []string         `json:"export_locations"`
 	CreatedAt     string            `json:"created_at"`
 	UpdatedAt     string            `json:"updated_at"`
 	Metadata      map[string]string `json:"metadata,omitempty"`
