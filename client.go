@@ -220,7 +220,7 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 		urlStr = "/" + urlStr
 	}
 	url := serviceURL + urlStr
-	fmt.Printf("[gobizfly] %s %s (service=%s, serviceURL=%s, region=%s)\n", method, url, serviceName, c.GetServiceURL(serviceName), c.regionName)
+
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
@@ -287,7 +287,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if len(tokenHeader) > 20 {
 		tokenHeader = tokenHeader[:20] + "..."
 	}
-	fmt.Printf("[gobizfly] Response: %d %s (token=%s, projectID=%s)\n", resp.StatusCode, req.URL.String(), tokenHeader, req.Header.Get("X-Project-ID"))
+
 
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
