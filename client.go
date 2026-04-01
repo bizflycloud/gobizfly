@@ -215,7 +215,7 @@ func (c *Client) matchRegion(catalogRegion string) bool {
 
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
-	serviceURL := c.GetServiceURL(serviceName)
+	serviceURL := strings.TrimRight(c.GetServiceURL(serviceName), "/")
 	url := serviceURL + urlStr
 	buf := new(bytes.Buffer)
 	if body != nil {
