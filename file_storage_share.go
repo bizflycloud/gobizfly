@@ -65,11 +65,13 @@ func (fs *fileStorageService) List(ctx context.Context) ([]*Share, error) {
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	var data []*Share
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	var wrapper struct {
+		FileStorages []*Share `json:"filestorages"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&wrapper); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return wrapper.FileStorages, nil
 }
 
 // Create creates a new share.
@@ -85,11 +87,13 @@ func (fs *fileStorageService) Create(ctx context.Context, createReq *CreateShare
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	var data *Share
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	var wrapper struct {
+		FileStorage *Share `json:"filestorage"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&wrapper); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return wrapper.FileStorage, nil
 }
 
 // Get returns details of a specific share.
@@ -105,11 +109,13 @@ func (fs *fileStorageService) Get(ctx context.Context, shareID string) (*Share, 
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	var data *Share
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	var wrapper struct {
+		FileStorage *Share `json:"filestorage"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&wrapper); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return wrapper.FileStorage, nil
 }
 
 // Delete deletes a share. If force is true, the share is forcefully deleted.
@@ -143,9 +149,11 @@ func (fs *fileStorageService) Resize(ctx context.Context, shareID string, resize
 	defer func() {
 		_ = resp.Body.Close()
 	}()
-	var data *Share
-	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+	var wrapper struct {
+		FileStorage *Share `json:"filestorage"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&wrapper); err != nil {
 		return nil, err
 	}
-	return data, nil
+	return wrapper.FileStorage, nil
 }
