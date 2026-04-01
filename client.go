@@ -283,12 +283,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if err != nil {
 		return
 	}
-	tokenHeader := req.Header.Get("X-Auth-Token")
-	if len(tokenHeader) > 20 {
-		tokenHeader = tokenHeader[:20] + "..."
-	}
-
-
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)
