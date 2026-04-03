@@ -80,9 +80,10 @@ func (igw *cloudServerInternetGatewayResource) parsePath(igwID string) string {
 
 // create internet gateway
 type CreateInternetGatewayPayload struct {
-	Name        string    `json:"name"`
-	Description *string   `json:"description,omitempty"`
-	NetworkIDs  *[]string `json:"network_ids,omitempty"`
+	Name             string    `json:"name"`
+	Description      *string   `json:"description,omitempty"`
+	NetworkIDs       *[]string `json:"network_ids,omitempty"`
+	AvailabilityZone *string   `json:"availability_zone,omitempty"`
 }
 
 func (igw *cloudServerInternetGatewayResource) Create(ctx context.Context, payload CreateInternetGatewayPayload) (*ExtendedInternetGateway, error) {
