@@ -38,6 +38,7 @@ const (
 	mediaType                = "application/json; charset=utf-8"
 	serverServiceName        = "cloud_server"
 	kafkaServiceName         = "kafka"
+	fileStorageServiceName   = "file_storage"
 	ua                       = "bizfly-client-go/" + version
 	version                  = "0.0.1"
 )
@@ -86,6 +87,7 @@ type Client struct {
 	Token              TokenService
 	KMS                KMSService
 	Kafka              KafkaService
+	FileStorage        FileStorageService
 }
 
 // Option set Client specific attributes
@@ -174,6 +176,7 @@ func NewClient(options ...Option) (*Client, error) {
 	c.Token = &token{client: c}
 	c.KMS = &kmsService{client: c}
 	c.Kafka = &kafkaService{client: c}
+	c.FileStorage = &fileStorageService{client: c}
 	return c, nil
 }
 
@@ -189,17 +192,35 @@ func (c *Client) GetServiceURL(serviceName string) string {
 		return apiURL.String()
 	}
 	for _, service := range c.services {
-		if service.CanonicalName == serviceName && service.Region == c.regionName {
+		if service.CanonicalName == serviceName && c.matchRegion(service.Region) {
 			return service.ServiceURL
 		}
 	}
 	return defaultAPIURL
 }
 
+// matchRegion checks if a service catalog region matches the client's region.
+// The service catalog may use inconsistent region formats (e.g. "HN", "HaNoi", "hn")
+// while the client's regionName is already normalized via ParseRegionName.
+func (c *Client) matchRegion(catalogRegion string) bool {
+	if catalogRegion == c.regionName {
+		return true
+	}
+	normalized, err := utils.ParseRegionName(catalogRegion)
+	if err != nil {
+		return false
+	}
+	return normalized == c.regionName
+}
+
 // NewRequest creates an API request.
 func (c *Client) NewRequest(ctx context.Context, method, serviceName string, urlStr string, body interface{}) (*http.Request, error) {
-	serviceURL := c.GetServiceURL(serviceName)
+	serviceURL := strings.TrimRight(c.GetServiceURL(serviceName), "/")
+	if !strings.HasPrefix(urlStr, "/") && urlStr != "" && !strings.HasPrefix(urlStr, "?") {
+		urlStr = "/" + urlStr
+	}
 	url := serviceURL + urlStr
+
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err := json.NewEncoder(buf).Encode(body); err != nil {
@@ -262,7 +283,6 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 	if err != nil {
 		return
 	}
-
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
 		tok, tokErr := c.Token.Refresh(ctx)

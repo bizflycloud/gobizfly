@@ -67,3 +67,7 @@ func KMSURL(path string) string {
 func KafkaURL(path string) string {
 	return "/api/kafka/v1" + path
 }
+
+func FileStorageURL(path string) string {
+	return "/api/filestorage" + path
+}
