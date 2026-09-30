@@ -201,8 +201,9 @@ type ServerCreateRequest struct {
 	IsCreatedWan      *bool             `json:"is_created_wan,omitempty"`
 	UserData          string            `json:"user_data,omitempty"`
 	Metadata          map[string]string `json:"metadata,omitempty"`
+	Generation        string            `json:"generation_id,omitempty"`
+	FlavorId          string            `json:"flavor_id,omitempty"`
 }
-
 
 // itemActionPath return http path of server action
 func (s *cloudServerService) itemActionPath(id string) string {
