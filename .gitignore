@@ -32,3 +32,4 @@
 
 build/
 examples/
+.antigravity/memory.json

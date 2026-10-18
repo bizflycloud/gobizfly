@@ -955,6 +955,23 @@ func TestInstallAddon(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestUpgradeAddon(t *testing.T) {
+	setup()
+	defer teardown()
+	var c kubernetesEngineService
+	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/add_ons/nginx-ingress")), func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		var payload map[string]string
+		err := json.NewDecoder(r.Body).Decode(&payload)
+		require.NoError(t, err)
+		assert.Equal(t, "upgrade", payload["action"])
+		_, _ = fmt.Fprint(w, `{}`)
+	})
+
+	err := client.KubernetesEngine.UpgradeAddon(ctx, "67b36fed16bd9672f0f01e78", "nginx-ingress")
+	require.NoError(t, err)
+}
+
 func TestUninstallAddon(t *testing.T) {
 	setup()
 	defer teardown()
@@ -974,12 +991,15 @@ func TestGetAddonStatus(t *testing.T) {
 	var c kubernetesEngineService
 	mux.HandleFunc(testlib.K8sURL(c.itemPath("67b36fed16bd9672f0f01e78/add_ons/nginx-ingress")), func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
-		_, _ = fmt.Fprint(w, `{"type": "nginx-ingress", "version": "v1.29.13", "status": "active"}`)
+		_, _ = fmt.Fprint(w, `{"type": "nginx-ingress", "version": "v1.9.5", "status": "active", "installed_version": "v1.9.5", "latest_version": "v1.12.1", "upgradable": true}`)
 	})
 
 	status, err := client.KubernetesEngine.GetAddonStatus(ctx, "67b36fed16bd9672f0f01e78", "nginx-ingress")
 	require.NoError(t, err)
 	assert.Equal(t, "nginx-ingress", status.Type)
-	assert.Equal(t, "v1.29.13", status.Version)
+	assert.Equal(t, "v1.9.5", status.Version)
 	assert.Equal(t, "active", status.Status)
+	assert.Equal(t, "v1.9.5", status.InstalledVersion)
+	assert.Equal(t, "v1.12.1", status.LatestVersion)
+	assert.True(t, status.Upgradable)
 }

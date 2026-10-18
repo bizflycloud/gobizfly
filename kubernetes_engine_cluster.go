@@ -41,10 +41,10 @@ type ClusterCreateRequest struct {
 
 // ControllerVersion represents the version of the controller
 type ControllerVersion struct {
-	ID          string `json:"id,omitempty"       yaml:"id,omitempty"`
-	Name        string `json:"name,omitempty"     yaml:"name,omitempty"`
-	Description string `json:"description"        yaml:"description"`
-	K8SVersion  string `json:"kubernetes_version" yaml:"kubernetes_version"`
+	ID            string `json:"id,omitempty"       yaml:"id,omitempty"`
+	Name          string `json:"name,omitempty"     yaml:"name,omitempty"`
+	Description   string `json:"description"        yaml:"description"`
+	K8SVersion    string `json:"kubernetes_version" yaml:"kubernetes_version"`
 	WorkerImageID string `json:"worker_image_id" yaml:"worker_image_id"`
 }
 
@@ -111,9 +111,12 @@ type UpdateClusterRequest struct {
 }
 
 type AddonStatusResponse struct {
-	Type    string `json:"type"`
-	Version string `json:"version"`
-	Status  string `json:"status"`
+	Type             string `json:"type"`
+	Version          string `json:"version"`
+	Status           string `json:"status"`
+	InstalledVersion string `json:"installed_version,omitempty"`
+	LatestVersion    string `json:"latest_version,omitempty"`
+	Upgradable       bool   `json:"upgradable,omitempty"`
 }
 
 // UpgradeClusterVersionRequest represents the request body for upgrade version a Kubernetes cluster
@@ -324,6 +327,25 @@ func (c *kubernetesEngineService) InstallAddon(ctx context.Context, id string, a
 	path := strings.Join([]string{id, "add_ons", addonType}, "/")
 	payload := map[string]string{
 		"action": "install",
+	}
+	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
+	if err != nil {
+		return err
+	}
+	resp, err := c.client.Do(ctx, req)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+	return nil
+}
+
+func (c *kubernetesEngineService) UpgradeAddon(ctx context.Context, id string, addonType string) error {
+	path := strings.Join([]string{id, "add_ons", addonType}, "/")
+	payload := map[string]string{
+		"action": "upgrade",
 	}
 	req, err := c.client.NewRequest(ctx, http.MethodPost, kubernetesServiceName, c.itemPath(path), payload)
 	if err != nil {
