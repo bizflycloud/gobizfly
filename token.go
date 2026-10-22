@@ -56,6 +56,7 @@ func (t *token) Init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 
 // Refresh retrieves new token base on underlying client information.
 func (t *token) Refresh(ctx context.Context) (*Token, error) {
+	t.client.mu.RLock()
 	tcr := &TokenCreateRequest{
 		AuthMethod:    t.client.authMethod,
 		Username:      t.client.username,
@@ -64,6 +65,7 @@ func (t *token) Refresh(ctx context.Context) (*Token, error) {
 		AppCredSecret: t.client.appCredSecret,
 		ProjectID:     t.client.projectID,
 	}
+	t.client.mu.RUnlock()
 	return t.create(ctx, tcr)
 }
 
@@ -81,7 +83,8 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 			if err != nil {
 				return nil, err
 			}
-			resp, err := t.client.Do(ctx, req)
+			// DoInit: a 401 here must not trigger another refresh
+			resp, err := t.client.DoInit(ctx, req)
 			if err != nil {
 				return nil, err
 			}
@@ -95,15 +98,22 @@ func (t *token) create(ctx context.Context, tcr *TokenCreateRequest) (*Token, er
 		}
 	}
 
-	if len(t.client.services) == 0 {
+	t.client.mu.RLock()
+	noServices := len(t.client.services) == 0
+	t.client.mu.RUnlock()
+	if noServices {
 		// Get new services catalog after create token
 		services, err := t.client.Service.List(ctx)
 		if err != nil {
 			return nil, err
 		}
+		t.client.mu.Lock()
 		t.client.services = services
+		t.client.mu.Unlock()
 	}
 
+	t.client.mu.Lock()
+	defer t.client.mu.Unlock()
 	t.client.authMethod = tcr.AuthMethod
 	t.client.username = tcr.Username
 	t.client.password = tcr.Password
@@ -142,15 +152,22 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 		}
 	}
 
-	if len(t.client.services) == 0 {
+	t.client.mu.RLock()
+	noServices := len(t.client.services) == 0
+	t.client.mu.RUnlock()
+	if noServices {
 		// Get new services catalog after create token
 		services, err := t.client.Service.List(ctx)
 		if err != nil {
 			return nil, err
 		}
+		t.client.mu.Lock()
 		t.client.services = services
+		t.client.mu.Unlock()
 	}
 
+	t.client.mu.Lock()
+	defer t.client.mu.Unlock()
 	t.client.authMethod = tcr.AuthMethod
 	t.client.username = tcr.Username
 	t.client.password = tcr.Password
@@ -164,12 +181,16 @@ func (t *token) init(ctx context.Context, tcr *TokenCreateRequest) (*Token, erro
 
 func (t *token) getUserInfo(ctx context.Context, token string) (*Token, error) {
 	var tok Token
+	t.client.mu.Lock()
 	t.client.keystoneToken = token
+	t.client.mu.Unlock()
 	services, err := t.client.Service.List(ctx)
 	if err != nil {
 		return nil, err
 	}
+	t.client.mu.Lock()
 	t.client.services = services
+	t.client.mu.Unlock()
 	user, err := t.client.Account.GetUserInfo(ctx)
 	if err != nil {
 		return nil, err

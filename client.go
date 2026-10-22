@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/bizflycloud/gobizfly/utils"
 )
@@ -69,6 +70,10 @@ type Client struct {
 	apiURL     *url.URL
 	httpClient *http.Client
 	services   []*Service
+
+	// mu guards the auth state and the service catalog: Do refreshes the token
+	// while other goroutines build requests with the same client.
+	mu sync.RWMutex
 
 	Account            AccountService
 	AutoScaling        AutoScalingService
@@ -191,7 +196,10 @@ func (c *Client) GetServiceURL(serviceName string) string {
 		}
 		return apiURL.String()
 	}
-	for _, service := range c.services {
+	c.mu.RLock()
+	services := c.services
+	c.mu.RUnlock()
+	for _, service := range services {
 		if service.CanonicalName == serviceName && c.matchRegion(service.Region) {
 			return service.ServiceURL
 		}
@@ -227,29 +235,33 @@ func (c *Client) NewRequest(ctx context.Context, method, serviceName string, url
 			return nil, err
 		}
 	}
-	req, err := http.NewRequest(method, url, buf)
+	req, err := http.NewRequestWithContext(ctx, method, url, buf)
 	if err != nil {
 		return nil, err
+	}
+
+	c.mu.RLock()
+	projectID, keystoneToken, authType := c.projectID, c.keystoneToken, c.authType
+	appCredID, appCredSecret := c.appCredID, c.appCredSecret
+	c.mu.RUnlock()
+	if authType == "" {
+		authType = defaultAuthType
 	}
 
 	req.Header.Add("Content-Type", mediaType)
 	req.Header.Add("Accept", mediaType)
 	req.Header.Add("User-Agent", c.userAgent)
-	req.Header.Add("X-Project-ID", c.projectID)
+	req.Header.Add("X-Project-ID", projectID)
 	req.Header.Add("Authorization", "Basic "+c.basicAuth)
 
-	if c.authType == "" {
-		c.authType = defaultAuthType
+	if keystoneToken != "" {
+		req.Header.Add("X-Auth-Token", keystoneToken)
 	}
 
-	if c.keystoneToken != "" {
-		req.Header.Add("X-Auth-Token", c.keystoneToken)
-	}
-
-	req.Header.Add("X-Auth-Type", c.authType)
-	if c.authType == appCredentialAuthType {
-		req.Header.Add("X-App-Credential-ID", c.appCredID)
-		req.Header.Add("X-App-Credential-Secret", c.appCredSecret)
+	req.Header.Add("X-Auth-Type", authType)
+	if authType == appCredentialAuthType {
+		req.Header.Add("X-App-Credential-ID", appCredID)
+		req.Header.Add("X-App-Credential-Secret", appCredSecret)
 	}
 	return req, nil
 }
@@ -259,7 +271,6 @@ func (c *Client) do(ctx context.Context, req *http.Request) (*http.Response, err
 }
 
 func (c *Client) DoInit(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
-
 	resp, err = c.do(ctx, req)
 	if err != nil {
 		return
@@ -278,22 +289,32 @@ func (c *Client) DoInit(ctx context.Context, req *http.Request) (resp *http.Resp
 
 // Do sends API request.
 func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response, err error) {
-
 	resp, err = c.do(ctx, req)
 	if err != nil {
 		return
 	}
 	// If 401, get new token and retry one time.
 	if resp.StatusCode == http.StatusUnauthorized {
+		buf, _ := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
 		tok, tokErr := c.Token.Refresh(ctx)
 		if tokErr != nil {
-			buf, _ := io.ReadAll(resp.Body)
-			err = fmt.Errorf("%s : %w", string(buf), tokErr)
-			return
+			return nil, fmt.Errorf("%s : %w", string(buf), tokErr)
 		}
 		c.SetKeystoneToken(tok)
-		req.Header.Set("X-Auth-Token", c.keystoneToken)
+		// The first attempt consumed the body; send it again
+		if req.GetBody != nil {
+			body, bodyErr := req.GetBody()
+			if bodyErr != nil {
+				return nil, bodyErr
+			}
+			req.Body = body
+		}
+		req.Header.Set("X-Auth-Token", tok.KeystoneToken)
 		resp, err = c.do(ctx, req)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
 		defer func() {
@@ -307,6 +328,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request) (resp *http.Response
 
 // SetKeystoneToken sets keystone token value, which will be used for authentication.
 func (c *Client) SetKeystoneToken(token *Token) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.keystoneToken = token.KeystoneToken
 	c.projectID = token.ProjectID
 }
